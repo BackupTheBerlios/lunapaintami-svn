@@ -144,8 +144,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
                 {
                     set ( LayerOpacity, MUIA_Numeric_Value, ( IPTR )buf->opacity );
                     return ( IPTR )NULL;
-                }
-                         
+                }     
 				int testWidth = XGET ( WidgetLayers, MUIA_Width );
 				unsigned int posV = 0; get ( ScrollLayers, MUIA_Prop_First, &posV );
 				if ( posV != globalActiveCanvas->layerScrollPosV )
@@ -162,7 +161,6 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
                     if ( buf->visible )
                         set ( LayerVisible, MUIA_Text_Contents, ( STRPTR )"Shown" );
                     else set ( LayerVisible, MUIA_Text_Contents, ( STRPTR )"Hidden" );
-                    UpdateCanvasInfo ( globalActiveWindow );
 				}
 				// If we changed anything important
 				else if 
@@ -178,11 +176,10 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 					layerRender ( CLASS, self );
                     layersRepaintWindow ( CLASS, self );
                     set ( LayerName, MUIA_String_Contents, ( STRPTR )buf->name );
-                    if ( buf->visible )
-                        set ( LayerVisible, MUIA_Text_Contents, ( STRPTR )"Shown" );
+                    if ( buf->visible ) set ( LayerVisible, MUIA_Text_Contents, ( STRPTR )"Shown" );
                     else set ( LayerVisible, MUIA_Text_Contents, ( STRPTR )"Hidden" );
-                    UpdateCanvasInfo ( globalActiveWindow );
 				}
+                UpdateCanvasInfo ( globalActiveWindow );            
                 globalActiveWindow->layersChg = FALSE;
 				return ( IPTR )NULL;
 			}
@@ -199,9 +196,8 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 			{
 				PrevFrame ( globalActiveCanvas );
 				set ( AnimationSlider, MUIA_Numeric_Value, ( globalActiveCanvas->currentFrame + 1 ) );
-				UpdateCanvasInfo ( globalActiveWindow );
-                globalActiveWindow->layersChg = TRUE;            
-                DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+                globalActiveWindow->layersChg = TRUE;
+                winHasChanged ( );
 			}
 			break;
 		
@@ -210,9 +206,8 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 			{
 				NextFrame ( globalActiveCanvas );
 				set ( AnimationSlider, MUIA_Numeric_Value, ( globalActiveCanvas->currentFrame + 1 ) );
-				UpdateCanvasInfo ( globalActiveWindow );
                 globalActiveWindow->layersChg = TRUE;            
-                DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+                winHasChanged ( );
 			}
 			break;
 
@@ -223,9 +218,8 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 				num = ( num - 1 < 0 ) ? 0 : ( num - 1 );
 				globalActiveCanvas->currentFrame = num;
 				setActiveBuffer ( globalActiveCanvas );
-				UpdateCanvasInfo ( globalActiveWindow );
                 globalActiveWindow->layersChg = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+                winHasChanged ( );
 			}
 			break;
 
@@ -234,7 +228,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 			{
 				addLayer ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;            
-				DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+				winHasChanged ( );
 				return 0;
 			}
 			break;
@@ -247,7 +241,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 			{
 				swapLayers ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;            
-				DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+				winHasChanged ( );
 				return 0;
 			}
 			break;
@@ -258,7 +252,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 				deleteLayer ( globalActiveCanvas );
 				setActiveBuffer ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;            
-				DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+				winHasChanged ( );
 				return 0;
 			}
 			break;
@@ -269,7 +263,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 				mergeLayers ( globalActiveCanvas );
 				setActiveBuffer ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;            
-				DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+				winHasChanged ( );
 				return 0;
 			}
 			break;
@@ -279,7 +273,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 			{
 				copyLayers ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;
-				DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+				winHasChanged ( );
 				return 0;
 			}
 			break;
@@ -291,7 +285,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
 				get ( CycleOnionSkin, MUIA_Cycle_Active, &num );
 				globalActiveCanvas->onion = ( char )num;
                 globalActiveWindow->layersChg = TRUE;            
-				DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
+				winHasChanged ( );
 			}
 			break;
 
@@ -319,6 +313,7 @@ void Init_LayersWindow ( )
 		MUIA_Window_SizeGadget, TRUE,
 		MUIA_Window_LeftEdge, 0,
 		MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
+        MUIA_Window_UseRightBorderScroller, TRUE,      
 		WindowContents, ( IPTR )VGroup,
 			MUIA_Group_HorizSpacing, 0,
 			Child, ( IPTR )GroupObject,
@@ -336,7 +331,7 @@ void Init_LayersWindow ( )
 						) ),
 					End,
 					Child, ( IPTR )( ScrollLayers = ScrollbarObject, 
-						MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_None,
+						MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_Right,
 					End ),
 				End,
 			End,

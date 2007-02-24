@@ -70,7 +70,7 @@ AROS_UFH3 ( void, brushOptions_func,
 	AROS_USERFUNC_INIT
 	
 	int val = *( int *)param;
-	
+    
 	switch ( val )
 	{
 		case SET_ANTIALIAS:

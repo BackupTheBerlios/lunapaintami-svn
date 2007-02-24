@@ -530,7 +530,7 @@ inline unsigned long long int processPixel (
 	rgba64 result = { origCol.a, origCol.b, origCol.g, origCol.r };
 	
 	// Snap to colors
-	if ( globalColorMode == LUNA_COLORMODE_SNAP )
+	if ( globalColorMode == LUNA_COLORMODE_SNAP && brushTool.paintmode != LUNA_PAINTMODE_ERASE )
 		result = snapToPalette ( result, FALSE );
 	
 	return *( unsigned long long int * )&result;

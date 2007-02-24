@@ -190,6 +190,25 @@ void checkKeyboardShortcuts ( UWORD valu )
 {
 	switch ( valu )
 	{
+        case RAWKEY_A:
+            if ( brushTool.antialias == FALSE )
+            {
+                DoMethod ( antiOffImage, MUIM_CallHook, &brushOptions_hook, SET_ANTIALIAS );
+            }
+            else 
+            {
+                DoMethod ( antiOffImage, MUIM_CallHook, &brushOptions_hook, SET_ANTIALIASOFF );
+            }
+            makeToolBrush ( );
+            break;      
+        case RAWKEY_SPACE:
+            {
+                int VAL = ( int )XGET( tbxCyc_PaletteSnap, MUIA_Cycle_Active );
+                if ( VAL == 0 )
+                    set ( tbxCyc_PaletteSnap, MUIA_Cycle_Active, 1 );
+                else set ( tbxCyc_PaletteSnap, MUIA_Cycle_Active, 0 );
+            } 
+            break;
 		case RAWKEY_F:
 			globalCurrentTool = LUNA_TOOL_FILL;
 			setToolbarActive ( );
@@ -212,6 +231,15 @@ void checkKeyboardShortcuts ( UWORD valu )
 		case RAWKEY_B:
 			DoMethod ( paletteRect, MUIM_SetTool_ClipBrush );
 			break;
+        case RAWKEY_G:
+            {
+                ULONG curr = XGET ( tbxCycGrid, MUIA_Cycle_Active );
+                if ( curr == 0 )
+                    set ( tbxCycGrid, MUIA_Cycle_Active, 1 );
+                else
+                    set ( tbxCycGrid, MUIA_Cycle_Active, 0 );
+            }
+            break;         
 		case RAWKEY_J:
 			swapCanvasBuffers ( globalActiveCanvas );
 			globalActiveWindow->rRectW = 0;
@@ -367,13 +395,12 @@ IPTR CanvasAskMinMax ( Class *CLASS,Object *self, struct MUIP_AskMinMax *message
 	{
 		message->MinMaxInfo->MinWidth += 0;
 		message->MinMaxInfo->MinHeight += 0;
+        message->MinMaxInfo->DefWidth += calcwidth;
+        message->MinMaxInfo->MaxWidth += calcwidth;
+        message->MinMaxInfo->DefHeight += calcheight;
+        message->MinMaxInfo->MaxHeight += calcheight;      
 	}
-	
-	message->MinMaxInfo->DefWidth += calcwidth;
-	message->MinMaxInfo->MaxWidth += calcwidth;
-	message->MinMaxInfo->DefHeight += calcheight;
-	message->MinMaxInfo->MaxHeight += calcheight;
-	
+
 	return ( IPTR )NULL;
 }
 
@@ -423,12 +450,12 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 		SnapOffsetToZoom ( NULL );
 		
 		// Set scrollbars
-		set ( data->window->scrollH, MUIA_Prop_First, globalActiveCanvas->offsetx );
-		set ( data->window->scrollV, MUIA_Prop_First, globalActiveCanvas->offsety );
-		set ( data->window->scrollV, MUIA_Prop_Visible, areaHeight );
-		set ( data->window->scrollV, MUIA_Prop_Entries, imageHeight );
-		set ( data->window->scrollH, MUIA_Prop_Visible, areaWidth );
-		set ( data->window->scrollH, MUIA_Prop_Entries, imageWidth );
+		set ( data->window->scrollH, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsetx );
+		set ( data->window->scrollV, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsety );
+		set ( data->window->scrollV, MUIA_Prop_Visible, ( IPTR )areaHeight );
+		set ( data->window->scrollV, MUIA_Prop_Entries, ( IPTR )imageHeight );
+		set ( data->window->scrollH, MUIA_Prop_Visible, ( IPTR )areaWidth );
+		set ( data->window->scrollH, MUIA_Prop_Entries, ( IPTR )imageWidth );
 		
 		// Sometimes the scrollbar will refuse a coordinate, always sync with
 		// the scrollbar!!!
@@ -486,11 +513,9 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 			);
             UpdateCanvasInfo ( data->window );         
             Update_AnimValues ( );
-            if ( globalActiveWindow->layersChg )      
-            {   
-			    DoMethod ( WidgetLayers, MUIM_Draw );
-            }
 		}
+        if ( globalActiveWindow->layersChg )      
+            DoMethod ( WidgetLayers, MUIM_Draw );      
 		data->window->canvas->winHasChanged = FALSE;
 		globalCurrentTool = Tool;
 	}
@@ -779,13 +804,16 @@ void addCanvaswindow (
 			sizeof ( struct RGBitmapData ), 
 			RGBitmapDispatcher 
 		);
-
-	canvases->win = MUI_NewObject ( MUIC_Window,
+        
+    canvases->win = MUI_NewObject ( MUIC_Window,
 		MUIA_Window_Title, ( IPTR )"Unnamed image",
 		MUIA_Window_SizeGadget, TRUE,
 		MUIA_Window_Screen, ( IPTR )lunaPubScreen,
 		MUIA_Window_MouseObject, ( IPTR )canvases->mouse,
 		MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
+        MUIA_Window_UseRightBorderScroller, TRUE,
+        MUIA_Window_UseBottomBorderScroller, TRUE,      
+        MUIA_Window_IsSubWindow, TRUE,
 		WindowContents, ( IPTR )VGroup,
 			InnerSpacing( 0, 0 ),
 			MUIA_Group_HorizSpacing, 0,
@@ -800,9 +828,8 @@ void addCanvaswindow (
 					InnerSpacing( 0, 0 ),
 					Child, ( IPTR )GroupObject,
 						MUIA_Group_HorizSpacing, 0,
-						MUIA_Group_VertSpacing, 0,
-						InnerSpacing( 0, 0 ),
-						MUIA_Group_Spacing, 0,
+                        MUIA_Group_VertSpacing, 0,
+                        InnerSpacing( 0, 0 ),
 						MUIA_Frame, MUIV_Frame_None,
 						MUIA_Group_Rows, 3,
 						MUIA_Group_SameSize, FALSE,
@@ -811,31 +838,24 @@ void addCanvaswindow (
 							InnerSpacing( 0, 0 ),
 							MUIA_Weight, 1,
 						End,
-						Child, ( IPTR )GroupObject,	
-							InnerSpacing( 0, 0 ),
+						Child, ( IPTR )HGroup,	
 							MUIA_Group_HorizSpacing, 0,
-							MUIA_Group_VertSpacing, 0,
-							MUIA_Group_Spacing, 0,
+                            MUIA_Group_VertSpacing, 0,
+                            InnerSpacing( 0, 0 ),
 							MUIA_Frame, MUIV_Frame_None,
 							MUIA_Group_Columns, 3,
 							MUIA_Group_SameSize, FALSE,
-							MUIA_Group_Child, ( IPTR )RectangleObject,
+							Child, ( IPTR )RectangleObject,
 								MUIA_Frame, MUIV_Frame_None,
 								InnerSpacing( 0, 0 ),
 								MUIA_Weight, 1,
 							End,
-							MUIA_Group_Child, ( IPTR )( canvases->container = GroupObject, 	
-								InnerSpacing( 0, 0 ),
+							Child, ( IPTR )( canvases->container = GroupObject, 	
 								MUIA_Group_HorizSpacing, 0,
-								MUIA_Group_VertSpacing, 0,
-								MUIA_Group_Spacing, 0,
+                                MUIA_Group_VertSpacing, 0,
+                                InnerSpacing( 0, 0 ),
 								MUIA_Frame, MUIV_Frame_Group,
-								MUIA_Group_Horiz, TRUE,
 								MUIA_FillArea, FALSE,
-								MUIA_InnerTop, 0,
-								MUIA_InnerLeft, 0,
-								MUIA_InnerRight, 0,
-								MUIA_InnerBottom, 0,
 								Child, ( IPTR )( canvases->area = NewObject(
 									mcc->mcc_Class, NULL,
 									MUIA_FillArea, FALSE,
@@ -844,7 +864,7 @@ void addCanvaswindow (
 									TAG_DONE
 								) ),
 							End ),
-							MUIA_Group_Child, ( IPTR )RectangleObject,
+							Child, ( IPTR )RectangleObject,
 								MUIA_Frame, MUIV_Frame_None,
 								InnerSpacing( 0, 0 ),
 								MUIA_Weight, 1,
@@ -856,14 +876,7 @@ void addCanvaswindow (
 							MUIA_Weight, 1,
 						End,
 					End,
-					Child, ( IPTR )( canvases->scrollV = ScrollbarObject, 
-						MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_None,
-					End ),
-				End,
-				Child, ( IPTR )( canvases->scrollH = ScrollbarObject, 
-					MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_None,
-					MUIA_Group_Horiz, TRUE,
-				End ),
+				End,        
 				Child, ( IPTR )HGroup,
 					MUIA_Group_SameHeight, TRUE,
 					MUIA_Frame, MUIV_Frame_Group,
@@ -893,6 +906,12 @@ void addCanvaswindow (
 					End,
 				End,
 			End,
+            Child, ( IPTR )( canvases->scrollH = ScrollbarObject, 
+                MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_Bottom,
+            End ),
+            Child, ( IPTR )( canvases->scrollV = ScrollbarObject, 
+                MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_Right,
+            End ),             
 		End,
 	TAG_END );
 	
@@ -1009,7 +1028,7 @@ void deleteCanvaswindows ( )
 		set ( canvases->win, MUIA_Window_Open, FALSE );
 		
 		DoMethod ( PaintApp, OM_REMMEMBER, ( IPTR )canvases->win );
-		if ( canvases->win != NULL ) MUI_DisposeObject ( canvases->win );
+		if ( canvases->win != NULL ) DoMethod ( PaintApp, OM_REMMEMBER, ( IPTR )canvases->win );
 		
 		Destroy_Canvas ( canvases->canvas );
 		DestroyProjectWindow ( canvases );
@@ -1027,6 +1046,7 @@ IPTR removeActiveWindow ( Class *CLASS, Object *self )
 { 
 	struct RGBitmapData *data = INST_DATA ( CLASS, self );
 	set ( data->window->win, MUIA_Window_Open, FALSE );
+    DoMethod ( PaintApp, OM_REMMEMBER, ( IPTR )data->window->win );
 
 	WindowList *tmp = NULL;
 	WindowList *ptr = canvases;
@@ -1062,7 +1082,7 @@ IPTR removeActiveWindow ( Class *CLASS, Object *self )
 	globalActiveWindow = canvases;
 	globalActiveCanvas = NULL;
 	
-	//TODO: Lets reuse hidden windows in the future
+	//TODO: Lets reuse hidden windows in the future   
 	data->window->win = NULL;
 	return ( IPTR )NULL;
 }
