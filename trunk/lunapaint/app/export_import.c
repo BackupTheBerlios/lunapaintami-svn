@@ -150,7 +150,6 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
 			return 0;
 		
 		int size = canvas->width * canvas->height;
-		
 		int i = 0; for ( ; i < size; i++ )
 		{
 			rgba64 c64 = *( rgba64 *)&canvas->activebuffer[ i ];
@@ -187,16 +186,24 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
 	}
 	else if ( mode == 1 )
 	{
-		// Get flattened layers
-		buffer = renderCanvas ( 
-			canvas, 0, 0, canvas->width, canvas->height, TRUE 
-		);	
+		// Remove tool graphic that's overlayn
+        removePrevToolPreview ( );      
+        ULONG tool = globalCurrentTool;
+        globalCurrentTool = -1;
+		
+        // Get flattened layers without tool preview      
+        buffer = renderCanvas ( canvas, 0, 0, canvas->width, canvas->height, TRUE );
+        
+        // Reset tool setting
+        globalCurrentTool = tool;
+        
 		// Fix color order for different storage formats
-		int i = 0; for ( ; i < canvas->width * canvas->height; i++ )
+        int size = canvas->width * canvas->height;      
+		int i = 0; for ( ; i < size; i++ )
 		{
 			rgba32 c = *( rgba32 *)&buffer[ i ];
 			
-			// Set the colors in 32-but order
+			// Set the colors in 32-bit order
 			// datatype 0 is JPEG
 			if ( datatype == 0 )
 				c = ( rgba32 ){ c.a, c.r, c.g, c.b };

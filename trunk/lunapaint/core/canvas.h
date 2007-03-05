@@ -40,6 +40,7 @@
 #include "../math/math.h"
 
 #define MAXCOLOR 65535
+#define MAXCOLOR_DBL 65535.0
 #define TRANSCOLOR 0x4444444444440000ULL
 
 // Use this to interrupt redrawing

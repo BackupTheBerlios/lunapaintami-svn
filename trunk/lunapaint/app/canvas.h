@@ -115,7 +115,7 @@
 
 BOOL isZooming;
 BOOL isScrolling;
-int refreshPhase;
+int AskMinMaxTimes;
 
 /*
 	Setup keyboard shortcuts on canvas and toolbox

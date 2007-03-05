@@ -163,60 +163,61 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
 	if ( filename == NULL ) return;
 	
 	// Get a new filename container
-	unsigned char *tmpFilename = AllocVec ( strlen ( filename ), MEMF_ANY|MEMF_CLEAR );
+	unsigned char *tmpFilename = AllocVec ( strlen ( filename ) + 1, MEMF_CLEAR );
 	strcpy ( tmpFilename, filename );
 	
 	BPTR inputFile;
 	if ( ( inputFile = Open ( tmpFilename, MODE_OLDFILE ) ) != NULL )
 	{
 		// Get the lunapaint header
-		struct LunapaintHeader header;
-		Read ( inputFile, &header, sizeof ( struct LunapaintHeader ) );
+		struct LunapaintHeader *header = AllocVec ( sizeof ( struct LunapaintHeader ), MEMF_CLEAR );
+		Read ( inputFile, header, sizeof ( struct LunapaintHeader ) );   
         // test if the header is correct      
-        char verTpl[ 32 ] = "Lunapaint_v1";
+        char verTpl[ 16 ] = "Lunapaint_v1";
         int p = 0; for ( p = 0; p < 12; p++ )
         {
-            if ( verTpl[ p ] != header.version[ p ] )		
+            if ( verTpl[ p ] != header->version[ p ] )		
             {      
-                D(bug("Not a valid lunapaint file!\n",header.version[p]));
                 FreeVec ( tmpFilename );
+                FreeVec ( header );
                 Close ( inputFile );
                 return;
             }
         }
+        
 		// Read in the description
 		int desclength;
 		Read ( inputFile, &desclength, 4 );
-		STRPTR text = AllocVec ( desclength, MEMF_ANY|MEMF_CLEAR );
+		STRPTR text = AllocVec ( desclength + 1, MEMF_CLEAR );
 		Read ( inputFile, text, desclength );
 		
 		// Load in object
 		// <not implemented>
 		
 		// Load in the bitmap data
-		int buffers = header.frameCount * header.layerCount;
-		int framesize = header.width * header.height * 8;
-		gfxbuffer *buf = AllocVec ( sizeof ( gfxbuffer ), MEMF_ANY ); 
+		int buffers = header->frameCount * header->layerCount;
+		int framesize = header->width * header->height * 8;
+		gfxbuffer *buf = AllocVec ( sizeof ( gfxbuffer ), MEMF_CLEAR ); 
 		gfxbuffer *tmp = buf;
 		int i = 0; for ( ; i < buffers; i++ )
 		{
-			tmp->buf = AllocVec ( framesize, MEMF_ANY );
+			tmp->buf = AllocVec ( framesize, MEMF_CLEAR );
             tmp->opacity = 100;                                 //
             tmp->visible = TRUE;                                // <- defaults
-            tmp->name = AllocVec ( 2, MEMF_ANY|MEMF_CLEAR );    //
+            tmp->name = AllocVec ( 2, MEMF_CLEAR );    //
 			Read ( inputFile, tmp->buf, framesize );
 			if ( i + 1 < buffers )
 			{
-				tmp->nextbuf = AllocVec ( sizeof ( gfxbuffer ), MEMF_ANY );                        
+				tmp->nextbuf = AllocVec ( sizeof ( gfxbuffer ), MEMF_CLEAR );                        
 				tmp = tmp->nextbuf;
 			}
 			else
 				tmp->nextbuf = NULL;
 		}
         // Layer objects      
-        if ( header.objectCount > 0 )
+        if ( header->objectCount > 0 )
         {
-            for ( i = 0; i < header.objectCount; i++ )
+            for ( i = 0; i < header->objectCount; i++ )
             {
                 struct LunaObjDesc desc;
                 Read ( inputFile, &desc, sizeof ( struct LunaObjDesc ) );
@@ -226,7 +227,7 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
                         {
                             char opacity;
                             Read ( inputFile, &opacity, 1 );
-                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header.layerCount, header.frameCount );
+                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
                             b->opacity = opacity;
                         }
                         break;
@@ -236,16 +237,16 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
                             char vis;
                             Read ( inputFile, &vis, 1 );
                             visible = vis == 1 ? TRUE : FALSE;
-                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header.layerCount, header.frameCount );
+                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
                             b->visible = visible;
                         }
                         break;
                     case LunaObj_LayerName:
                         {
-                            unsigned char *name = AllocVec ( desc.datalength, MEMF_ANY|MEMF_CLEAR );
+                            unsigned char *name = AllocVec ( desc.datalength + 1, MEMF_ANY|MEMF_CLEAR );
                             Read ( inputFile, name, desc.datalength );
-                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header.layerCount, header.frameCount );
-                            FreeVec ( b->name ); // Free the dummy allocation
+                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
+                            if ( b->name ) FreeVec ( b->name ); // Free the dummy allocation
                             b->name = AllocVec ( desc.datalength + 1, MEMF_ANY|MEMF_CLEAR ); // +1 = null terminator
                             strncpy ( b->name, name, desc.datalength );
                             FreeVec ( name );
@@ -262,25 +263,25 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
 		
 		// If loading new
 		if ( !useCurrentCanvas )
-			addCanvaswindow ( header.width, header.height, header.layerCount, header.frameCount, FALSE );	
+			addCanvaswindow ( header->width, header->height, header->layerCount, header->frameCount, FALSE );	
 		// Loading over old
 		else
 		{   
-			globalActiveCanvas->totalLayers = header.layerCount;
-			globalActiveCanvas->totalFrames = header.frameCount;
+			globalActiveCanvas->totalLayers = header->layerCount;
+			globalActiveCanvas->totalFrames = header->frameCount;
 			Destroy_Buffer ( globalActiveCanvas );
 		}
 		globalActiveCanvas->buffer = buf;
 		setActiveBuffer ( globalActiveCanvas );
 		
 		
-		
-		if ( globalActiveWindow->filename != NULL ) FreeVec ( globalActiveWindow->filename );
+		if ( globalActiveWindow->filename != NULL ) 
+            FreeVec ( globalActiveWindow->filename );
 		globalActiveWindow->filename = tmpFilename;
 		
-		set ( globalActiveWindow->win, MUIA_Window_Title, ( STRPTR )header.projectName );
-		set ( globalActiveWindow->projName, MUIA_String_Contents, ( STRPTR )header.projectName );
-		set ( globalActiveWindow->projAuthor, MUIA_String_Contents, ( STRPTR )header.author );
+		set ( globalActiveWindow->win, MUIA_Window_Title, ( IPTR )header->projectName );
+		set ( globalActiveWindow->projName, MUIA_String_Contents, ( IPTR )header->projectName );
+		set ( globalActiveWindow->projAuthor, MUIA_String_Contents, ( IPTR )header->author );
 		
 		// TODO: Do something with the project description
 		
@@ -288,8 +289,8 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
 			set ( globalActiveWindow->win, MUIA_Window_Open, TRUE );
 		
 		// Free description
+        FreeVec ( header );
 		FreeVec ( text );
-		
 		return;
 	}
 	FreeVec ( tmpFilename );

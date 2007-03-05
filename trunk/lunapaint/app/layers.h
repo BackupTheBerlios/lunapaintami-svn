@@ -58,6 +58,9 @@ Object *LayerOpacityValue;
 unsigned int *LayersWidgetTmpBuf;
 unsigned int layersWidgetWidth;
 unsigned int layersWidgetHeight;
+int layersLastScrollPos;
+int layersUpdateX, layersUpdateY, layersUpdateW, layersUpdateH;
+
 struct Hook changeOpacityHook;
 struct Hook acknowledgeOpacity;
 struct Hook acknowledgeLayName;
@@ -88,7 +91,7 @@ BOOL layerRender ( Class *CLASS, Object *self );
 /*
     Render OS friendly text to the layer preview
 */
-void RenderLayerNames ( );
+void RenderLayerNames ( int x, int y, int w, int h );
 
 /*
 	This function handles input on the layer widget

@@ -131,6 +131,10 @@ struct RGBitmapData
 	int								currentzoom;			// Current zoom level
 	int								currentareawidth; 	    // current width of paint area
 	int								currentareaheight;	    // current height of paint area
+    unsigned int                    scrollPosH;             // Remembered scroll pos
+    unsigned int                    scrollPosV;             // Remembered scroll pos
+    unsigned int                    scrollEntriesH;         // Remembered scroll pos
+    unsigned int                    scrollEntriesV;         // Remembered scroll pos
 	BOOL 				 			mousepressed;		    // If the mouse is pressed
 	BOOL							isBusy;				    // If the canvas is heavily busy on something
 	WindowList*						window;					// A pointer to the window

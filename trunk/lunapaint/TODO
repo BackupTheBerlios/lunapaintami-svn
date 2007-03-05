@@ -1,23 +1,18 @@
-TODO - 0.3.1
-
- * Move text rendering window to use the lunapaint screen!
- * Look at reinit for the text rendering window
- 
 TODO - 0.3.2
 
- * 64-bit raw export again
- * Smooth layer scrolling with movepixelarray
- * ASL Requestors in their own processes
- * Fix animation bug with loosing pixels
- * Dropshadow filter
- * Optimize usage of text buffer size (now it has a bounding box)
  * Fix crash sometimes when loading a unknown file format
- * Add font preview area
- * Fix bug with exporting only current layer in PNG
+ * Fix merging of two layers with opaque areas
+
  
  TODO - 0.3.3
  
- * Redo rendering engine in canvas.c (canvas/)
+ * Fix flimmer on scrolling layers
+ * Optimize usage of text buffer size (now it has a bounding box)
+ * Add font preview area
+ * 64-bit raw export again
+ * Redo rendering engine in canvas.c to also work with drawtools.c (canvas/)
  * Make brushes and canvas use same pixel effects (central blending engine)
  * Brightness/Contrast/Gamma "filter"
+ * Dropshadow filter
+ * ASL Requestors in their own processes
  * Guassian blur filter

@@ -48,6 +48,7 @@
 #include <string.h>
 
 #include "parts.h"
+#include "canvas.h"
 #include "../core/canvas.h"
 #include "../config.h"
 

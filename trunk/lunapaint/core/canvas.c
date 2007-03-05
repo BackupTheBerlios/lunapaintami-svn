@@ -153,78 +153,61 @@ void setActiveBuffer ( oCanvas *canvas )
 
 unsigned long long int *getNextFrame ( oCanvas *canvas )
 {
-	int target = canvas->currentFrame + 1;
-	if ( canvas->currentFrame == canvas->totalFrames - 1 ) target = 0;
-	if ( canvas->totalFrames == 1 ) target = 0;
-	gfxbuffer *buf = canvas->buffer;
-	
-	int f = 0; for ( ; f < canvas->totalFrames; f++ )
-	{
-		int l = 0; for ( ; l < canvas->totalLayers; l++ )
-		{
-			if ( f == target && l == canvas->currentLayer )	
-				return buf->buf;
-			else
-				buf = buf->nextbuf;
-		}
-	}
-	return ( unsigned long long int *)NULL;
+    gfxbuffer *buf = canvas->buffer;
+    int target = ( canvas->currentFrame + 1 ) % canvas->totalFrames;
+    int size = canvas->totalFrames * canvas->totalLayers;
+    int i = 0; for ( ; i < size; i++ )
+    {
+        int l = i % canvas->totalLayers;
+        if ( l == canvas->currentLayer )
+            if ( i / canvas->totalLayers == target ) return buf->buf;
+        buf = buf->nextbuf;
+    }
+	return NULL;
 }
 
 unsigned long long int *getPrevFrame ( oCanvas *canvas )
 {
-	int target = canvas->currentFrame - 1;
-	if ( canvas->currentFrame == canvas->totalFrames - 1 ) target = 0;
-	if ( target < 0 ) target = canvas->totalFrames - 1;
 	gfxbuffer *buf = canvas->buffer;
-	
-	int f = 0; for ( ; f < canvas->totalFrames; f++ )
-	{
-		int l = 0; for ( ; l < canvas->totalLayers; l++ )
-		{
-			if ( f == target && l == canvas->currentLayer )	
-				return buf->buf;
-			else
-				buf = buf->nextbuf;
-		}
-	}
-	return ( unsigned long long int *)NULL;
+    int target = ( canvas->currentFrame - 1 );
+    if ( target < 0 ) target = canvas->totalFrames - 1;
+    int size = canvas->totalFrames * canvas->totalLayers;
+    int i = 0; for ( ; i < size; i++ )
+    {
+        int l = i % canvas->totalLayers;
+        if ( l == canvas->currentLayer )
+            if ( i / canvas->totalLayers == target ) return buf->buf;
+        buf = buf->nextbuf;
+    }
+    return NULL;
 }
 
 gfxbuffer *getActiveGfxbuffer ( oCanvas *canvas )
 {
-	int target = canvas->currentFrame + 1;
-	if ( canvas->currentFrame == canvas->totalFrames - 1 ) target = 0;
-	if ( canvas->totalFrames == 1 ) target = 0;
 	gfxbuffer *buf = canvas->buffer;
-	
-	int f = 0; for ( ; f < canvas->totalFrames; f++ )
-	{
-		int l = 0; for ( ; l < canvas->totalLayers; l++ )
-		{
-			if ( f == target && l == canvas->currentLayer )	
-				return buf;
-			else
-				buf = buf->nextbuf;
-		}
-	}
-	return ( gfxbuffer *)NULL;
+    int size = canvas->totalFrames * canvas->totalLayers;
+    int i = 0; for ( ; i < size; i++ )
+    {
+        int l = i % canvas->totalLayers;
+        if ( l == canvas->currentLayer )
+            if ( i / canvas->totalLayers == canvas->currentFrame ) return buf;
+        buf = buf->nextbuf;
+    }
+    return NULL;
 }
 
 gfxbuffer *getGfxbuffer ( oCanvas *canvas, int layer, int frame )
 {
     gfxbuffer *buf = canvas->buffer;
-    int f = 0; for ( ; f < canvas->totalFrames; f++ )
+    int size = canvas->totalFrames * canvas->totalLayers;
+    int i = 0; for ( ; i < size; i++ )
     {
-        int l = 0; for ( ; l < canvas->totalLayers; l++ )
-        {
-            if ( f == frame && l == layer ) 
-                return buf;
-            else
-                buf = buf->nextbuf;
-        }
+        int l = i % canvas->totalLayers;
+        if ( l == layer )
+            if ( i / canvas->totalLayers == frame ) return buf;
+        buf = buf->nextbuf;
     }
-    return ( gfxbuffer *)NULL;
+    return NULL;
 }
 
 gfxbuffer *getGfxbufferFromList ( gfxbuffer *buf, int layer, int frame, int totallayers, int totalframes )
@@ -238,7 +221,7 @@ gfxbuffer *getGfxbufferFromList ( gfxbuffer *buf, int layer, int frame, int tota
         if ( f == frame && l == layer ) return buf;
         buf = buf->nextbuf;
     }
-    return ( gfxbuffer *)NULL;
+    return NULL;
 }
 
 inline unsigned int *renderCanvas ( 
@@ -278,21 +261,18 @@ inline unsigned int *renderCanvas (
 		    unsigned long long int *currentBuf = buf->buf;
 		    unsigned long long int *onionBuf = getPrevFrame ( canvas );      
 		        
-		    int y = ry; for ( ; y < ryrh; y ++ )
+		    int y = ry, YminRY = 0; for ( ; y < ryrh; y ++ )
 		    {
 			    if ( y >= canvas->height ) break;
 			    
-			    // Some often used calcs :-)
-                int YminRY = y - ry;         
+			    // Some often used calcs :-)    
 			    int tboffsety = YminRY * zoomZoomwidth; // <- heavily optimized! 
 			    int canvymul = canvas->width * y;
                 int YminRYrw = YminRY * rw;
                 
-                int x = rx; for ( ; x < rxrw; x++ )
+                int x = rx, XminRX = 0; for ( ; x < rxrw; x++ )
 			    {
                     if ( x >= canvas->width ) break;
-				    
-		            int XminRX = x - rx;		    
                     
                     // Color that it will result in
 				    unsigned int color = 0;
@@ -334,36 +314,43 @@ inline unsigned int *renderCanvas (
 					    
 					    // Get color from current canvas buffer
 					    rgba64 col2t = *( rgba64 *)&currentBuf[ canvymul + x ];
+                        
 					    // Convert 16-bit pr pixel to 8
-					    int 	r = ( ( int )col2t.a / 256 ), 
-							    g = ( ( int )col2t.b / 256 ), 
-							    b = ( ( int )col2t.g / 256 ), 
-							    a = ( ( int )col2t.r / 256 ); 
+					    int 	r = col2t.a / 256, 
+							    g = col2t.b / 256, 
+							    b = col2t.g / 256, 
+							    a = col2t.r / 256; 
 					    
 					    // Apply layer opacity
-					    if ( buf->opacity < 100 ) a = ( double )a / 100 * buf->opacity;
+					    if ( buf->opacity < 100 ) a = a / 100.0 * buf->opacity;
 							    
 					    // If current canvas is transparent, disregard it's colors
-					    if ( a <= 0 ){ r = col1.r; g = col1.g; b = col1.b; }
+					    if ( a <= 0 ){ r = col1.r; g = col1.g; b = col1.b; a = 0; }
 					    
 					    // Mix colors
-					    double alpha = ( double )a / 255.0;
+					    double alpha = a / 255.0;
 					    col1.r -= ( col1.r - r ) * alpha;
 					    col1.g -= ( col1.g - g ) * alpha;
 					    col1.b -= ( col1.b - b ) * alpha;
-					    col1.a = 255;
+                        if ( !Transparent ) 
+                            col1.a = 255;
+                        else
+                        {
+                            if ( ( col1.a + a ) > 255 ) col1.a = 255;
+                            else col1.a += a; 
+                        }
 					    
 					    // Add onion skin if needed
 					    if ( canvas->onion == 1 )
 					    {
 						    rgba64 onioncol = *( rgba64 *)&onionBuf[ canvymul + x ];
-						    r = (double )onioncol.a / 256;
-						    g = ( double )onioncol.b / 256;
-						    b = ( double )onioncol.g / 256;
-						    a = ( double )onioncol.r / 256;
+						    r = onioncol.a / 256;
+						    g = onioncol.b / 256;
+						    b = onioncol.g / 256;
+						    a = onioncol.r / 256;
 						    
 						    // Mix colors
-						    alpha = ( double )a / 512;
+						    alpha = a / 512.0;
 						    col1.r -= ( col1.r - r ) * alpha;
 						    col1.g -= ( col1.g - g ) * alpha;
 						    col1.b -= ( col1.b - b ) * alpha;
@@ -377,7 +364,7 @@ inline unsigned int *renderCanvas (
 						    if ( test != 0 )
 						    {
 							    rgba32 blend = *( rgba32 *)&test;
-							    double balph = ( double )blend.a / 255.0;
+							    double balph = blend.a / 255.0;
 							    col1.r -= ( col1.r - blend.r ) * balph;
 							    col1.g -= ( col1.g - blend.g ) * balph;
 							    col1.b -= ( col1.b - blend.b ) * balph;
@@ -405,7 +392,9 @@ inline unsigned int *renderCanvas (
 							    tempBuf[ zoompos + zx ] = color;
 					    }
 				    }
+                    XminRX++;
 			    }
+                YminRY++;
 		    }
 	    }
 	    if ( l >= 0 ) buf = buf->nextbuf;
@@ -600,9 +589,9 @@ rgbaData bufferToRGBA ( unsigned int color )
 unsigned long long int PaletteToBuffercolor ( unsigned int rgb )
 {
 	unsigned long long int r, g, b, rgba;
-	r = ( rgb << 24 ) >> 24; r = ( int )( ( float )r / 255 * MAXCOLOR );
-	g = ( rgb << 16 ) >> 24; g = ( int )( ( float )g / 255 * MAXCOLOR );
-	b = ( rgb << 8  ) >> 24; b = ( int )( ( float )b / 255 * MAXCOLOR );
+	r = ( rgb << 24 ) >> 24; r = ( int )( r / 255.0 * MAXCOLOR );
+	g = ( rgb << 16 ) >> 24; g = ( int )( g / 255.0 * MAXCOLOR );
+	b = ( rgb << 8  ) >> 24; b = ( int )( b / 255.0 * MAXCOLOR );
 	rgba = r << 48 | g << 32 | b << 16 | MAXCOLOR;
 	return rgba;
 }
@@ -610,9 +599,9 @@ unsigned long long int PaletteToBuffercolor ( unsigned int rgb )
 rgba64 PaletteToRgba64 ( unsigned int rgb )
 {
 	unsigned long long int r, g, b;
-	r = ( rgb << 24 ) >> 24; r = ( int )( ( float )r / 255 * MAXCOLOR );
-	g = ( rgb << 16 ) >> 24; g = ( int )( ( float )g / 255 * MAXCOLOR );
-	b = ( rgb << 8  ) >> 24; b = ( int )( ( float )b / 255 * MAXCOLOR );
+	r = ( rgb << 24 ) >> 24; r = ( int )( r / 255.0 * MAXCOLOR );
+	g = ( rgb << 16 ) >> 24; g = ( int )( g / 255.0 * MAXCOLOR );
+	b = ( rgb << 8  ) >> 24; b = ( int )( b / 255.0 * MAXCOLOR );
 	return ( rgba64 ){ r, g, b, MAXCOLOR };
 }
 
@@ -743,30 +732,34 @@ void mergeLayers ( oCanvas *canv )
 	}
 
 	// Mix colors
+    
+    double popacity = prev->opacity * 1.0;
+    
 	int i = 0; for ( ; i < canv->width * canv->height; i++ )
 	{	
 		rgba64 col1 = *( rgba64 *)&curr->buf[ i ];
 		col1 = ( rgba64 ){ col1.a, col1.b, col1.g, col1.r };
-	    if ( curr->opacity < 100 ) col1.a = ( double )col1.a / 100 * curr->opacity;
+	    if ( curr->opacity < 100 ) col1.a = col1.a / 100.0 * curr->opacity;
         
 		rgba64 col2 = *( rgba64 *)&prev->buf[ i ];	
 		col2 = ( rgba64 ){ col2.a, col2.b, col2.g, col2.r };
-        if ( prev->opacity < 100 ) col2.a = ( double )col2.a / 100 * prev->opacity;      
-		
+        if ( prev->opacity < 100 ) col2.a = col2.a / 100.0 * prev->opacity;      
+	    double alphx = col2.a / 100.0 * popacity;      	
+        
 		// Disregard fully transparent source colors
 		if ( col1.a <= 0 )
 		{ 
 			col1.r = col2.r; col1.g = col2.g; 
 			col1.b = col2.b; col1.a = col2.a;
 		}
-		else
-		{
-			col1.r -= ( ( int )col1.r - ( int )col2.r ) * ( ( double )col2.a / MAXCOLOR );
-			col1.g -= ( ( int )col1.g - ( int )col2.g ) * ( ( double )col2.a / MAXCOLOR );
-			col1.b -= ( ( int )col1.b - ( int )col2.b ) * ( ( double )col2.a / MAXCOLOR );
-			
-			int newA = ( col1.a + col2.a ) % MAXCOLOR;
-			if ( newA <= col1.a || newA <= col2.a ) newA = MAXCOLOR;
+        else if ( alphx > 0 )
+        {
+            double alpha = alphx / MAXCOLOR_DBL;  
+            col1.r -= ( ( int )col1.r - ( int )col2.r ) * alpha;
+            col1.g -= ( ( int )col1.g - ( int )col2.g ) * alpha;
+            col1.b -= ( ( int )col1.b - ( int )col2.b ) * alpha;
+            if ( ( col1.a + alphx ) > MAXCOLOR ) col1.a = MAXCOLOR;
+            else col1.a += alphx;
 		}
 		
 		// Set new color
@@ -868,8 +861,8 @@ unsigned int drawToolPreview ( int x, int y )
 			{
 				
 				double xoff = 0, yoff = 0;
-				if ( brushTool.width > 1 ) xoff = ( double )brushTool.width / 2;
-				if ( brushTool.height > 1 ) yoff = ( double )brushTool.height / 2;
+				if ( brushTool.width > 1 ) xoff = brushTool.width / 2.0;
+				if ( brushTool.height > 1 ) yoff = brushTool.height / 2.0;
 				
 				int cbx = ( int )( cMouseX - xoff );
 				int cby = ( int )( cMouseY - yoff );
@@ -915,8 +908,8 @@ unsigned int drawToolPreview ( int x, int y )
 			if ( lineTool.mode == 0 )
 			{
 				double xoff = 0, yoff = 0;
-				if ( brushTool.width > 1 ) xoff = ( double )brushTool.width / 2;
-				if ( brushTool.height > 1 ) yoff = ( double )brushTool.height / 2;
+				if ( brushTool.width > 1 ) xoff = brushTool.width / 2.0;
+				if ( brushTool.height > 1 ) yoff = brushTool.height / 2.0;
 				
 				int cbx = ( int )( ( int )cMouseX - xoff );
 				int cby = ( int )( ( int )cMouseY - yoff );
@@ -970,8 +963,8 @@ unsigned int drawToolPreview ( int x, int y )
 			if ( rectangleTool.mode == 0 )
 			{
 				double xoff = 0, yoff = 0;
-				if ( brushTool.width > 1 ) xoff = ( double )brushTool.width / 2;
-				if ( brushTool.height > 1 ) yoff = ( double )brushTool.height / 2;
+				if ( brushTool.width > 1 ) xoff = brushTool.width / 2.0;
+				if ( brushTool.height > 1 ) yoff = brushTool.height / 2.0;
 				
 				int cbx = ( int )( ( int )cMouseX - xoff );
 				int cby = ( int )( ( int )cMouseY - yoff );
@@ -1026,8 +1019,8 @@ unsigned int drawToolPreview ( int x, int y )
 			if ( circleTool.mode == 0 )
 			{	
 				double xoff = 0, yoff = 0;
-				if ( brushTool.width > 1 ) xoff = ( double )brushTool.width / 2;
-				if ( brushTool.height > 1 ) yoff = ( double )brushTool.height / 2;
+				if ( brushTool.width > 1 ) xoff = brushTool.width / 2.0;
+				if ( brushTool.height > 1 ) yoff = brushTool.height / 2.0;
 				
 				int cbx = ( int )( ( int )cMouseX - xoff );
 				int cby = ( int )( ( int )cMouseY - yoff );

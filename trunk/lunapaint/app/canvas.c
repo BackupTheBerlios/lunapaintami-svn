@@ -58,10 +58,11 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 		case MUIM_Draw:
 			
 	        // Redrawing		
-            if ( refreshPhase == 0 && globalActiveCanvas != NULL )
+            if ( globalActiveCanvas != NULL )
             {
+                AskMinMaxTimes = 0;
                 globalActiveWindow->prevBlit.w = 0;
-                RGBitmapRedraw ( CLASS, self ); 
+                RGBitmapRedraw ( CLASS, self );
                 return ( IPTR )NULL; 
             }
 		    return DoSuperMethodA ( CLASS, self, message );         
@@ -81,8 +82,8 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 		
 		case MUIM_Setup:
             {      
+                AskMinMaxTimes = 0;
 		        isScrolling = FALSE;
-		        refreshPhase = 0;
 		        isZooming = FALSE;
 		        MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
             }      
@@ -96,8 +97,20 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 			{
 				struct RGBitmapData *data = INST_DATA ( CLASS, self );
                 Update_AnimValues ( );            
+                AskMinMaxTimes = 0;
 				globalActiveWindow = data->window;
 				globalActiveCanvas = data->window->canvas;
+                
+                // Set scrollbars
+                int areaHeight = XGET ( self, MUIA_Height );
+                int areaWidth = XGET ( self, MUIA_Width );
+                set ( data->window->scrollV, MUIA_Prop_Entries, ( IPTR )globalActiveCanvas->height * data->currentzoom );
+                set ( data->window->scrollH, MUIA_Prop_Entries, ( IPTR )globalActiveCanvas->width * data->currentzoom );
+                set ( data->window->scrollV, MUIA_Prop_Visible, ( IPTR )areaHeight );
+                set ( data->window->scrollH, MUIA_Prop_Visible, ( IPTR )areaWidth );
+                set ( data->window->scrollH, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsetx );
+                set ( data->window->scrollV, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsety );
+                //
 				data->window->isActive = FALSE;            
 				DoMethod ( WidgetLayers, MUIM_Draw );
 			}
@@ -112,6 +125,8 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 			{
 				struct RGBitmapData *data = INST_DATA ( CLASS, self );
 				data->window->isActive = FALSE;
+                data->window->canvas->offsetx = XGET ( data->window->scrollH, MUIA_Prop_First );
+                data->window->canvas->offsety = XGET ( data->window->scrollV, MUIA_Prop_First );
 			}
 			return ( IPTR )NULL;
 			
@@ -119,6 +134,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 			if ( globalActiveCanvas->zoom + 1 <= 32 && !isZooming )
 			{	
 				isZooming = TRUE;
+                AskMinMaxTimes = 2;
 				
 				// Remove any previous tool preview
 				removePrevToolPreview ( );
@@ -146,6 +162,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 				
 				// Set new zoom
 				globalActiveCanvas->zoom--;
+                AskMinMaxTimes = 2;
 				
 				// Move scrollbars
 				globalActiveCanvas->offsetx -= globalActiveCanvas->visibleWidth * 0.5;
@@ -162,6 +179,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 			// Remove any previous tool preview
 			isZooming = TRUE;
 			removePrevToolPreview ( );
+            AskMinMaxTimes = 2;    
 			globalActiveCanvas->zoom = 1;
 			globalActiveCanvas->offsetx = 0; 
 			globalActiveCanvas->offsety = 0;
@@ -360,46 +378,40 @@ void constrainOffset ( oCanvas *canvas )
 
 void winHasChanged ( )
 {	
-    refreshPhase = 3;
 	globalActiveCanvas->winHasChanged = TRUE;
   	DoMethod ( globalActiveWindow->container, MUIM_Group_InitChange );
 	DoMethod ( globalActiveWindow->container, MUIM_Group_ExitChange );
 }
 
 IPTR CanvasAskMinMax ( Class *CLASS,Object *self, struct MUIP_AskMinMax *message )
-{
+{   
 	struct RGBitmapData *data = INST_DATA ( CLASS, self );
 	
 	int calcwidth = data->window->canvas->width * data->window->canvas->zoom;
 	int calcheight = data->window->canvas->height * data->window->canvas->zoom;
 	
-	// Hack to get display to redraw properly
-	// Because askminmax is seemingly asked 3 times, one for width, one for height
-	// and one for who knows.......
-	// So when refreshPhase is set to for instance 3, we force the width
-	// and height of our area... to circumvent zune behavior!
-	if ( refreshPhase > 0 )
+	int tWidth = 0, minWidth = 0, tHeight = 0, minHeight = 0;
+	tWidth = XGET ( globalActiveWindow->container, MUIA_Width );
+	tHeight = XGET ( globalActiveWindow->container, MUIA_Height );
+	minWidth = globalActiveCanvas->width * globalActiveCanvas->zoom;
+	minHeight = globalActiveCanvas->height * globalActiveCanvas->zoom;
+	if ( minWidth > tWidth ) minWidth = tWidth;
+	if ( minHeight > tHeight ) minHeight = tHeight;
+    if ( AskMinMaxTimes > 0 )   
 	{
-		int tWidth = 0, minWidth = 0, tHeight = 0, minHeight = 0;
-		get ( globalActiveWindow->container, MUIA_Width, &tWidth );
-		get ( globalActiveWindow->container, MUIA_Height, &tHeight );
-		minWidth = globalActiveCanvas->width * globalActiveCanvas->zoom;
-		minHeight = globalActiveCanvas->height * globalActiveCanvas->zoom;
-		if ( minWidth > tWidth ) minWidth = tWidth;
-		if ( minHeight > tHeight ) minHeight = tHeight;
-		message->MinMaxInfo->MinWidth += minWidth;
-		message->MinMaxInfo->MinHeight += minHeight;      
-		refreshPhase--;
-	}
-	else
-	{
-		message->MinMaxInfo->MinWidth += 0;
-		message->MinMaxInfo->MinHeight += 0;
-        message->MinMaxInfo->DefWidth += calcwidth;
-        message->MinMaxInfo->MaxWidth += calcwidth;
-        message->MinMaxInfo->DefHeight += calcheight;
-        message->MinMaxInfo->MaxHeight += calcheight;      
-	}
+        message->MinMaxInfo->MinWidth += minWidth;
+	    message->MinMaxInfo->MinHeight += minHeight;
+        AskMinMaxTimes--;   
+    }
+    else
+    {
+        message->MinMaxInfo->MinWidth += 0;
+        message->MinMaxInfo->MinHeight += 0;
+    }
+    message->MinMaxInfo->DefWidth += calcwidth;
+    message->MinMaxInfo->DefHeight += calcheight;
+    message->MinMaxInfo->MaxWidth += calcwidth;
+    message->MinMaxInfo->MaxHeight += calcheight;      
 
 	return ( IPTR )NULL;
 }
@@ -456,7 +468,7 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 		set ( data->window->scrollV, MUIA_Prop_Entries, ( IPTR )imageHeight );
 		set ( data->window->scrollH, MUIA_Prop_Visible, ( IPTR )areaWidth );
 		set ( data->window->scrollH, MUIA_Prop_Entries, ( IPTR )imageWidth );
-		
+        
 		// Sometimes the scrollbar will refuse a coordinate, always sync with
 		// the scrollbar!!!
 		globalActiveCanvas->offsetx = XGET ( data->window->scrollH, MUIA_Prop_First );
@@ -478,44 +490,42 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 		
 		// Accelerated redraw
 		if ( data->window->rRectW || data->window->rRectH )
-		{
+		{   
 			oCanvas *canvas = data->window->canvas;
 			int offsetx 	= ( canvas->offsetx + data->window->rRectX ) / canvas->zoom;
 			int offsety 	= ( canvas->offsety + data->window->rRectY ) / canvas->zoom;
 			int width 		= ( double )data->window->rRectW / canvas->zoom + 1;
 			int height 		= ( double )data->window->rRectH / canvas->zoom + 1;
 			
-			if ( !redrawScreenbufferRect ( canvas, offsetx, offsety, width, height, FALSE ) )
-				return ( IPTR )NULL;
-			
-            blitAreaRect ( 
-				offsetx, offsety, 
-				width, height, 
-				canvas, _rp ( data->window->area )
-			);
-			
-            // Reset accelerator parameters
-			data->window->rRectX = 0;
-			data->window->rRectY = 0;
-			data->window->rRectW = 0;
-			data->window->rRectH = 0;      
+			if ( redrawScreenbufferRect ( canvas, offsetx, offsety, width, height, FALSE ) )
+			{ 
+                blitAreaRect ( 
+				    offsetx, offsety, 
+				    width, height, 
+				    canvas, _rp ( data->window->area )
+			    );   
+                // Reset accelerator parameters
+			    data->window->rRectX = 0;
+			    data->window->rRectY = 0;
+			    data->window->rRectW = 0;
+			    data->window->rRectH = 0;
+            }               
 		}
 		// Slow redraw (with zoom etc)
 		else
 		{
-			if ( !redrawScreenbuffer ( data->window->canvas ) )
-				return ( IPTR )NULL;
-			// Write all data to the rastport!
-			WritePixelArray ( 
-				data->window->canvas->screenbuffer,
-				0, 0, data->window->canvas->visibleWidth * 4, _rp ( data->window->area ),
-				arealeft, areatop, areaWidth, areaHeight, RECTFMT_RGBA
-			);
+			if ( redrawScreenbuffer ( data->window->canvas ) )         
+            {         
+			    // Write all data to the rastport!
+			    WritePixelArray ( 
+				    data->window->canvas->screenbuffer,
+				    0, 0, data->window->canvas->visibleWidth * 4, _rp ( data->window->area ),
+				    arealeft, areatop, areaWidth, areaHeight, RECTFMT_RGBA
+			    );
+            }         
             UpdateCanvasInfo ( data->window );         
             Update_AnimValues ( );
-		}
-        if ( globalActiveWindow->layersChg )      
-            DoMethod ( WidgetLayers, MUIM_Draw );      
+		}   
 		data->window->canvas->winHasChanged = FALSE;
 		globalCurrentTool = Tool;
 	}
@@ -531,6 +541,9 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 			);
 		}
 	}
+    if ( globalActiveWindow->layersChg )      
+        DoMethod ( WidgetLayers, MUIM_Draw );  
+    
 	return ( IPTR )NULL;
 }
 
@@ -652,7 +665,7 @@ IPTR ScrollCanvas ( int x, int y )
 
 IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg )
 {		
-	if ( CLASS == NULL || isZooming || refreshPhase != 0 || globalActiveCanvas == NULL ) 
+	if ( CLASS == NULL || isZooming || globalActiveCanvas == NULL ) 
 		return ( IPTR )NULL;
 		
 	struct RGBitmapData *data = ( struct RGBitmapData *)INST_DATA ( CLASS, self );

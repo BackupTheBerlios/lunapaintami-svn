@@ -77,12 +77,12 @@ Affrect drawLine (
 	if ( W > H )
 	{
 		slopex = 1.0;
-		slopey = ( float )H / ( float )W;
+		slopey =  H / W;
 		dist = W;
 	}
 	else if ( H > W )
 	{
-		slopex = ( float )W / ( float )H;
+		slopex = W / H;
 		slopey = 1.0;
 		dist = H;
 	}
@@ -109,8 +109,8 @@ Affrect drawLine (
 	}
 	
 	// Return affected coorinates
-	int offx = ( double )brushTool.width / 2;
-	int offy = ( double )brushTool.height / 2;
+	int offx = brushTool.width / 2.0;
+	int offy = brushTool.height / 2.0;
 	Affrect rect = { 
 		( int )( X - 1 - offx ), ( int )( Y - 1 - offy ), 
 		( int )( W + brushTool.width + 2 ), ( int )( H + brushTool.height + 2 )
@@ -151,11 +151,11 @@ void drawLineCharbuf (
 	
 	if ( W > H )
 	{
-		slopex = 1.0; slopey = ( float )H / ( float )W; dist = W;
+		slopex = 1.0; slopey = H / W; dist = W;
 	}
 	else if ( H > W )
 	{
-		slopex = ( float )W / ( float )H; slopey = 1.0; dist = H;
+		slopex = W / H; slopey = 1.0; dist = H;
 	}
 	else
 	{
@@ -204,19 +204,42 @@ Affrect plotBrush (
 	else
 	{
 		// Precision to center the brush on x,y coordinate
-		offx = ( double )brushTool.width / 2;
-		offy = ( double )brushTool.height / 2;	
-		int size = brushTool.width * brushTool.height;
-		int i = 0; for ( ; i < size; i++ )
-		{
-			int bx = i % brushTool.width;
-			int by = i / brushTool.width;
-			double px = bx + x - offx;
-			double py = by + y - offy;
-			rgba64 col2 = *( rgba64 *)&brushTool.buffer[ i ];
-			if ( brushTool.antialias ) pixelAntialias ( px, py, col2, bufferwidth, bufferheight, buffer );
-			else pixelPlain ( ( int )px, ( int )py, col2, bufferwidth, bufferheight, buffer );
-		}
+		offx = brushTool.width / 2.0;
+		offy = brushTool.height / 2.0;	
+        double offxx = x - offx;
+        double offyy = y - offy;      
+        
+        if ( brushTool.antialias )
+        {            
+            int by = 0; for ( ; by < brushTool.height; by++ )      
+		    {   
+                int ymul = by * brushTool.width;      
+                double py = by + offyy;
+                int bx = 0; for ( ; bx < brushTool.width; bx++ )
+                {
+                    int pos = ymul + bx;
+			        double px = bx + offxx;
+			        rgba64 col2 = *( rgba64 *)&brushTool.buffer[ pos ];
+			        pixelAntialias ( px, py, col2, bufferwidth, bufferheight, buffer );
+			        
+		        }
+            }
+        }
+        else
+        {
+            int by = 0; for ( ; by < brushTool.height; by++ )      
+            {   
+                int ymul = by * brushTool.width;      
+                double py = by + offyy;
+                int bx = 0; for ( ; bx < brushTool.width; bx++ )
+                {
+                    int pos = ymul + bx;
+                    double px = bx + offxx;
+                    rgba64 col2 = *( rgba64 *)&brushTool.buffer[ pos ];
+                    pixelPlain ( ( int )px, ( int )py, col2, bufferwidth, bufferheight, buffer );
+                }
+            }
+        }      
 	}
 	
 	// Return the affected area (x,y,w,h)
@@ -268,10 +291,10 @@ inline unsigned long long int processPixel (
     	r2 = paintCol.a, 	g2 = paintCol.b, 	b2 = paintCol.g, 	a2 = paintCol.r;
 	
 	// Take into account the brush tool opacity and power
-	a2 = ( ( double )a2 / 255 * brushTool.opacity ) / 100 * brushTool.power;
+	a2 = ( a2 / 255.0 * brushTool.opacity ) / 100 * brushTool.power;
 	
 	// Calculate alpha
-	double alpha = ( double )a2 / MAXCOLOR;
+	double alpha = a2 / MAXCOLOR_DBL;
 	
 	// Decrease alpha with antialiasing calc.
 	if ( brushTool.antialias )
@@ -406,18 +429,21 @@ inline unsigned long long int processPixel (
 				int power = 1;
 				
 				int r = 0, g = 0, b = 0, a = 0;
-				int samples = 0;
+				double samples = 0.0;
 				
 				int sy3 = 0; for ( sy3 = -power; sy3 <= power; sy3++ )
 				{
-					int yoffset = ( int )( y + sy3 ) * globalActiveCanvas->width;
+                    int ysy3 = y + sy3;            
+					int yoffset = ysy3 * globalActiveCanvas->width;
 					int sx3 = 0; for ( sx3 = -power; sx3 <= power; sx3++ )
 					{
+                        int xsx3 = x + sx3;               
+                        
 						if ( 
-							x + sx3 >= 0 && x + sx3 < globalActiveCanvas->width && 
-							y + sy3 >= 0 && y + sy3 < globalActiveCanvas->height )
+							xsx3 >= 0 && xsx3 < globalActiveCanvas->width && 
+							ysy3 >= 0 && ysy3 < globalActiveCanvas->height )
 						{
-							int offset = yoffset + ( int )( x + sx3 );
+							int offset = yoffset + xsx3;
 							rgba64 tmp = *( rgba64 *)&globalActiveCanvas->activebuffer[ offset ];
 							r += tmp.a;
 							g += tmp.b;
@@ -430,9 +456,9 @@ inline unsigned long long int processPixel (
 				
 				if ( samples > 0 )
 				{
-					r = ( ( double )r / samples );
-					g = ( ( double )g / samples );
-					b = ( ( double )b / samples );
+					r = r / samples;
+					g = g / samples;
+					b = b / samples;
 					
 					r1 -= ( ( r1 - r ) * alpha );
 					g1 -= ( ( g1 - g ) * alpha );
@@ -440,7 +466,7 @@ inline unsigned long long int processPixel (
 					
 					if ( brushTool.opacitymode == LUNA_OPACITYMODE_ADD )
 					{
-						a = ( ( double )a / samples );
+						a = ( a / samples );
 						a1 -= ( ( a1 - a ) * alpha );
 					}
 				}
@@ -462,18 +488,20 @@ inline unsigned long long int processPixel (
 				int power = 1;
 				
 				int r = 0, g = 0, b = 0, a = 0;
-				int samples = 0;
+				double samples = 0;
 				
 				int sy3; for ( sy3 = -power + diffy; sy3 <= power + diffy; sy3++ )
 				{
-					int yoffset =  ( int )( y + sy3 ) * globalActiveCanvas->width;
+	                int ysy3 = y + sy3;
+                    int yoffset =  ysy3 * globalActiveCanvas->width;
 					int sx3; for ( sx3 = -power + diffx; sx3 <= power + diffx; sx3++ )
 					{
+                        int xsx3 = x + sx3;               
 						if ( 
-							x + sx3 >= 0 && x + sx3 < globalActiveCanvas->width && 
-							y + sy3 >= 0 && y + sy3 < globalActiveCanvas->height )
+							xsx3 >= 0 && xsx3 < globalActiveCanvas->width && 
+							ysy3 >= 0 && ysy3 < globalActiveCanvas->height )
 						{
-							int offset = yoffset + ( int )( x + sx3 );
+							int offset = yoffset + xsx3;
 							rgba64 tmp = *( rgba64 *)&globalActiveCanvas->activebuffer[ offset ];
 							r += tmp.a;
 							g += tmp.b;
@@ -485,9 +513,9 @@ inline unsigned long long int processPixel (
 				}
 				if ( samples > 0 )
 				{
-					r = ( ( double )r / samples );
-					g = ( ( double )g / samples );
-					b = ( ( double )b / samples );
+					r = ( r / samples );
+					g = ( g / samples );
+					b = ( b / samples );
 
 					r1 -= ( ( r1 - r ) * alpha );
 					g1 -= ( ( g1 - g ) * alpha );
@@ -495,7 +523,7 @@ inline unsigned long long int processPixel (
 					
 					if ( brushTool.opacitymode == LUNA_OPACITYMODE_ADD )
 					{
-						a = ( ( double )a / samples );
+						a = ( a / samples );
 						a1 -= ( ( a1 - a ) * alpha );
 					}
 				}	
@@ -546,15 +574,11 @@ Affrect floodFill (
 )
 {	
 	// Exit if out of bounds for filling or otherwise we're not allowed
-	if ( x < 0 || y < 0 || x >= bufferwidth || y >= bufferheight || clickColor == color || isFilling == TRUE )
-	{
+	if ( x < 0 || y < 0 || x >= bufferwidth || y >= bufferheight || clickColor == color )
 		return ( Affrect ){ 0, 0, 0, 0 };
-	}
-	
-	isFilling = TRUE;
 	
 	// redraw all rect =)
-	Affrect rect = { 0, 0, bufferwidth, bufferheight };
+	Affrect rect = { x, y, 1, 1 };
 	
 	unsigned int click8 = bufferToScreenColor ( clickColor );
 	unsigned int clicka = ( click8 << 24 ) >> 24; // a part of rgba
@@ -569,20 +593,21 @@ Affrect floodFill (
 	fPush ( fx, fy, stacksize, bufferwidth, fStack );
 	
 	// Do - until there's no more pixels to fill in the stack
-	while ( fPop ( &fx, &fy, bufferwidth, fStack ) )
+    while ( fPop ( &fx, &fy, bufferwidth, fStack ) )
 	{	
-		// Watch for buffer overflow
+        // fill at pixelpos
+        int boffset = ( fy * bufferwidth );
+        buffer[ boffset + fx ] = color;
+        
+        // Make sure we have the correct rect to update
+		if ( fx < rect.x ) rect.x = fx;
+        if ( fx > rect.x + rect.w ) rect.w = fx - rect.x + 1;
+        if ( fy < rect.y ) rect.y = fx;
+        if ( fy > rect.y + rect.h ) rect.h = fy - rect.y + 1;
+        
+        // Watch for buffer overflow
 		if ( fStackPointer >= stacksize - 1 ) 
-		{
-			FreeVec ( fStack );
-			return rect;
-		}
-		
-		// rowpos here
-		int boffset = ( fy * bufferwidth );
-		
-		// Fill
-		buffer[ boffset + fx ] = color;
+	       break;
 		
 		// The colors to the n,e,s,w directions
 		unsigned long long int topcol = 0ULL, botcol = 0ULL, lefcol = 0ULL, rigcol = 0ULL;
@@ -620,37 +645,18 @@ Affrect floodFill (
 		}
 		else tz = FALSE;
 		
-		// Add pixels within bounds 64-bit
-		/*if ( rz && clickColor == rigcol )
-			fPush ( fx + 1, fy, stacksize, bufferwidth, fStack );
-		if ( lz && clickColor == lefcol )
-			fPush ( fx - 1, fy, stacksize, bufferwidth, fStack );
-		if ( bz && clickColor == botcol )
-			fPush ( fx, fy + 1, stacksize, bufferwidth, fStack );
-		if ( tz && clickColor == topcol )
-			fPush ( fx, fy - 1, stacksize, bufferwidth, fStack );*/
-			
 		// Add pixels within bounds 24-bit
 		// Fill if clickcolor or that clickcolor alpha = 0 and destcolor alpha = 0
-		if ( rz && ( click8 == rigcol8 || ( !riga && !clicka ) ) )
-		{
+		if ( rigcol != color && rz && ( click8 == rigcol8 || riga + clicka == 0 ) )
 			fPush ( fx + 1, fy, stacksize, bufferwidth, fStack );
-		}
-		if ( lz && ( click8 == lefcol8 || ( !lefa && !clicka ) ) )
-		{
+		if ( lefcol != color && lz && ( click8 == lefcol8 || lefa + clicka == 0 ) )
 			fPush ( fx - 1, fy, stacksize, bufferwidth, fStack );
-		}
-		if ( bz && ( click8 == botcol8 || ( !bota && !clicka ) ) )
-		{
+		if ( botcol != color && bz && ( click8 == botcol8 || bota + clicka == 0 ) )
 			fPush ( fx, fy + 1, stacksize, bufferwidth, fStack );
-		}
-		if ( tz && ( click8 == topcol8 || ( !topa && !clicka ) ) )
-		{
+		if ( topcol != color && tz && ( click8 == topcol8 || topa + clicka == 0 ) )
 			fPush ( fx, fy - 1, stacksize, bufferwidth, fStack );
-		}
 	}
 	FreeVec ( fStack );
-	isFilling = FALSE;
 	return rect;
 }
 
@@ -682,9 +688,7 @@ void fillCharbuf (
 	{
 		// Watch for buffer overflow
 		if ( fStackPointer >= stacksize - 1 ) 
-		{
-			FreeVec ( fStack ); return;
-		}
+			break;
 		
 		// rowpos here
 		int boffset = ( fy * bufferwidth );
@@ -711,13 +715,13 @@ void fillCharbuf (
 		else tz = FALSE;
 		
 		// Add pixels within bounds
-		if ( rz && clickColor == rigcol )
+		if ( rz && clickColor == rigcol && value != rigcol )
 			fPush ( fx + 1, fy, stacksize, bufferwidth, fStack );
-		if ( lz && clickColor == lefcol )
+		if ( lz && clickColor == lefcol && value != lefcol )
 			fPush ( fx - 1, fy, stacksize, bufferwidth, fStack );
-		if ( bz && clickColor == botcol )
+		if ( bz && clickColor == botcol && value != botcol )
 			fPush ( fx, fy + 1, stacksize, bufferwidth, fStack );
-		if ( tz && clickColor == topcol )
+		if ( tz && clickColor == topcol && value != topcol )
 			fPush ( fx, fy - 1, stacksize, bufferwidth, fStack );
 	}
 	FreeVec ( fStack );
@@ -730,9 +734,6 @@ Affrect drawCircle (
 	unsigned long long int *buffer
 )
 {
-	int offx = ( double )brushTool.width / 2;
-	int offy = ( double )brushTool.height / 2;
-
 	double prevx = cos ( RAD ) * w + x;
 	double prevy = sin ( RAD ) * h + y;		
 	
@@ -746,16 +747,18 @@ Affrect drawCircle (
 		unsigned long long int *tmpBuf = AllocVec ( datalen * 8, MEMF_ANY );
 		
 		// Make a uniform circular shape
-		int i = 0; for ( ; i < datalen; i++ )
-		{
-			int yc = i / size2;
-			int xc = i % size2;
-			int tmpoff = yc * size2 + xc;
-			if ( getDistance ( xc, yc, size, size ) < fillradius )
-				tmpBuf[ tmpoff ] = 0xffffffffffffffffULL;
-			else
-				tmpBuf[ tmpoff ] = 0x0000000000000000ULL;
-		}
+        int yc = 0; for ( ; yc < size2; yc++ )
+        {        
+            int tmpoff = yc * size2;
+            int xc = 0; for ( ; xc < size2; xc++ ) 
+		    {
+			    int tmpoffx = tmpoff + xc;
+			    if ( getDistance ( xc, yc, size, size ) < fillradius )
+				    tmpBuf[ tmpoffx ] = 0xffffffffffffffffULL;
+			    else
+				    tmpBuf[ tmpoffx ] = 0x0000000000000000ULL;
+		    }
+        }      
 		
 		// Copy the tmpbuf data scaled to fit the wanted shape
 		int sx = x - w;
@@ -764,17 +767,20 @@ Affrect drawCircle (
 		int dy = y + h;
 		int w2 = w * 2;
 		int h2 = h * 2;
+        double xw = x - w;
+        double yh = y - h;      
 		
 		BOOL ba = brushTool.antialias;
 		brushTool.antialias = FALSE;
 		
-		int yc = sy; for ( ; yc <= dy; yc++ )
+		yc = sy; for ( ; yc < dy; yc++ )
 		{
-			int xc = sx; for ( ; xc <= dx; xc++ )
+            int pry = ( yc - yh ) / h2 * size2;      
+			int xc = sx; for ( ; xc < dx; xc++ )
 			{	
-				int prx = ( xc - x + w ) / w2 * size2;
-				int pry = ( yc - y + h ) / h2 * size2;
+				int prx = ( xc - xw ) / w2 * size2;
 				int offset = pry * size2 + prx;
+                
 				if ( offset < 0 || offset >= datalen ) continue;
 				if ( tmpBuf[ offset ] != 0x0000000000000000ULL )
 					plotBrush ( xc, yc, bufferwidth, bufferheight, buffer );
@@ -805,9 +811,14 @@ Affrect drawCircle (
 			}
 		}
 	}
+    
+    int offx = brushTool.width / 2.0;
+    int offy = brushTool.height / 2.0;
 	Affrect rect = { 
-		x - w - offx - 1, y - h - offy - 1, 
-		x + w + offx + 2, y + h + offy + 2 
+		x - w - offx - 2, 
+        y - h - offy - 2, 
+		( w * 2 ) + ( ( offx + 2 ) * 2 ), 
+        ( h * 2 ) + ( ( offy + 2 ) * 2 ) 
 	};
 	return rect;
 }
@@ -844,9 +855,9 @@ rgba64 snapToPalette ( rgba64 color, BOOL selectIndex )
 	
 	rgba64 res = { 
 		MAXCOLOR,
-		( unsigned long long int )( ( double )rescol.b / 255 * MAXCOLOR ),
-		( unsigned long long int )( ( double )rescol.g / 255 * MAXCOLOR ),
-		( unsigned long long int )( ( double )rescol.r / 255 * MAXCOLOR )
+		( unsigned long long int )( rescol.b / 255.0 * MAXCOLOR ),
+		( unsigned long long int )( rescol.g / 255.0 * MAXCOLOR ),
+		( unsigned long long int )( rescol.r / 255.0 * MAXCOLOR )
 	};
 	return res;
 }

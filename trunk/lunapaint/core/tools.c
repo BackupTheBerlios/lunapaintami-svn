@@ -132,11 +132,11 @@ void toolBrushFill ( )
 {
 	// Make a buffer with brushsize margin
 	int margin = ( 
-		( double )( 
+		( 
 			brushTool.width > brushTool.height ? 
 				brushTool.width : 
 				brushTool.height 
-		) / 2 
+		) / 2.0 
 	) + 2;
 	
 	// Double mardin.. optimization
@@ -220,6 +220,7 @@ void toolBrushFill ( )
 	
 	// Clean up
 	FreeVec ( pixelBuffer );
+    
 }
 
 
@@ -232,7 +233,7 @@ void makeToolBrush ( )
 	brushTool.buffer = AllocVec ( buflen * 8, MEMF_ANY );
 	
 	// Only one radius is used when generating circular brushes
-	double hRad = ( double )brushTool.width / 2;
+	double hRad = brushTool.width / 2.0;
 	
 	rgbaDataL rgba = canvasColorToRGBA_ull ( 
 		PaletteToBuffercolor ( globalColor )
@@ -263,8 +264,9 @@ void makeToolBrush ( )
 
 BOOL toolFill ( )
 {
-	if ( MouseButtonL )
+	if ( MouseButtonL && !isFilling )
 	{
+        isFilling = TRUE;   
 		int x = cMouseX;
 		int y = cMouseY;
 				
@@ -287,6 +289,7 @@ BOOL toolFill ( )
 		}
 		globalActiveCanvas->winHasChanged = TRUE;
 		DoMethod ( globalActiveWindow->area, MUIM_Draw, FALSE );
+        isFilling = FALSE;      
 		return TRUE;
 	}
 	return FALSE;
@@ -353,8 +356,8 @@ BOOL toolLine ( )
 			
 			// Draw line on tool buffer without feather or antialias
 			
-			int xoff = ( double )brushTool.width / 2;
-			int yoff = ( double )brushTool.height / 2;
+			int xoff = brushTool.width / 2.0;
+			int yoff = brushTool.height / 2.0;
 			
 			lineTool.ox = ox - xoff;
 			lineTool.oy = oy - yoff;
@@ -466,8 +469,8 @@ BOOL toolRectangle ( )
 			
 			// Draw line on tool buffer without feather or antialias
 			
-			int xoff = ( double )brushTool.width / 2;
-			int yoff = ( double )brushTool.height / 2;
+			int xoff = brushTool.width / 2.0;
+			int yoff = brushTool.height / 2.0;
 			
 			rectangleTool.ox = ox - xoff;
 			rectangleTool.oy = oy - yoff;
@@ -646,13 +649,17 @@ BOOL toolCircle ( )
 			int cirHeight = abs ( circleTool.y - ( int )cMouseY );
 			
 			// Include the brushsize in the calculation
-			int datawidth = ( int )( cirWidth * 2 ) + 2;
-			int dataheight = ( int )( cirHeight * 2 ) + 2;
+			int datawidth = ( int )( cirWidth * 2 ) + brushTool.width + 1;
+			int dataheight = ( int )( cirHeight * 2 ) + brushTool.height + 1;
 			int datasize = datawidth * dataheight * 8;
+         
 			circleTool.buffer = AllocVec ( datasize, MEMF_ANY|MEMF_CLEAR );
 			
-			circleTool.ox = circleTool.x - cirWidth;
-			circleTool.oy = circleTool.y - cirHeight;
+            double offx = brushTool.width / 2.0;
+            double offy = brushTool.height / 2.0;
+            
+			circleTool.ox = circleTool.x - cirWidth - offx;
+			circleTool.oy = circleTool.y - cirHeight - offy;
 			circleTool.w = cirWidth; 
 			circleTool.h = cirHeight;
 			circleTool.bufwidth = datawidth;
@@ -662,12 +669,13 @@ BOOL toolCircle ( )
 			int oldMode = brushTool.paintmode;
 			brushTool.paintmode = LUNA_PAINTMODE_NORMAL;
 			drawCircle ( 
-				cirWidth, cirHeight, cirWidth, cirHeight,
+				cirWidth + offx, 
+                cirHeight + offy, 
+                cirWidth, cirHeight,
 				datawidth, dataheight,
 				circleTool.buffer
 			);
 			brushTool.paintmode = oldMode;
-			
 			return TRUE;
 		}
 	}
@@ -677,17 +685,17 @@ BOOL toolCircle ( )
 	{
 		if ( circleTool.mode == 1 )
 		{	
-			drawCircle (
-				circleTool.ox + circleTool.w,
-				circleTool.oy + circleTool.h,
+			Affrect rect = drawCircle (
+				circleTool.ox + circleTool.w + ( brushTool.width / 2.0 ),
+				circleTool.oy + circleTool.h + ( brushTool.height / 2.0 ),
 				circleTool.w,  circleTool.h,
 				globalActiveCanvas->width, globalActiveCanvas->height,
 				globalActiveCanvas->activebuffer
 			);
 		
 			blitAreaRect (
-				circleTool.ox, circleTool.oy, 
-				circleTool.bufwidth, circleTool.bufheight,
+				rect.x, rect.y, 
+				rect.w, rect.h,
 				globalActiveCanvas, 
 				_rp ( globalActiveWindow->area )
 			);

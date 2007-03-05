@@ -126,7 +126,7 @@ void Init_TextToBrushMethods ( )
 	
 	// TODO: Make these paths be configurable
 	// Get all fonts listed out
-	STRPTR SearchFolders[] = { "Ram:", "Sys:Fonts", "Sys:Fonts/TrueType", NULL };
+	STRPTR SearchFolders[] = { "Ram:", "Sys:Fonts/", "Sys:Fonts/TrueType/", NULL };
 	LONG fontpos = 0;
 	LONG fontfolderpos = 0;
 	
@@ -134,43 +134,42 @@ void Init_TextToBrushMethods ( )
 	{
 		BPTR lock;
 		if ( ( lock = Lock ( ( CONST_STRPTR )SearchFolders[ fontfolderpos ], SHARED_LOCK ) ) != 0 )
-		{
-			static UBYTE buffer[ FONTREAD_BUFSIZE ];
+		{			
+            struct FileInfoBlock *fib = AllocDosObject ( DOS_FIB, NULL );
+			BOOL loop = Examine ( lock, fib );
 			
-			struct ExAllControl *eac = AllocDosObject( DOS_EXALLCONTROL,NULL );
-			eac->eac_LastKey = 0;
-			BOOL loop;
-			
-			do
+			while ( loop )
 			{	
-				loop = ExAll ( lock, ( struct ExAllData *)buffer, sizeof( struct ExAllData ), ED_TYPE, eac );
-				if ( !loop && IoErr() != ERROR_NO_MORE_ENTRIES )
-					break;
-				struct ExAllData *pos = ( struct ExAllData *)buffer;
-				if ( eac->eac_Entries == 0 ) continue;
-				
-				do 
-				{
-					// Crudely add .ttf fonts
-					if ( strlen ( pos->ed_Name ) > 5  )
-					{
-						if ( !strstr ( pos->ed_Name, ".ttf" ) )
-							break;
-						STRPTR str = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
-						STRPTR Fnt = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
-						strcpy ( str, pos->ed_Name );
-						DoMethod ( ttbw_FontList, MUIM_List_InsertSingle, str, MUIV_List_Insert_Bottom );
-						sprintf ( Fnt, "%s/%s", SearchFolders[ fontfolderpos ], pos->ed_Name );
-						FontList[ fontpos ] = Fnt;
-						fontpos++;
-					}
-					pos = pos->ed_Next;
-				}
-				while ( pos != NULL );
-			}
-			while ( loop );
-			FreeDosObject ( DOS_EXALLCONTROL, ( APTR )eac );
+                if ( strlen ( fib->fib_FileName ) >= 5 && fib->fib_DirEntryType < 0 )
+                {
+                    if ( strstr ( fib->fib_FileName, ".ttf" ) )
+                    {
+                        STRPTR str = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
+                        STRPTR Fnt = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
+                        strcpy ( str, fib->fib_FileName );
+                        sprintf ( Fnt, "%s%s", SearchFolders[ fontfolderpos ], fib->fib_FileName );
+                        int i = 0, found = 0; for ( ; i < fontpos; i++ )
+                        {
+                            if ( strcmp ( FontList[ i ], Fnt ) == 1 )
+                                found = 1;
+                        }
+                        if ( found == 1 ) 
+                        {
+                            FreeVec ( Fnt ); 
+                            FreeVec ( str );
+                        }
+                        else
+                        {
+                            DoMethod ( ttbw_FontList, MUIM_List_InsertSingle, str, MUIV_List_Insert_Bottom );
+                            FontList[ fontpos ] = Fnt;
+                            fontpos++;
+                        }
+                    }
+                }
+                loop = ExNext ( lock, fib );
+			}         
 			UnLock ( lock );
+            FreeDosObject( DOS_FIB, fib );         
 		}
 		fontfolderpos++;
 	}
@@ -238,9 +237,21 @@ Affrect RenderTextToBuffer (
 	FT_Library library;
 	FT_Face face; 
 	
-	if ( ( error = FT_Init_FreeType( &library ) ) ) goto error;
-	if ( ( error = FT_New_Face( library, font, 0, &face ) ) ) goto error;
-	if ( ( error = FT_Set_Pixel_Sizes( face, 0, size ) ) ) goto error;
+	if ( ( error = FT_Init_FreeType( &library ) ) ) 
+    {
+        //printf ( "Couldn't initialize freetype library.\n" );   
+        goto error;
+    }
+	if ( ( error = FT_New_Face( library, font, 0, &face ) ) )
+    {
+        //printf ( "Couldn't initialize font face ( %s ).\n", font );
+        goto error;
+    }
+	if ( ( error = FT_Set_Pixel_Sizes( face, 0, size ) ) ) 
+    {
+        //printf ( "Couldn't set pixel sizes.\n" );   
+        goto error;
+    }
 	
 	FT_GlyphSlot slot = face->glyph; // recommended ft2 shortcut >:-D
 
