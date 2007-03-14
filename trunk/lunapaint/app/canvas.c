@@ -450,8 +450,8 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 		data->window->canvas->winHasChanged = TRUE;
 	data->window->canvas->visibleWidth = areaWidth;
 	data->window->canvas->visibleHeight = areaHeight;
-	
-	// Update scrollbars if we're changing zoom
+    
+    // Update scrollbars if we're changing zoom
 	if ( 
 		globalActiveCanvas->zoom != data->currentzoom ||
 		areaWidth != data->currentareawidth || 
@@ -568,6 +568,12 @@ void UpdateCanvasInfo ( WindowList *win )
 	set ( win->txtFrameInf, MUIA_Text_Contents, ( STRPTR )&frameText );
 	sprintf ( ( unsigned char *)&layerText, "Layer: %d/%d ", layer, layrs );
 	set ( win->txtLayerInf, MUIA_Text_Contents, ( STRPTR )&layerText );
+    
+    // Update zoom display   
+    STRPTR zlevel = AllocVec ( 20, MEMF_CLEAR );
+    sprintf ( zlevel, "Zoom: x%d ", ( int )win->canvas->zoom );
+    set ( win->txtZoomLevel, MUIA_Text_Contents, ( IPTR )zlevel );
+    FreeVec ( zlevel );
 }
 
 IPTR ScrollCanvas ( int x, int y )
@@ -732,6 +738,16 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
 					dMouseX = cMouseX, dMouseY = cMouseY;
 					break;
 				}
+                // Update coordinates on display            
+                STRPTR coord = AllocVec ( 20, MEMF_CLEAR );
+                sprintf ( coord, "X: %d ", ( int )cMouseX );
+                set ( data->window->txtCoordX, MUIA_Text_Contents, ( IPTR )coord );
+                FreeVec ( coord );
+                coord = AllocVec ( 20, MEMF_CLEAR );
+                sprintf ( coord, "Y: %d ", ( int )cMouseY );
+                set ( data->window->txtCoordY, MUIA_Text_Contents, ( IPTR )coord );
+                FreeVec ( coord );
+                
 				
 			case IDCMP_MOUSEBUTTONS:
 				
@@ -905,6 +921,15 @@ void addCanvaswindow (
 						Child, ( IPTR )( canvases->txtFrameInf = TextObject,
 							MUIA_Text_Contents, "Frame: 0/0  ",
 						End ),
+                        Child, ( IPTR )( canvases->txtZoomLevel = TextObject,
+                            MUIA_Text_Contents, "Zoom: 1x ",
+                        End ),                  
+                        Child, ( IPTR )( canvases->txtCoordX = TextObject,
+                            MUIA_Text_Contents, "X: 0 " ,
+                        End ),
+                        Child, ( IPTR )( canvases->txtCoordY = TextObject,
+                            MUIA_Text_Contents, "Y: 0 ",
+                        End ),
 						Child, ( IPTR )RectangleObject, MUIA_Weight, 20, End,
 					End,
 					Child, ( IPTR )HGroup,

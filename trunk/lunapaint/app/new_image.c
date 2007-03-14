@@ -142,7 +142,7 @@ void Init_NewProjectMethods ( )
 		nwWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE 
 	);
 	
-	template_hook.h_Entry = ( HOOKFUNC )template_func;
+	template_hook.h_Entry = ( HOOKFUNC )&template_func;
 	
 	DoMethod (
 		nwTemplates, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,

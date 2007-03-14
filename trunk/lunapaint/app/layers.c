@@ -346,7 +346,7 @@ void Init_LayersWindow ( )
 	LayersWidgetTmpBuf = NULL;
 
 	struct MUI_CustomClass *lay = MUI_CreateCustomClass (
-		NULL, MUIC_Area, NULL, 0, LayersClass
+		NULL, MUIC_Area, NULL, 0, &LayersClass
 	);
 
 	WindowLayers = WindowObject,
@@ -371,6 +371,8 @@ void Init_LayersWindow ( )
 						MUIA_Group_HorizSpacing, 0,
 						Child, ( IPTR )( WidgetLayers = NewObject (
 							lay->mcc_Class, NULL, 
+                            MUIA_FillArea, FALSE,                     
+                            MUIA_Frame, MUIV_Frame_None,
 							TAG_DONE
 						) ),
 					End,
@@ -464,18 +466,18 @@ void Init_LayersWindow ( )
 	);   
 	
     // Layer opacity   
-	changeOpacityHook.h_Entry = ( HOOKFUNC )changeOpacityFunc;
-    changeVisibilityHook.h_Entry = ( HOOKFUNC )changeVisibilityFunc;  
+	changeOpacityHook.h_Entry = ( HOOKFUNC )&changeOpacityFunc;
+    changeVisibilityHook.h_Entry = ( HOOKFUNC )&changeVisibilityFunc;  
     DoMethod (
 	    LayerOpacity, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime,
 	    ( IPTR )LayerOpacity, 2, MUIM_CallHook, &changeOpacityHook
     );
-    acknowledgeOpacity.h_Entry = ( HOOKFUNC )acknowledgeOpacityFunc;
+    acknowledgeOpacity.h_Entry = ( HOOKFUNC )&acknowledgeOpacityFunc;
     DoMethod (
         LayerOpacityValue, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime,
         ( IPTR )LayerOpacityValue, 2, MUIM_CallHook, &acknowledgeOpacity
     );
-    acknowledgeLayName.h_Entry = ( HOOKFUNC )acknowledgeLayNameFunc;
+    acknowledgeLayName.h_Entry = ( HOOKFUNC )&acknowledgeLayNameFunc;
     DoMethod (
         LayerName, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime,
         ( IPTR )LayerName, 2, MUIM_CallHook, &acknowledgeLayName

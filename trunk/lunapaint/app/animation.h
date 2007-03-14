@@ -24,6 +24,10 @@
 
 #include <stdio.h>
 
+#ifndef __AROS__
+#include "../aros/aros.h"
+#endif
+
 #include <exec/types.h>
 #include <libraries/mui.h>
 #include <cybergraphx/cybergraphics.h>

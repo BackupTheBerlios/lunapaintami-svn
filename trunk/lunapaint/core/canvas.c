@@ -44,7 +44,7 @@ oCanvas* Init_Canvas (
 			tmp->buf = AllocVec ( bufsize, MEMF_ANY );
 			tmp->opacity = 100;
 			tmp->visible = TRUE;
-            tmp->name = AllocVec ( 11, MEMF_ANY|MEMF_CLEAR );
+            tmp->name = AllocVec ( 12, MEMF_ANY|MEMF_CLEAR );
             strcpy ( tmp->name, "Empty layer" );
 			
 			// Clear the buffer

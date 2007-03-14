@@ -38,6 +38,10 @@
 #include <clib/alib_protos.h>
 #include <string.h>
 
+#ifndef __AROS__
+#include "../aros/aros.h"
+#endif
+
 /*
 	GUI includes
 */

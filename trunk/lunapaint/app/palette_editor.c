@@ -507,7 +507,7 @@ void Init_PaletteWindow ( )
 		MUI_CreateCustomClass ( 
 			NULL, MUIC_Rectangle, NULL, 
 			0, 
-			PaletteArea
+			&PaletteArea
 		);
 
 	paletteWindow = WindowObject,
@@ -605,10 +605,10 @@ void Init_PaletteWindow ( )
 void Init_PaletteMethods ( )
 {
 	// Setup hooks
-	rgbslider_hook.h_Entry = ( HOOKFUNC )rgbslider_func;
-	paletteLoad_hook.h_Entry = ( HOOKFUNC )paletteLoad_func;
-	paletteSave_hook.h_Entry = ( HOOKFUNC )paletteSave_func;
-	paletteClose_hook.h_Entry = ( HOOKFUNC )paletteClose_func;
+	rgbslider_hook.h_Entry = ( HOOKFUNC )&rgbslider_func;
+	paletteLoad_hook.h_Entry = ( HOOKFUNC )&paletteLoad_func;
+	paletteSave_hook.h_Entry = ( HOOKFUNC )&paletteSave_func;
+	paletteClose_hook.h_Entry = ( HOOKFUNC )&paletteClose_func;
 
 	// Set initial slider positions
 	rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );

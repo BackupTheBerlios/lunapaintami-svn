@@ -43,6 +43,10 @@
 
 #include <stdio.h>
 
+#ifndef __AROS__
+#include "../aros/aros.h"
+#endif
+
 #include <exec/types.h>
 #include <libraries/asl.h>
 #include <libraries/mui.h>
@@ -109,6 +113,9 @@ typedef struct sWinList
 	Object									*btnUnZoom;		// The zoom out button
 	Object									*txtFrameInf;   // Info of which frame you're on
 	Object									*txtLayerInf;   // Info on which layer you're on
+    Object                                  *txtCoordX;     // X coordinates
+    Object                                  *txtCoordY;     // Y coordinates
+    Object                                  *txtZoomLevel;  // How much zoom
 	oCanvas									*canvas;		// Pixel buffer
 	unsigned	int 					 	id;				// Window ID
 	BOOL								    isActive;		// is the window active or not?

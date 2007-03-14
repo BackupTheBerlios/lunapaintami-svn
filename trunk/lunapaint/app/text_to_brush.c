@@ -117,7 +117,7 @@ void Init_TextToBrushMethods ( )
 		textToBrushWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE 
 	);
 	
-	RenderTextToBrush_hook.h_Entry = ( HOOKFUNC )RenderTextToBrush_func;
+	RenderTextToBrush_hook.h_Entry = ( HOOKFUNC )&RenderTextToBrush_func;
 	
 	DoMethod (
 		ttbw_RenderButton, MUIM_Notify, MUIA_Pressed, FALSE, 

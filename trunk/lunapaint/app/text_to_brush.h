@@ -28,6 +28,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef __AROS__
+#include "../aros/aros.h"
+#endif
+
 #include <exec/types.h>
 #include <datatypes/datatypes.h>
 #include <libraries/asl.h>

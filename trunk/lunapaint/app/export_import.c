@@ -339,12 +339,12 @@ void makeExportWindow ( )
 	);
 	
 	// Setup hook
-	export_hook.h_Entry = ( HOOKFUNC )export_func;
+	export_hook.h_Entry = ( HOOKFUNC )&export_func;
 	DoMethod (
 		exportBtnExport, MUIM_Notify, MUIA_Pressed, FALSE,
 		( IPTR )exportWindow, 2, MUIM_CallHook, &export_hook
 	);
-	exportanimation_hook.h_Entry = ( HOOKFUNC )exportanimation_func;
+	exportanimation_hook.h_Entry = ( HOOKFUNC )&exportanimation_func;
 	DoMethod (
 		exportAnimBtnExport, MUIM_Notify, MUIA_Pressed, FALSE,
 		( IPTR )exportWindow, 2, MUIM_CallHook, &exportanimation_hook
@@ -405,7 +405,7 @@ void makeImportWindow ( )
 	);
 	
 	// Setup hook
-	import_hook.h_Entry = ( HOOKFUNC )import_func;
+	import_hook.h_Entry = ( HOOKFUNC )&import_func;
 	DoMethod (
 		importBtnImport, MUIM_Notify, MUIA_Pressed, FALSE,
 		( IPTR )importWindow, 3, MUIM_CallHook, &import_hook

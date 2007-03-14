@@ -98,8 +98,14 @@
 #include <clib/alib_protos.h>
 #include <string.h>
 
+#ifdef __AROS__
 #define DEBUG 1
 #include <aros/debug.h>
+#endif
+
+#ifndef __AROS__
+#include "../aros/aros.h"
+#endif
 
 #include "parts.h"
 #include "toolbox.h"

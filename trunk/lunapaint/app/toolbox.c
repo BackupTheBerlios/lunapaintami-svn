@@ -442,7 +442,8 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
 					int segh = h / 16;
 					
 					currColor = ( 16 * ( y / segh ) ) + ( x / wu );
-					tbxPaletteRedraw ( ); DoMethod ( paletteRect, MUIM_Draw );
+					tbxPaletteRedraw ( ); 
+                    DoMethod ( paletteRect, MUIM_Draw );
 					
 					// If we are using normal brushes, make a new 
 					// brush with the new color
@@ -478,12 +479,12 @@ void Init_ToolboxWindow ( )
 {	
 	// Palette widget
 	struct MUI_CustomClass *mcc = MUI_CreateCustomClass ( 
-		NULL, MUIC_Rectangle, NULL, 0, tbxPalette
+		NULL, MUIC_Rectangle, NULL, 0, &tbxPalette
 	);
 	
 	// Brush preview widget
 	struct MUI_CustomClass *mcc_preview = MUI_CreateCustomClass (
-		NULL, MUIC_Rectangle, NULL, 0, tbxPreview
+		NULL, MUIC_Rectangle, NULL, 0, &tbxPreview
 	);
 	
 	static const char *arr_fillmode[] = { "Draw only", "Fill shapes", "Draw/Fill", NULL };
@@ -744,10 +745,10 @@ void Exit_ToolboxWindow ( )
 void Init_ToolboxMethods ( )
 {
 	// Set up our hooks
-	getMenu_hook.h_Entry = ( HOOKFUNC )getMenu_func;
-	brushOptions_hook.h_Entry = ( HOOKFUNC )brushOptions_func;
-	getFill_hook.h_Entry = ( HOOKFUNC )getFill_func;
-	getOpacMode_hook.h_Entry = ( HOOKFUNC )getOpacMode_func;
+	getMenu_hook.h_Entry = ( HOOKFUNC )&getMenu_func;
+	brushOptions_hook.h_Entry = ( HOOKFUNC )&brushOptions_func;
+	getFill_hook.h_Entry = ( HOOKFUNC )&getFill_func;
+	getOpacMode_hook.h_Entry = ( HOOKFUNC )&getOpacMode_func;
 	
 	// Methods
 	DoMethod ( 

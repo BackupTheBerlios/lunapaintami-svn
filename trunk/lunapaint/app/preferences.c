@@ -102,7 +102,7 @@ void Init_PrefsWindow ( )
 		End,
 	End;
 	
-	PrefsHandler_hook.h_Entry = ( HOOKFUNC )PrefsHandler_func;
+	PrefsHandler_hook.h_Entry = ( HOOKFUNC )&PrefsHandler_func;
 	
 	// Setting the prefs visible in the gui
 	set ( PrefsCycScrType, MUIA_Cycle_Active, ( IPTR )GlobalPrefs.ScreenmodeType );
