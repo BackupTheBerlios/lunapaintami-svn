@@ -67,85 +67,85 @@
 #include "../core/definitions.h"
 
 /*
-	For the pubscreen
+    For the pubscreen
 */
 struct NewScreen *lunaScreen;
 struct Screen *lunaPubScreen;
 
 typedef struct rect__struct
 {
-	int x;
-	int y;
-	int w;
-	int h;
+    int x;
+    int y;
+    int w;
+    int h;
 } RectStruct;
 
 /*
-	A linked list consisting of windowID and a window object
+    A linked list consisting of windowID and a window object
 */
 typedef struct sWinList 
 {
-	Object 									*win;					// The MUI window
-	
-	Object									*projectWin;	// Project window
-	Object									*projBtnOk;		// Project ok button
-	Object									*projName;		// Project name
-	Object									*projAuthor;	// Project author
-	Object									*projDesc;		// Project description
-	struct 		Hook					 	projHook;		// Function hook to change the proj info
-	char									*filename;		// The filename
-	
-	int										rRectX;			// RedrawRect X
-	int										rRectY;			// RedrawRect Y
-	int										rRectW;			// RedrawRect W
-	int										rRectH;			// RedrawRect H
-	unsigned int							contWidth;		// Known container width
-	unsigned int							contHeight;		// Known container height
-	
-	Object									*container; 	// Containing the area
-	Object									*area;			// MUI area data
-	Object									*scrollgrp;		// Scrollgroup
-	Object									*scrollH;		// Horizontal scrollbar
-	Object									*scrollV;		// Vertical scrollbar
-	Object									*mouse;			// Contains the mouse object
-	Object									*btnZoom;		// The zoom button
-	Object									*btnShowAll;	// The whole image
-	Object									*btnUnZoom;		// The zoom out button
-	Object									*txtFrameInf;   // Info of which frame you're on
-	Object									*txtLayerInf;   // Info on which layer you're on
+    Object 									*win;					// The MUI window
+    
+    Object									*projectWin;	// Project window
+    Object									*projBtnOk;		// Project ok button
+    Object									*projName;		// Project name
+    Object									*projAuthor;	// Project author
+    Object									*projDesc;		// Project description
+    struct 		Hook					 	projHook;		// Function hook to change the proj info
+    char									*filename;		// The filename
+    
+    int										rRectX;			// RedrawRect X
+    int										rRectY;			// RedrawRect Y
+    int										rRectW;			// RedrawRect W
+    int										rRectH;			// RedrawRect H
+    unsigned int							contWidth;		// Known container width
+    unsigned int							contHeight;		// Known container height
+    
+    Object									*container; 	// Containing the area
+    Object									*area;			// MUI area data
+    Object									*scrollgrp;		// Scrollgroup
+    Object									*scrollH;		// Horizontal scrollbar
+    Object									*scrollV;		// Vertical scrollbar
+    Object									*mouse;			// Contains the mouse object
+    Object									*btnZoom;		// The zoom button
+    Object									*btnShowAll;	// The whole image
+    Object									*btnUnZoom;		// The zoom out button
+    Object									*txtFrameInf;   // Info of which frame you're on
+    Object									*txtLayerInf;   // Info on which layer you're on
     Object                                  *txtCoordX;     // X coordinates
     Object                                  *txtCoordY;     // Y coordinates
     Object                                  *txtZoomLevel;  // How much zoom
-	oCanvas									*canvas;		// Pixel buffer
-	unsigned	int 					 	id;				// Window ID
-	BOOL								    isActive;		// is the window active or not?
-	BOOL								    isVisible;		// If it is supposed to be visible
-	BOOL								    layersChg;		// Has the layercount changed?
-	RectStruct							 	prevBlit;		// previous blitted area
-	struct 		Hook						CanvasKey_hook; // Hook for input keys
-	struct 		sWinList 			        *nextwin;		// Next window in list
-	
-	
+    oCanvas									*canvas;		// Pixel buffer
+    unsigned	int 					 	id;				// Window ID
+    BOOL								    isActive;		// is the window active or not?
+    BOOL								    isVisible;		// If it is supposed to be visible
+    BOOL								    layersChg;		// Has the layercount changed?
+    RectStruct							 	prevBlit;		// previous blitted area
+    struct 		Hook						CanvasKey_hook; // Hook for input keys
+    struct 		sWinList 			        *nextwin;		// Next window in list
+    
+    
 } WindowList;
 
 /*
-	The data struct for the custom area class 
+    The data struct for the custom area class 
 */
 struct RGBitmapData
 {
-	int								arealeft;				// Offset relative to window
-	int								areatop;				// --||--
-	int								currentzoom;			// Current zoom level
-	int								currentareawidth; 	    // current width of paint area
-	int								currentareaheight;	    // current height of paint area
+    int								arealeft;				// Offset relative to window
+    int								areatop;				// --||--
+    int								currentzoom;			// Current zoom level
+    int								currentareawidth; 	    // current width of paint area
+    int								currentareaheight;	    // current height of paint area
     unsigned int                    scrollPosH;             // Remembered scroll pos
     unsigned int                    scrollPosV;             // Remembered scroll pos
     unsigned int                    scrollEntriesH;         // Remembered scroll pos
     unsigned int                    scrollEntriesV;         // Remembered scroll pos
-	BOOL 				 			mousepressed;		    // If the mouse is pressed
-	BOOL							isBusy;				    // If the canvas is heavily busy on something
-	WindowList*						window;					// A pointer to the window
-	struct RastPort* 				rp;						// Rastport to draw on
+    BOOL 				 			mousepressed;		    // If the mouse is pressed
+    BOOL							isBusy;				    // If the canvas is heavily busy on something
+    WindowList*						window;					// A pointer to the window
+    struct RastPort* 				rp;						// Rastport to draw on
 };
 
 struct FileRequester *aslfileReq;
@@ -154,12 +154,12 @@ int mouseClickCount; // registers clicks and doubleclicks etc
 
 
 /*
-	Remember ALWAYS to free a filename gotten from getFilename()
+    Remember ALWAYS to free a filename gotten from getFilename()
 */
 char *getFilename ( );
 
 /*
-	Get the filesize
+    Get the filesize
 */
 unsigned int getFilesize ( char *filename );
 

@@ -77,22 +77,22 @@ oCanvas* lastDrawnCanvas;
 BOOL forceLayerRedraw;
 
 /*
-	This function initializes the layer window and the widget
+    This function initializes the layer window and the widget
 */
 void Init_LayersWindow ( );
 
 /*
-	This function returns the dimensions of the layer widget
+    This function returns the dimensions of the layer widget
 */
 IPTR layerMinMax ( Class *CLASS, Object *self, struct MUIP_AskMinMax *message );
 
 /*
-	Blank box on the layer widget
+    Blank box on the layer widget
 */
 void layerRenderBlank ( );
 
 /*
-	This function renders the layer widget
+    This function renders the layer widget
 */ 
 BOOL layerRender ( Class *CLASS, Object *self );
 
@@ -102,17 +102,17 @@ BOOL layerRender ( Class *CLASS, Object *self );
 void RenderLayerNames ( int x, int y, int w, int h );
 
 /*
-	This function handles input on the layer widget
+    This function handles input on the layer widget
 */
 IPTR layerHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg );
 
 /*
-	Repaint the actual widget
+    Repaint the actual widget
 */
 void layersRepaintWindow ( Class *CLASS, Object *self );
 
 /*
-	Clean up
+    Clean up
 */
 void Exit_LayersWindow ( );
 

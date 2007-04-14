@@ -47,56 +47,56 @@ void fEmptyStack ( int *fStack );
 // endpoint is if you are doing this in a draw operation
 // where you don't want to draw over a coord two times
 Affrect drawLine (
-	double x1, double y1, double x2, double y2, 
-	int bufferwidth, int bufferheight,
-	unsigned long long int *buffer, BOOL subtract_endpoint
+    double x1, double y1, double x2, double y2, 
+    int bufferwidth, int bufferheight,
+    unsigned long long int *buffer, BOOL subtract_endpoint
 );
 // Draws a line used on an unsigned char buffer (used for internal stuff)
 void drawLineCharbuf ( 
-	double x1, double y1, double x2, double y2, 
-	int bufferwidth, int bufferheight,
-	unsigned char *buffer, unsigned char value
+    double x1, double y1, double x2, double y2, 
+    int bufferwidth, int bufferheight,
+    unsigned char *buffer, unsigned char value
 );
 
 Affrect plotBrush ( 
-	double x, double y,
-	int bufferwidth, int bufferheight,
-	unsigned long long int *buffer
+    double x, double y,
+    int bufferwidth, int bufferheight,
+    unsigned long long int *buffer
 );
 
 inline void pixelAntialias ( 
-	double x, double y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf 
+    double x, double y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf 
 );
 
 inline void pixelPlain (
-	int x, int y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf
+    int x, int y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf
 );
 
 
 inline unsigned long long int processPixel ( rgba64 origCol, rgba64 paintCol, double x, double y, double diffx, double diffy );
 
 Affrect floodFill (
-	int x, int y,
-	int bufferwidth, int bufferheight, 
-	unsigned long long int color, 
-	unsigned long long int clickColor,
-	unsigned long long int *buffer, 
-	unsigned int threshold
+    int x, int y,
+    int bufferwidth, int bufferheight, 
+    unsigned long long int color, 
+    unsigned long long int clickColor,
+    unsigned long long int *buffer, 
+    unsigned int threshold
 );
 
 void fillCharbuf (
-	int x, int y, int bufferwidth, int bufferheight, 
-	unsigned char *buffer, unsigned char value
+    int x, int y, int bufferwidth, int bufferheight, 
+    unsigned char *buffer, unsigned char value
 );
 
 Affrect drawCircle (
-	double x, double y, double w, double h,
-	unsigned int bufferwidth, unsigned int bufferheight,
-	unsigned long long int *buffer
+    double x, double y, double w, double h,
+    unsigned int bufferwidth, unsigned int bufferheight,
+    unsigned long long int *buffer
 );
 
 /*
-	Snap a color to the palette
+    Snap a color to the palette
 */
 rgba64 snapToPalette ( rgba64 color, BOOL selectIndex );
 

@@ -124,12 +124,12 @@ BOOL isScrolling;
 int AskMinMaxTimes;
 
 /*
-	Setup keyboard shortcuts on canvas and toolbox
+    Setup keyboard shortcuts on canvas and toolbox
 */
 void checkKeyboardShortcuts ( UWORD stri );
 
 /*
-	Move canvas
+    Move canvas
 */
 void moveScrollbarUp ( );
 void moveScrollbarDown ( );
@@ -137,108 +137,108 @@ void moveScrollbarLeft ( );
 void moveScrollbarRight ( );
 
 /*
-	Redraw the area object with canvas data
+    Redraw the area object with canvas data
 */
 IPTR RGBitmapRedraw ( Class *CLASS, Object *self );
 
 /*
-	Return min default and max sizes of canvas
+    Return min default and max sizes of canvas
 */
 IPTR CanvasAskMinMax ( Class *CLASS,Object *self, struct MUIP_AskMinMax *message );
 
 /*
-	Update Frame: 1/1 etc
+    Update Frame: 1/1 etc
 */
 void UpdateCanvasInfo ( WindowList *win );
 
 /*
-	Scroll the active canvas
+    Scroll the active canvas
 */
 IPTR ScrollCanvas ( int x, int y );
 
 /*
-	Snap offset coords to zoom (globalactivecanvas)
+    Snap offset coords to zoom (globalactivecanvas)
 */
 void SnapOffsetToZoom ( oCanvas *canv );
 
 /*
-	Check if active window has changed and
-	redraw if it has
+    Check if active window has changed and
+    redraw if it has
 */
 void winHasChanged ( );
 
 /*
-	Handle input events on area, like pressed mouse buttons, mouse movements and so on.
-	Also, store the state of events in self.
+    Handle input events on area, like pressed mouse buttons, mouse movements and so on.
+    Also, store the state of events in self.
 */
 IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg );
 
 /*
-	Store mouse coordinates into the global variables
+    Store mouse coordinates into the global variables
 */
 void getMouseCoordinates ( struct MUIP_HandleInput *msg, struct RGBitmapData *data, int ox, int oy );
 
 /*
-	This function adds a canvas window to the canvas window list
-	( canwinlist )
+    This function adds a canvas window to the canvas window list
+    ( canwinlist )
 */
 void addCanvaswindow ( 
-	unsigned int width, unsigned int height, 
-	unsigned int layers, unsigned int frames,
-	BOOL generateCanvas 
+    unsigned int width, unsigned int height, 
+    unsigned int layers, unsigned int frames,
+    BOOL generateCanvas 
 );
 
 /*
-	Contstrain offset values within scope of canvas
+    Contstrain offset values within scope of canvas
 */
 void constrainOffset ( oCanvas *canvas );
 
 /*
-	This function sends back a pointer to a window object
+    This function sends back a pointer to a window object
 */
 Object *getCanvaswindowById ( unsigned int id );
 
 /*
-	This function sends back a pointer to the window struct
+    This function sends back a pointer to the window struct
 */
 WindowList *getCanvasDataById ( unsigned int id );
 
 /*
-	Import an image rawly! :-D
+    Import an image rawly! :-D
 */
 void importImageRAW ( unsigned int w, unsigned int h, unsigned long long int *buffer );
 
 /*
-	Load an image through datatypes
+    Load an image through datatypes
 */
 BOOL loadDatatypeImage ( );
 
 /*
-	Free memory
+    Free memory
 */
 void deleteCanvaswindows ( );
 
 /*
-	Remove a single canvas window and it's structure
+    Remove a single canvas window and it's structure
 */
 IPTR removeActiveWindow ( Class *CLASS, Object *self );
 
 /*
-	Blit over a rect to the area from a canvas
+    Blit over a rect to the area from a canvas
 */
 void blitAreaRect ( 
-	int x, int y, int w, int h, 
-	oCanvas* canvas, struct RastPort *rp
+    int x, int y, int w, int h, 
+    oCanvas* canvas, struct RastPort *rp
 );
 
 /*
-	Removes previous tool preview blit from the painting
+    Removes previous tool preview blit from the painting
 */
 void removePrevToolPreview ( );
 
 /*
-	Calls blitAreaRect over a hovered over part of the screen
-	to show the current brush or a clipbrush
+    Calls blitAreaRect over a hovered over part of the screen
+    to show the current brush or a clipbrush
 */
 void callToolPreview ( );
 

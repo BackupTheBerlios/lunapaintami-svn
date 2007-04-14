@@ -34,31 +34,31 @@
 #include <exec/types.h>
 
 /*
-	The lunapaint fileformat header
-	794 bytes
+    The lunapaint fileformat header
+    794 bytes
 */
 struct LunapaintHeader
 {
-	char version[ 16 ];
-	char projectName[ 128 ];
-	char author[ 128 ];
-	short width;
-	short height;
-	short layerCount;
-	short frameCount;
-	short objectCount;
+    char version[ 16 ];
+    char projectName[ 128 ];
+    char author[ 128 ];
+    short width;
+    short height;
+    short layerCount;
+    short frameCount;
+    short objectCount;
 };
 
 /*
-	A lunapaint object can be connected to 
-	a project
+    A lunapaint object can be connected to 
+    a project
 */
 struct LunapaintObject
 {
-	char type[ 32 ];
-	unsigned int layer;
-	unsigned int frame;
-	void *data;
+    char type[ 32 ];
+    unsigned int layer;
+    unsigned int frame;
+    void *data;
 };
 
 // This one is to be found in the file format
@@ -76,36 +76,36 @@ struct LunaObjDesc
 
 
 /*
-	The lunapaint fileformat
+    The lunapaint fileformat
 */
 struct LunapaintFormat
 {
-	struct LunapaintHeader header;
-	char *description;
-	struct LunapaintObject *objects;
-	unsigned long long int *layers;
+    struct LunapaintHeader header;
+    char *description;
+    struct LunapaintObject *objects;
+    unsigned long long int *layers;
 };
 
 /*
-	A gfxbuffer is a 16 bits pr color buffer that holds
-	graphics in nodes. Internally it's just a linked list
-	of graphics. But externally, it does group buffers in
-	layers and frames. 
-	The list with 2 frames and three layers is like this for example:
-	fr1_L1 - fr1_L2 - fr1_L3 - fr2_L1 - fr2_L2 - fr2_L3
-	So first comes layers then frames. When resizing the animation
-	or the layers, one has 4to restructure the list.
+    A gfxbuffer is a 16 bits pr color buffer that holds
+    graphics in nodes. Internally it's just a linked list
+    of graphics. But externally, it does group buffers in
+    layers and frames. 
+    The list with 2 frames and three layers is like this for example:
+    fr1_L1 - fr1_L2 - fr1_L3 - fr2_L1 - fr2_L2 - fr2_L3
+    So first comes layers then frames. When resizing the animation
+    or the layers, one has 4to restructure the list.
 */
 typedef struct gfxbuf {	
-	struct gfxbuf *nextbuf;
-	BOOL visible;
-	char opacity;
-	unsigned char *name;
-	unsigned long long int *buf;
+    struct gfxbuf *nextbuf;
+    BOOL visible;
+    char opacity;
+    unsigned char *name;
+    unsigned long long int *buf;
 } gfxbuffer;
 
 /*
-	A simple 24bpp palette
+    A simple 24bpp palette
 */
 char filledDrawing;
 unsigned int *globalPalette;
@@ -114,63 +114,63 @@ unsigned int currColor; // current color index
 unsigned int prevColor; // previous color index
 
 /*
-	Simple struct which holds rgb data
+    Simple struct which holds rgb data
 */
 typedef struct rgbdata
 {
-	unsigned int r, g, b;
+    unsigned int r, g, b;
 } rgbData;
 
 /*
-	Struct that holds rgba data in unsigned long long int
+    Struct that holds rgba data in unsigned long long int
 */
 typedef struct rgbadatal
 {
-	unsigned long long int r, g, b, a;
+    unsigned long long int r, g, b, a;
 } rgbaDataL;
 
 /*
-	Struct that holds rgba data in unsigned int
+    Struct that holds rgba data in unsigned int
 */
 typedef struct rgbadata
 {
-	unsigned int r, g, b, a;
+    unsigned int r, g, b, a;
 } rgbaData;
 
 /*
-	A canvas holds all the information about a surface. A surface
-	can be shown in a Window, can have frames (it always starts with 1
-	frames), can have layers on the frames etc.
+    A canvas holds all the information about a surface. A surface
+    can be shown in a Window, can have frames (it always starts with 1
+    frames), can have layers on the frames etc.
 */
 typedef struct typeCanvas
 {
-	unsigned int 							width;
-	unsigned int 							height;
-	int										offsetx;
-	int										offsety;
-	unsigned int 							currentFrame;
-	unsigned int                            totalFrames;
-	unsigned int                            currentLayer;
-	unsigned int                            previousLayer; 	    // Previously selected layer
-	unsigned int 							totalLayers;
-	unsigned char							onion;				// Modes of onion skin
-	
-	unsigned int*							screenbuffer;		// Holds temp data for displaying
-	unsigned int*							screenstorage;		// Stores the screenbuffer
-	BOOL										winHasChanged;		// If the window has changed
-	unsigned int							scrStorageWidth;	// Width of storage window
-	unsigned int							scrStorageHeight;	// Height of storage window
-	unsigned int							layerScrollPosV;	// Vertical scroll position in layers window
-	
-	unsigned int							winEdgeWidth;		// Edge from canvas to window edge
-	unsigned int							winEdgeHeight;		// --||--
-	unsigned int							visibleWidth;		// Visible part of image
-	unsigned int							visibleHeight;		// Visible part of image
-	double									zoom;				// Amout of zoom on canvas
-	gfxbuffer* 								buffer;				// Linked list	
-	unsigned long long int* 			    activebuffer;		// Points to the current layer/frame
-	unsigned long long int*				    swapbuffer;			// A swap buffer :-)
-	unsigned int*							tmpBuf;				// Stores temp info if needed
+    unsigned int 							width;
+    unsigned int 							height;
+    int										offsetx;
+    int										offsety;
+    unsigned int 							currentFrame;
+    unsigned int                            totalFrames;
+    unsigned int                            currentLayer;
+    unsigned int                            previousLayer; 	    // Previously selected layer
+    unsigned int 							totalLayers;
+    unsigned char							onion;				// Modes of onion skin
+    
+    unsigned int*							screenbuffer;		// Holds temp data for displaying
+    unsigned int*							screenstorage;		// Stores the screenbuffer
+    BOOL										winHasChanged;		// If the window has changed
+    unsigned int							scrStorageWidth;	// Width of storage window
+    unsigned int							scrStorageHeight;	// Height of storage window
+    unsigned int							layerScrollPosV;	// Vertical scroll position in layers window
+    
+    unsigned int							winEdgeWidth;		// Edge from canvas to window edge
+    unsigned int							winEdgeHeight;		// --||--
+    unsigned int							visibleWidth;		// Visible part of image
+    unsigned int							visibleHeight;		// Visible part of image
+    double									zoom;				// Amout of zoom on canvas
+    gfxbuffer* 								buffer;				// Linked list	
+    unsigned long long int* 			    activebuffer;		// Points to the current layer/frame
+    unsigned long long int*				    swapbuffer;			// A swap buffer :-)
+    unsigned int*							tmpBuf;				// Stores temp info if needed
 } oCanvas;
 
 #endif

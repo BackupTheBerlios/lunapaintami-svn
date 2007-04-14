@@ -62,8 +62,8 @@ typedef struct Affected_Rect
 WindowList*                 globalActiveWindow;
 oCanvas*                    globalActiveCanvas;
 int                         globalWindowIncrement;
-int                             globalEvents;
-int                             globalCurrentTool;
+int                         globalEvents;
+int                         globalCurrentTool;
 int                         globalGrid; // Using grid?
 int                         globalCurrentGrid; // Grid size
 
@@ -76,13 +76,13 @@ double                      dMouseY; // --||--
 double                      pMouseX; // Prev coordinate for drawing
 double                      pMouseY; // --||--
 
-BOOL                            MouseButtonL;
-BOOL                            MouseButtonR;
-BOOL                            globalAntialiasing;
-BOOL                            globalFeather;
+BOOL                        MouseButtonL;
+BOOL                        MouseButtonR;
+BOOL                        globalAntialiasing;
+BOOL                        globalFeather;
 int                         globalBrushMode; // Normal generated or clipbrush
 int                         globalColorMode; // How to use colors
-UWORD                           lastKeyPressed;
-BOOL                            MouseHasMoved;
+UWORD                       lastKeyPressed;
+BOOL                        MouseHasMoved;
 
 #endif

@@ -30,18 +30,18 @@
 #include "definitions.h"
 
 /*
-	Move the active layer on a canvas with x and y and wrap 
-	around.
+    Move the active layer on a canvas with x and y and wrap 
+    around.
 */
 void effectOffset ( int x, int y, oCanvas *canvas );
 
 /*
-	Flip a buffer vertically
+    Flip a buffer vertically
 */
 void effectFlipVert ( oCanvas *canvas );
 
 /*
-	Flip a buffer horizontally
+    Flip a buffer horizontally
 */
 void effectFlipHoriz ( oCanvas *canvas ); 
 

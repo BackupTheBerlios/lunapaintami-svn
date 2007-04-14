@@ -62,21 +62,21 @@
 Object *projectWindow;
 
 /*
-	Creates a project window object and adds it to the PaintApp object
+    Creates a project window object and adds it to the PaintApp object
 */
 void CreateProjectWindow ( WindowList *lst );
 /*
-	Destroys the project window object and removes it from the PaintApp
+    Destroys the project window object and removes it from the PaintApp
 */
 void DestroyProjectWindow ( WindowList *lst );
 
 /*
-	Save a project to disk
+    Save a project to disk
 */
 void SaveProject ( WindowList *lst );
 
 /*
-	Load project from disk
+    Load project from disk
 */
 void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas );
 

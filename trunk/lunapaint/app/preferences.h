@@ -72,12 +72,12 @@ Object *PrefsCycScrType;	// Screen type cycle
 void Init_PrefsWindow ( );
 
 /*
-	Save program preferences
+    Save program preferences
 */
 BOOL savePreferences ( );
 
 /*
-	Load program preferences
+    Load program preferences
 */
 BOOL loadPreferences ( );
 

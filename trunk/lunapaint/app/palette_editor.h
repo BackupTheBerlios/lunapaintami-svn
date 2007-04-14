@@ -90,42 +90,42 @@ struct Hook paletteLoad_hook;
 struct Hook paletteClose_hook;
 
 /*
-	Function to redraw the palette area
+    Function to redraw the palette area
 */
 IPTR PaletteRedraw ( int colorIndex );
 
 /*
-	Function to handle input events on area
+    Function to handle input events on area
 */
 IPTR PaletteEvents ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg );
 
 /*
-	Do different palette actions
+    Do different palette actions
 */
 IPTR PaletteActions ( ULONG action );
 
 /*
-	update the little preview rect over the rgb sliders
+    update the little preview rect over the rgb sliders
 */
 void updateColorPreview ( );
 
 /*
-	Initialize the palette window
+    Initialize the palette window
 */
 void Init_PaletteWindow ( );
 
 /*
-	Initialize the events on the palette
+    Initialize the events on the palette
 */
 void Init_PaletteMethods ( );
 
 /*
-	Save a palette to disk using RAW binary format
+    Save a palette to disk using RAW binary format
 */
 ULONG savePalette ( );
 
 /*
-	Load a palette from disk using RAW binary format
+    Load a palette from disk using RAW binary format
 */
 ULONG loadPalette ( );
 

@@ -46,84 +46,84 @@ char *Version = VERSIONSTRING;
 
 void doEvents ( )
 {
-	if ( globalActiveWindow == NULL ) return;
-	if ( globalActiveCanvas == NULL ) return;
-		
-	// Go through events
-	if ( globalActiveWindow->isActive )
-	{
-		if ( MouseHasMoved )
-		{
-			/* If we get an action response it means the tool */
-			/* Did something. So we then reset MouseHasMoved  */
-			BOOL response = FALSE;
-			switch ( globalCurrentTool )
-			{
-				case LUNA_TOOL_BRUSH:		
-					response = toolBrush ( );
-					break;	
-				case LUNA_TOOL_FILL:		
-					response = toolFill ( );				
-					break;
-				case LUNA_TOOL_LINE:		
-					response = toolLine ( );				
-					break;
-				case LUNA_TOOL_RECTANGLE:		
-					response = toolRectangle ( );				
-					break;
-				case LUNA_TOOL_CIRCLE:		
-					response = toolCircle ( );				
-					break;
-				case LUNA_TOOL_CLIPBRUSH:		
-					response = toolClipBrush ( );				
-					break;
-				case LUNA_TOOL_COLORPICKER:		
-					response = toolColorPicker ( );				
-					break;
-				default:
-					break;
-			}
-			if ( response )
-				MouseHasMoved = FALSE;
-		}		
-		// Show outline of tool
-		callToolPreview ( );
-	}
+    if ( globalActiveWindow == NULL ) return;
+    if ( globalActiveCanvas == NULL ) return;
+        
+    // Go through events
+    if ( globalActiveWindow->isActive )
+    {
+        if ( MouseHasMoved )
+        {
+            /* If we get an action response it means the tool */
+            /* Did something. So we then reset MouseHasMoved  */
+            BOOL response = FALSE;
+            switch ( globalCurrentTool )
+            {
+                case LUNA_TOOL_BRUSH:		
+                    response = toolBrush ( );
+                    break;	
+                case LUNA_TOOL_FILL:		
+                    response = toolFill ( );				
+                    break;
+                case LUNA_TOOL_LINE:		
+                    response = toolLine ( );				
+                    break;
+                case LUNA_TOOL_RECTANGLE:		
+                    response = toolRectangle ( );				
+                    break;
+                case LUNA_TOOL_CIRCLE:		
+                    response = toolCircle ( );				
+                    break;
+                case LUNA_TOOL_CLIPBRUSH:		
+                    response = toolClipBrush ( );				
+                    break;
+                case LUNA_TOOL_COLORPICKER:		
+                    response = toolColorPicker ( );				
+                    break;
+                default:
+                    break;
+            }
+            if ( response )
+                MouseHasMoved = FALSE;
+        }		
+        // Show outline of tool
+        callToolPreview ( );
+    }
 }
 
 int main ( int argc, char *argv[] )
 {
-	ULONG sigs;
-	globalEvents = -1;
-	globalCurrentTool = LUNA_TOOL_BRUSH;
-	
-	// Init brush
-	brushTool.antialias = TRUE; // TODO: load from config set toolbox cycle!
-	brushTool.width = 1;
-	brushTool.height = 1;
-	brushTool.feather = TRUE; // TODO: load from config and set toolbox cycle!
-	
-	// Set the colors
-	prevColor = 0;
-	currColor = 0;
-	globalColor = 0;
-	
-	Init_Application ( );
+    ULONG sigs;
+    globalEvents = -1;
+    globalCurrentTool = LUNA_TOOL_BRUSH;
+    
+    // Init brush
+    brushTool.antialias = TRUE; // TODO: load from config set toolbox cycle!
+    brushTool.width = 1;
+    brushTool.height = 1;
+    brushTool.feather = TRUE; // TODO: load from config and set toolbox cycle!
+    
+    // Set the colors
+    prevColor = 0;
+    currColor = 0;
+    globalColor = 0;
+    
+    Init_Application ( );
 
-	while ( getSignals ( &sigs ) )
-	{
-		// Check for signals from GUI
-		if ( checkSignalBreak ( &sigs ) )
-			break;	
-		
-		// Execute pending events
-		doEvents ( );
-		
-		// Reset events
-		globalEvents = -1;
-		
-		// Mouse clicks
-		if ( mouseClickCount > 0 ) mouseClickCount--;
+    while ( getSignals ( &sigs ) )
+    {
+        // Check for signals from GUI
+        if ( checkSignalBreak ( &sigs ) )
+            break;	
+        
+        // Execute pending events
+        doEvents ( );
+        
+        // Reset events
+        globalEvents = -1;
+        
+        // Mouse clicks
+        if ( mouseClickCount > 0 ) mouseClickCount--;
             
         // Delayed canvas redraw
         if ( redrawTimes == 1 )
@@ -133,9 +133,9 @@ int main ( int argc, char *argv[] )
             redrawTimes--;       
         }
         if ( redrawTimes > 0 ) redrawTimes--;
-	}
+    }
 
-	Exit_Application ( );
+    Exit_Application ( );
 
-	return 0;
+    return 0;
 }

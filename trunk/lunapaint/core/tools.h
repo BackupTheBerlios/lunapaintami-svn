@@ -37,44 +37,44 @@
 #include "drawtools.h"
 
 /*
-	Draw with the brush!
+    Draw with the brush!
 */
 BOOL toolBrush ( );
 void toolBrushFill ( ); // Fill the last drawn shape
 void makeToolBrush ( ); // <- generate pixel buffer
 
 /*
-	Fill!
+    Fill!
 */
 BOOL toolFill ( );
 
 /*
-	Line drawing tool
+    Line drawing tool
 */
 BOOL toolLine ( );
 
 /*
-	Rectangle drawing tool
+    Rectangle drawing tool
 */
 BOOL toolRectangle ( );
 
 /*
-	Rectangle drawing tool
+    Rectangle drawing tool
 */
 BOOL toolCircle ( );
 
 /*
-	Rectangle drawing tool
+    Rectangle drawing tool
 */
 BOOL toolClipBrush ( );
 
 /*
-	Pick a color
+    Pick a color
 */
 BOOL toolColorPicker ( );
 
 /*
-	Tool tools =)
+    Tool tools =)
 */
 void flipBrushVert ( );
 void flipBrushHoriz ( );

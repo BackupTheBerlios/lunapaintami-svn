@@ -23,68 +23,68 @@
 
 void effectOffset ( int x, int y, oCanvas *canvas )
 {
-	unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
-	
-	unsigned long long int *buf = canvas->activebuffer;
-	
-	int cy, cx, offy, offx; 
-	
-	// Y pass
-	
-	for ( cy = 0; cy < canvas->height; cy++ )
-	{
-		offy = ( cy + y ) % canvas->height;
-		memcpy ( &buffer[ offy * canvas->width ], &buf[ cy * canvas->width ], canvas->width * 8 );
-	}
-	
-	// Copy back
-	
-	memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-	
-	// X pass
-	
-	for ( cy = 0; cy < canvas->height; cy++ )
-	{
-		int dataoffy = cy * canvas->width;
-		
-		for ( cx = 0; cx < canvas->width; cx++ )
-		{
-			offx = ( cx + x ) % canvas->width;
-			buffer[ dataoffy + offx ] = buf[ dataoffy + cx ];
-		}
-	}
-	
-	// Copy back
-	
-	memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-	
-	FreeVec ( buffer );
+    unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
+    
+    unsigned long long int *buf = canvas->activebuffer;
+    
+    int cy, cx, offy, offx; 
+    
+    // Y pass
+    
+    for ( cy = 0; cy < canvas->height; cy++ )
+    {
+        offy = ( cy + y ) % canvas->height;
+        memcpy ( &buffer[ offy * canvas->width ], &buf[ cy * canvas->width ], canvas->width * 8 );
+    }
+    
+    // Copy back
+    
+    memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
+    
+    // X pass
+    
+    for ( cy = 0; cy < canvas->height; cy++ )
+    {
+        int dataoffy = cy * canvas->width;
+        
+        for ( cx = 0; cx < canvas->width; cx++ )
+        {
+            offx = ( cx + x ) % canvas->width;
+            buffer[ dataoffy + offx ] = buf[ dataoffy + cx ];
+        }
+    }
+    
+    // Copy back
+    
+    memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
+    
+    FreeVec ( buffer );
 }
 
 void effectFlipVert ( oCanvas *canvas )
 {
-	unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
-	unsigned long long int *buf = canvas->activebuffer;
-	int cy; for ( cy = 0; cy < canvas->height; cy++ )
-	{
-		memcpy( &buffer[ ( cy * canvas->width ) ], &buf[ ( canvas->height - cy - 1 ) * canvas->width ], canvas->width * 8 );
-	}
-	memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-	FreeVec ( buffer );
+    unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
+    unsigned long long int *buf = canvas->activebuffer;
+    int cy; for ( cy = 0; cy < canvas->height; cy++ )
+    {
+        memcpy( &buffer[ ( cy * canvas->width ) ], &buf[ ( canvas->height - cy - 1 ) * canvas->width ], canvas->width * 8 );
+    }
+    memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
+    FreeVec ( buffer );
 }
 
 void effectFlipHoriz ( oCanvas *canvas )
 {
-	unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
-	unsigned long long int *buf = canvas->activebuffer;
-	int cy; for ( cy = 0; cy < canvas->height; cy++ )
-	{
-		int yoff = cy * canvas->width;
-		int cx; for ( cx = 0; cx < canvas->width; cx++ )
-		{
-			buffer[ yoff + cx ] = buf[ yoff + ( canvas->width - 1 - cx ) ];
-		}
-	}
-	memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-	FreeVec ( buffer );
+    unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
+    unsigned long long int *buf = canvas->activebuffer;
+    int cy; for ( cy = 0; cy < canvas->height; cy++ )
+    {
+        int yoff = cy * canvas->width;
+        int cx; for ( cx = 0; cx < canvas->width; cx++ )
+        {
+            buffer[ yoff + cx ] = buf[ yoff + ( canvas->width - 1 - cx ) ];
+        }
+    }
+    memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
+    FreeVec ( buffer );
 }

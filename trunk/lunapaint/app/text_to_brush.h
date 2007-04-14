@@ -76,8 +76,8 @@ void Init_TextToBrushMethods ( );
 void Exit_TextToBrushWindow ( );
 void RenderTextToBrushBuffer ( );
 Affrect RenderTextToBuffer ( 
-	unsigned char *text, char *font, 
-	int size, unsigned int **buffer
+    unsigned char *text, char *font, 
+    int size, unsigned int **buffer
 );
 
 #endif

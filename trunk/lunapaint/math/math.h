@@ -13,12 +13,12 @@
 #include <math.h>
 
 /*
-	Get the distance between two points in double units
+    Get the distance between two points in double units
 */
 float getDistance ( int x1, int y1, int x2, int y2 );
 
 /*
-	Get the radian angle between two points
+    Get the radian angle between two points
 */
 float getAngle ( int x1, int y1, int x2, int y2 );
 

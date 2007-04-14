@@ -43,7 +43,7 @@
 #endif
 
 /*
-	GUI includes
+    GUI includes
 */
 #include "about_window.h"
 #include "new_image.h"
@@ -61,19 +61,19 @@
 
 typedef struct ObjectBOOL
 {
-	Object *obj;
-	BOOL value;
+    Object *obj;
+    BOOL value;
 } ObjectBOOL;
 
 /*
-	Program menu
+    Program menu
 */
 IPTR ProgramMenu;
 Object *mainPulldownMenu;
 
 /*
-	- The MUI "Application" runs on *PaintApp
-	- The canvases is managed in the canvases list
+    - The MUI "Application" runs on *PaintApp
+    - The canvases is managed in the canvases list
 */
 Object *PaintApp;
 WindowList *canvases;
@@ -84,59 +84,59 @@ Object *AlertOk;
 Object *LunaBackdrop;
 
 /*
-	This function returns a pointer to a window by id
+    This function returns a pointer to a window by id
 */
 Object *GetWindowById ( int id );
 
 /*
-	DOSBase and IntutitionBase for opening and closing libraries
+    DOSBase and IntutitionBase for opening and closing libraries
 */
 struct DosLibrary *DOSBase;
 struct IntuitionBase *IntuitionBase;
 
 /*
-	This function starts the application object
+    This function starts the application object
 */
 void Init_Application ( );
 
 /*
-	Clean up and dispose of all MUI objects
+    Clean up and dispose of all MUI objects
 */
 void Exit_Application ( );
 
 /*
-	Get signals 
+    Get signals 
 */
 int getSignals ( ULONG *sigs );
 
 /*
-	Check for break
+    Check for break
 */
 int checkSignalBreak ( ULONG *sigs );
 
 /*
-	Setup the lunapaint screen
+    Setup the lunapaint screen
 */
 void InitLunaScreen ( );
 
 /*
-	Init the backdrop window
+    Init the backdrop window
 */
 void Init_Backdrop ( );
 
 /*
-	Initialize the alert window
+    Initialize the alert window
 */
 void Init_AlertWindow ( );
 
 /*
-	Display an alert message
+    Display an alert message
 */
 void ShowAlert ( unsigned char *text );
 
 /*
-	Hide all open windows and save their state so they can be reopened
-	as they were
+    Hide all open windows and save their state so they can be reopened
+    as they were
 */
 void HideOpenWindows ( );
 void ReopenWindows ( );

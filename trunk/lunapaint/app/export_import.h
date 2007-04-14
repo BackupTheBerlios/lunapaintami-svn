@@ -84,37 +84,37 @@ struct Hook import_hook;
 struct Hook exportanimation_hook;
 
 /*
-	Generate an exportable buffer
+    Generate an exportable buffer
 */
 unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype );
 
 /*
-	Generate the export window
+    Generate the export window
 */
 void makeExportWindow ( );
 /*
-	Generate the import window
+    Generate the import window
 */
 void makeImportWindow ( );
 
 /*
-	Create an image from an animation by the choices done in the 
-	gui
+    Create an image from an animation by the choices done in the 
+    gui
 */
 void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename );
 
 /*
-	Export a jpeg image (for now only jpeg)
+    Export a jpeg image (for now only jpeg)
 */
 void exportDT ( int w, int h, unsigned int *buffer, unsigned char *filename, const char *format );
 
 /*
-	Export png
+    Export png
 */
 void exportPNG ( int w, int h, unsigned int *buffer, unsigned char *filename );
 
 /*
-	Save a lunapaint project
+    Save a lunapaint project
 */
 void saveProject ( );
 

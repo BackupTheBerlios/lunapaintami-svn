@@ -23,62 +23,62 @@
 
 void Init_AnimationWindow ( )
 {
-	static const char *arr_onion[] = { "No onion skin", "Simple onion skin", NULL };
+    static const char *arr_onion[] = { "No onion skin", "Simple onion skin", NULL };
 
-	WindowAnimation = WindowObject,
-		MUIA_Window_Title, ( IPTR )"Animation Control",
-		MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
-		MUIA_Window_CloseGadget, FALSE,
-		MUIA_Window_Screen, ( IPTR )lunaPubScreen,
-		MUIA_Window_LeftEdge, 0,
-		MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
-		WindowContents, ( IPTR )HGroup,
-			Child, ( IPTR )GroupObject,
-				MUIA_Frame, MUIV_Frame_None,
-				MUIA_Weight, 1,
-				Child, ( IPTR )VGroup,
-					Child, ( IPTR )( CycleOnionSkin = CycleObject,
-						MUIA_Cycle_Entries, &arr_onion,
-					End ),
-				End,
-			End,
-			Child, ( IPTR )( AnimationSlider = SliderObject, 
-				MUIA_Group_Horiz, TRUE,
-				MUIA_Numeric_Min, 1,
-				MUIA_Numeric_Max, 1,
-				MUIA_Numeric_Value, 1,
-				MUIA_Weight, 100,
-			End ),
-			Child, ( IPTR )GroupObject,
-				MUIA_Frame, MUIV_Frame_None,
-				MUIA_Weight, 1,
-				Child, ( IPTR )HGroup,
-					Child, ( IPTR )( ButtonAnimPrev = SimpleButton ( ( IPTR )"«" ) ),
-					Child, ( IPTR )( ButtonAnimNext = SimpleButton ( ( IPTR )"»" ) ),
-				End,
-			End,
-		End,
-	End;
-	
-	// Animation
-	DoMethod (
-		ButtonAnimNext, MUIM_Notify, MUIA_Pressed, FALSE,
-		( IPTR )WidgetLayers, 1, MUIM_NextFrame
-	);
-	DoMethod ( 
-		ButtonAnimPrev, MUIM_Notify, MUIA_Pressed, FALSE,
-		( IPTR )WidgetLayers, 1, MUIM_PrevFrame
-	);
-	DoMethod (
-		AnimationSlider, MUIM_Notify, 
-		MUIA_Numeric_Value, MUIV_EveryTime,
-		( IPTR )WidgetLayers, 1, MUIM_GotoFrame
-	);
-	DoMethod (
-		CycleOnionSkin, MUIM_Notify,
-		MUIA_Cycle_Active, MUIV_EveryTime,
-		( IPTR )WidgetLayers, 1, MUIM_ChangeOnionskin
-	);
+    WindowAnimation = WindowObject,
+        MUIA_Window_Title, ( IPTR )"Animation Control",
+        MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
+        MUIA_Window_CloseGadget, FALSE,
+        MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_LeftEdge, 0,
+        MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
+        WindowContents, ( IPTR )HGroup,
+            Child, ( IPTR )GroupObject,
+                MUIA_Frame, MUIV_Frame_None,
+                MUIA_Weight, 1,
+                Child, ( IPTR )VGroup,
+                    Child, ( IPTR )( CycleOnionSkin = CycleObject,
+                        MUIA_Cycle_Entries, &arr_onion,
+                    End ),
+                End,
+            End,
+            Child, ( IPTR )( AnimationSlider = SliderObject, 
+                MUIA_Group_Horiz, TRUE,
+                MUIA_Numeric_Min, 1,
+                MUIA_Numeric_Max, 1,
+                MUIA_Numeric_Value, 1,
+                MUIA_Weight, 100,
+            End ),
+            Child, ( IPTR )GroupObject,
+                MUIA_Frame, MUIV_Frame_None,
+                MUIA_Weight, 1,
+                Child, ( IPTR )HGroup,
+                    Child, ( IPTR )( ButtonAnimPrev = SimpleButton ( ( IPTR )"«" ) ),
+                    Child, ( IPTR )( ButtonAnimNext = SimpleButton ( ( IPTR )"»" ) ),
+                End,
+            End,
+        End,
+    End;
+    
+    // Animation
+    DoMethod (
+        ButtonAnimNext, MUIM_Notify, MUIA_Pressed, FALSE,
+        ( IPTR )WidgetLayers, 1, MUIM_NextFrame
+    );
+    DoMethod ( 
+        ButtonAnimPrev, MUIM_Notify, MUIA_Pressed, FALSE,
+        ( IPTR )WidgetLayers, 1, MUIM_PrevFrame
+    );
+    DoMethod (
+        AnimationSlider, MUIM_Notify, 
+        MUIA_Numeric_Value, MUIV_EveryTime,
+        ( IPTR )WidgetLayers, 1, MUIM_GotoFrame
+    );
+    DoMethod (
+        CycleOnionSkin, MUIM_Notify,
+        MUIA_Cycle_Active, MUIV_EveryTime,
+        ( IPTR )WidgetLayers, 1, MUIM_ChangeOnionskin
+    );
 }
 
 void Update_AnimValues ( )
