@@ -655,15 +655,16 @@ void swapLayers ( oCanvas *canv )
     // current gfxbuffer and previous selected gfxbuffer
 
     int size = canv->totalFrames * canv->totalLayers;
-    int i = 0; for ( ; i < size; i++ )
+    int f = 0; for ( ; f < canv->totalFrames; f++ )
     {
-        int l = i % canv->totalLayers;
-        int f = i / canv->totalLayers;
-    if ( f == canv->currentFrame && l == canv->currentLayer )
-            curr = pos;
-        if ( f == canv->currentFrame && l == canv->previousLayer )
-            prev = pos;
-        pos = pos->nextbuf;
+        int l = 0; for ( ; l < canv->totalLayers; l++ )
+        {
+            if ( f == canv->currentFrame && l == canv->currentLayer )
+                curr = pos;
+            if ( f == canv->currentFrame && l == canv->previousLayer )
+                prev = pos;
+            pos = pos->nextbuf;
+        }
     }
     if ( prev == NULL || curr == NULL )
         return;
@@ -735,8 +736,9 @@ void mergeLayers ( oCanvas *canv )
     // Mix colors
     
     double popacity = prev->opacity * 1.0;
+    int range = canv->width * canv->height;
     
-    int i = 0; for ( ; i < canv->width * canv->height; i++ )
+    int i = 0; for ( ; i < range; i++ )
     {	
         rgba64 col1 = *( rgba64 *)&curr->buf[ i ];
         col1 = ( rgba64 ){ col1.a, col1.b, col1.g, col1.r };
