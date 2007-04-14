@@ -291,7 +291,7 @@ inline unsigned long long int processPixel (
         r2 = paintCol.a, 	g2 = paintCol.b, 	b2 = paintCol.g, 	a2 = paintCol.r;
     
     // Take into account the brush tool opacity and power
-    a2 = ( a2 / 255.0 * brushTool.opacity ) / 100 * brushTool.power;
+    a2 = ( a2 / 255.0 * brushTool.opacity ) / 100.0 * brushTool.power;
     
     // Calculate alpha
     double alpha = a2 / MAXCOLOR_DBL;
