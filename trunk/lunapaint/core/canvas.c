@@ -500,10 +500,10 @@ unsigned int canvasToWindowPixel ( unsigned long long int source )
 {
     // Fetch RGBA from 64-bit source;
     unsigned long long int R, G, B, A;
-    R = source; 				R = R >> 48;
-    G = source << 16;		G = G >> 48;
-    B = source << 32; 	B = B >> 48;
-    A = source << 48; 	A = A >> 48;
+    R = source;         R = R >> 48;
+    G = source << 16;   G = G >> 48;
+    B = source << 32;   B = B >> 48;
+    A = source << 48;   A = A >> 48;
     
     // Convert to 8-bit integer
     int r, g, b, a;
@@ -654,7 +654,6 @@ void swapLayers ( oCanvas *canv )
     // Go through frames and layers with pos and store addy to 
     // current gfxbuffer and previous selected gfxbuffer
 
-    int size = canv->totalFrames * canv->totalLayers;
     int f = 0; for ( ; f < canv->totalFrames; f++ )
     {
         int l = 0; for ( ; l < canv->totalLayers; l++ )

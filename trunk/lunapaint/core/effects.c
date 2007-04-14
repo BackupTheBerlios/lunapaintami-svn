@@ -63,28 +63,33 @@ void effectOffset ( int x, int y, oCanvas *canvas )
 
 void effectFlipVert ( oCanvas *canvas )
 {
-    unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
     unsigned long long int *buf = canvas->activebuffer;
-    int cy; for ( cy = 0; cy < canvas->height; cy++ )
+    int cx; for ( cx = 0; cx < canvas->width; cx++ )
     {
-        memcpy( &buffer[ ( cy * canvas->width ) ], &buf[ ( canvas->height - cy - 1 ) * canvas->width ], canvas->width * 8 );
+        int range = floor ( canvas->height / 2.0 );
+        int cy; for ( cy = 0; cy < range; cy++ )
+        {
+            int yoff1 = cy * canvas->width + cx;
+            int yoff2 = ( canvas->height - 1 - cy ) * canvas->width + cx;
+            unsigned long long int col = buf[ yoff2 ];
+            buf[ yoff2 ] = buf[ yoff1 ];
+            buf[ yoff1 ] = col;
+        }
     }
-    memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-    FreeVec ( buffer );
 }
 
 void effectFlipHoriz ( oCanvas *canvas )
 {
-    unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
     unsigned long long int *buf = canvas->activebuffer;
     int cy; for ( cy = 0; cy < canvas->height; cy++ )
     {
         int yoff = cy * canvas->width;
-        int cx; for ( cx = 0; cx < canvas->width; cx++ )
+        int range = floor ( canvas->width / 2.0 );
+        int cx; for ( cx = 0; cx < range; cx++ )
         {
-            buffer[ yoff + cx ] = buf[ yoff + ( canvas->width - 1 - cx ) ];
+            unsigned long long int col = buf[ yoff + cx ];
+            buf[ yoff + cx ] = buf[ yoff + ( canvas->width - 1 - cx ) ];
+            buf[ yoff + ( canvas->width - 1 - cx ) ] = col;
         }
     }
-    memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-    FreeVec ( buffer );
 }
