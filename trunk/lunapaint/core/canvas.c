@@ -516,20 +516,12 @@ unsigned int canvasToWindowPixel ( unsigned long long int source )
     return pixel;
 }
 
-void initPalette ( )
-{
-    // Reserve memory
-    globalPalette = AllocVec ( 256 * sizeof ( unsigned int ), MEMF_ANY );
-    // Load in default palette
-    loadDefaultPalette ( );
-}
-
 rgbData paletteColorToRGB ( unsigned int color )
 {
     unsigned int r, g, b;
-    r = color << 24; 	r = r >> 24;
-    g = color << 16; 	g = g >> 24;
-    b = color << 8; 	b = b >> 24;
+    r = color << 24;    r = r >> 24;
+    g = color << 16;    g = g >> 24;
+    b = color << 8;     b = b >> 24;
     
     rgbData mydata = { r, g, b }; 
     return mydata;
@@ -580,9 +572,9 @@ rgbaData bufferToRGBA ( unsigned int color )
 {
     unsigned int r, g, b, a;
     r = color >> 24;
-    g = color << 8; 	g = g >> 24;
-    b = color << 16; 	b = b >> 24;
-    a = color << 24;	a = a >> 24;
+    g = color << 8;     g = g >> 24;
+    b = color << 16;    b = b >> 24;
+    a = color << 24;    a = a >> 24;
     rgbaData mydata = { r, g, b, a }; 
     return mydata;
 }
@@ -604,6 +596,14 @@ rgba64 PaletteToRgba64 ( unsigned int rgb )
     g = ( rgb << 16 ) >> 24; g = ( int )( g / 255.0 * MAXCOLOR );
     b = ( rgb << 8  ) >> 24; b = ( int )( b / 255.0 * MAXCOLOR );
     return ( rgba64 ){ r, g, b, MAXCOLOR };
+}
+
+void initPalette ( )
+{
+    // Reserve memory
+    globalPalette = AllocVec ( 256 * sizeof ( unsigned int ), MEMF_ANY );
+    // Load in default palette
+    loadDefaultPalette ( );
 }
 
 void loadDefaultPalette ( )
