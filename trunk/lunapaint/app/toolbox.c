@@ -207,7 +207,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 int i; for ( i = 0; i < globalActiveCanvas->height * globalActiveCanvas->width; i++ )
                     globalActiveCanvas->activebuffer[ i ] = TRANSCOLOR;
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Draw, NULL );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
         
@@ -337,7 +337,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 get ( offsetWindowY, MUIA_String_Integer, &y );
                 effectOffset ( x, y, globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Draw, FALSE );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
         
@@ -926,7 +926,7 @@ void checkMenuEvents ( int udata )
                 setActiveBuffer ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
                 set ( globalActiveWindow->win, MUIA_Window_Open, TRUE );
-                DoMethod ( globalActiveWindow->area, MUIM_Draw, NULL );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw, NULL );
             }
             break;
     
@@ -954,7 +954,7 @@ void checkMenuEvents ( int udata )
                 setActiveBuffer ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
                 
-                DoMethod ( globalActiveWindow->area, MUIM_Draw );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
             
@@ -1046,7 +1046,7 @@ void checkMenuEvents ( int udata )
                 globalActiveWindow->rRectH = 0;
                 globalActiveWindow->rRectY = 0;
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Draw );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
             
@@ -1062,7 +1062,7 @@ void checkMenuEvents ( int udata )
             {
                 effectFlipVert ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Draw );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
             
@@ -1071,7 +1071,7 @@ void checkMenuEvents ( int udata )
             {
                 effectFlipHoriz ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Draw );
+                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
         

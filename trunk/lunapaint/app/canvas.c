@@ -67,6 +67,13 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
             }
             return DoSuperMethodA ( CLASS, self, message );         
         
+        case MUIM_Redraw:
+            if ( globalActiveCanvas )
+            {
+                MUI_Redraw ( globalActiveWindow->area, MADF_DRAWUPDATE );
+            }
+            break;
+        
         // Called externally      
         case MUIM_RedrawArea:
             if ( globalActiveCanvas != NULL )
@@ -112,7 +119,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
                 set ( data->window->scrollV, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsety );
                 //
                 data->window->isActive = FALSE;            
-                DoMethod ( WidgetLayers, MUIM_Draw );
+                MUI_Redraw ( WidgetLayers, MADF_DRAWUPDATE );
             }
             return ( IPTR )NULL;
         
@@ -266,7 +273,7 @@ void checkKeyboardShortcuts ( UWORD valu )
             globalActiveWindow->rRectY = 0;
             globalActiveCanvas->winHasChanged = TRUE;
             globalActiveWindow->layersChg = TRUE;         
-            DoMethod ( globalActiveWindow->area, MUIM_Draw );
+            MUI_Redraw ( globalActiveWindow->area, MADF_DRAWUPDATE );
             break;
         case RAWKEY_J | RAWKEY_RSHIFT:
             copyToSwap ( globalActiveCanvas );
@@ -542,7 +549,7 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
         }
     }
     if ( globalActiveWindow->layersChg )      
-        DoMethod ( WidgetLayers, MUIM_Draw );  
+        MUI_Redraw ( WidgetLayers, MADF_DRAWUPDATE );  
     
     return ( IPTR )NULL;
 }
@@ -629,7 +636,7 @@ IPTR ScrollCanvas ( int x, int y )
         }
         globalActiveCanvas->offsety = y;
         globalActiveCanvas->winHasChanged = TRUE;      
-        DoMethod ( globalActiveWindow->area, MUIM_Draw );
+        MUI_Redraw ( globalActiveWindow->area, MADF_DRAWUPDATE );
     }
     if ( abs ( diffx ) > 0 )
     {
@@ -664,7 +671,7 @@ IPTR ScrollCanvas ( int x, int y )
         }
         globalActiveCanvas->offsetx = x;
         globalActiveCanvas->winHasChanged = TRUE;
-        DoMethod ( globalActiveWindow->area, MUIM_Draw );
+        MUI_Redraw ( globalActiveWindow->area, MADF_DRAWUPDATE );
     }
     return ( IPTR )NULL;
 }
@@ -775,7 +782,7 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
                     MouseButtonL = FALSE;
                     if ( globalCurrentTool == LUNA_TOOL_BRUSH ) brushTool.RecordContour = FALSE;
                     globalActiveWindow->layersChg = TRUE;               
-                    DoMethod ( WidgetLayers, MUIM_Draw );             
+                    MUI_Redraw ( WidgetLayers, MADF_DRAWUPDATE );
                 }
                 break;
                 
@@ -1191,7 +1198,7 @@ void importImageRAW ( unsigned int w, unsigned int h, unsigned long long int *bu
             {
                 Read ( myfile, buffer, 8 * w * h );
                 Close ( myfile );
-                DoMethod ( globalActiveWindow->area, MUIM_Draw );
+                MUI_Redraw ( globalActiveWindow->area, MADF_DRAWUPDATE );
             }
         }
         FreeVec ( filename );

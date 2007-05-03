@@ -22,18 +22,18 @@
 #ifndef _aros_canvas_h_
 #define _aros_canvas_h_
 
-#define MUIM_ClearActiveCanvas 		7001
+#define MUIM_ClearActiveCanvas 		    7001
 #define MUIM_SetPaintMode				7004
 #define MUIM_AlterBrushShape			7005
-#define MUIM_AlterBrushStep			7006
-#define MUIM_AlterBrushStrength		7007
-#define MUIM_CanvasAddLayer			7020
+#define MUIM_AlterBrushStep			    7006
+#define MUIM_AlterBrushStrength		    7007
+#define MUIM_CanvasAddLayer			    7020
 #define MUIM_CanvasSwapLayer			7021
-#define MUIM_CanvasDeleteLayer		7022
+#define MUIM_CanvasDeleteLayer		    7022
 #define MUIM_CanvasMergeLayer			7023
 #define MUIM_CanvasCopyLayer			7024
 #define MUIM_ChangeOnionskin			7025
-#define MUIM_ChangeScrollOffset		7026
+#define MUIM_ChangeScrollOffset		    7026
 #define MUIM_SetGlobalGrid				7050
 #define MUIM_SetGridSize				7051
 #define MUIM_SetColorMode				7070
@@ -41,9 +41,10 @@
 #define MUIM_PrevFrame					7061
 #define MUIM_GotoFrame					7062
 #define MUIM_EffectOffset				8000
-#define MUIM_OpenPaletteEditor		7600
+#define MUIM_OpenPaletteEditor		    7600
 #define MUIM_ScrollingNotify			7777
-#define MUIM_RedrawArea 43587
+#define MUIM_RedrawArea                 43587
+#define MUIM_Redraw                     43588
 
 // Paint tool keys
 #define MUIA_Key_F						1001

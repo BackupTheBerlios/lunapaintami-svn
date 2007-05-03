@@ -281,7 +281,9 @@ inline unsigned int *renderCanvas (
                     if ( l == -1 )
                     {
                         if ( Transparent )
+                        {
                             color = *( unsigned int *)&( ( rgba32 ){ 128, 128, 128, 0 } );
+                        }
                         else
                         {               
                             switch ( GlobalPrefs.LayerBackgroundMode )
