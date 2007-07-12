@@ -23,9 +23,9 @@
 #define _lunapaint_config_
 
 #define LUNA_VERSION "0.3.3"
-#define LUNA_SCREEN_TITLE "Lunapaint v0.3.3, 09.04.2007"
+#define LUNA_SCREEN_TITLE "Lunapaint v0.3.3, 12.07.2007"
 #define LUNA_ABOUT_TEXT "Lunapaint v0.3.3\n\nAuthor: Hogne Titlestad (m0ns00n)\nE-Mail: hogga@sub-ether.org\nUrl: http://www.sub-ether.org/lunapaint\n\nSpecial thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
-#define VERSIONSTRING "$VER: Lunapaint v0.3.3 (09.04.07) by Hogne (m0ns00n) Titlestad\n"
+#define VERSIONSTRING "$VER: Lunapaint v0.3.3 (12.07.07) by Hogne (m0ns00n) Titlestad\n"
 
 typedef struct LunapaintPrefs
 {

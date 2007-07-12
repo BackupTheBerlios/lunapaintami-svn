@@ -264,7 +264,7 @@ inline unsigned int *renderCanvas (
             {
                 if ( y >= canvas->height ) break;
 
-                // Some often used calcs :-)    
+                // Some often used calcs :-)
                 int tboffsety = YminRY * zoomZoomwidth; // <- heavily optimized! 
                 int canvymul = canvas->width * y;
                 int YminRYrw = YminRY * rw;
@@ -596,6 +596,16 @@ void mergeLayers ( oCanvas *canv )
         
     gfxbuffer *curr = NULL, *prev = NULL, *pos = canv->buffer;
     
+    // Make sure that currentLayer is the highest sortorder
+    int tempCL = canv->currentLayer;
+    int tempPL = canv->previousLayer;
+    if ( canv->previousLayer > canv->currentLayer )
+    {
+        canv->currentLayer = tempPL;
+        canv->previousLayer = tempCL;
+    }
+    
+    
     // Go through frames and layers with pos and store addy to 
     // current gfxbuffer and previous selected gfxbuffer
     int f = 0; for ( ; f < canv->totalFrames; f++ )
@@ -609,42 +619,51 @@ void mergeLayers ( oCanvas *canv )
             pos = pos->nextbuf;
         }
     }
-
-    // Mix colors
     
-    double popacity = prev->opacity * 1.0;
+    
+
+    // Mix colors of previous selected and current gfx buffers
+    double popacity = prev->opacity / 100.0;
     int range = canv->width * canv->height;
     
     int i = 0; for ( ; i < range; i++ )
     {	
-        rgba64 col1 = *( rgba64 *)&curr->buf[ i ];
+        // Previous selected layer
+        rgba64 col1 = *( rgba64 *)&prev->buf[ i ];
         col1 = ( rgba64 ){ col1.a, col1.b, col1.g, col1.r };
-        if ( curr->opacity < 100 ) col1.a = col1.a / 100.0 * curr->opacity;
+        if ( prev->opacity < 100 ) col1.a = col1.a * popacity;
         
-        rgba64 col2 = *( rgba64 *)&prev->buf[ i ];	
+        // Current selected layer
+        rgba64 col2 = *( rgba64 *)&curr->buf[ i ];	
         col2 = ( rgba64 ){ col2.a, col2.b, col2.g, col2.r };
-        if ( prev->opacity < 100 ) col2.a = col2.a / 100.0 * prev->opacity;      
-        double alphx = col2.a / 100.0 * popacity;      	
         
         // Disregard fully transparent source colors
-        if ( col1.a <= 0 )
+        if ( col1.a <= 0.0 )
         { 
             col1.r = col2.r; col1.g = col2.g; 
             col1.b = col2.b; col1.a = col2.a;
         }
-        else if ( alphx > 0 )
+        else
         {
-            double alpha = alphx / MAXCOLOR_DBL;  
-            col1.r -= ( ( int )col1.r - ( int )col2.r ) * alpha;
-            col1.g -= ( ( int )col1.g - ( int )col2.g ) * alpha;
-            col1.b -= ( ( int )col1.b - ( int )col2.b ) * alpha;
-            if ( ( col1.a + alphx ) > MAXCOLOR ) col1.a = MAXCOLOR;
-            else col1.a += alphx;
+            // Do the actual blending
+            double alpha_prev = col1.a / MAXCOLOR_DBL;  
+            double alpha_curr = col2.a / MAXCOLOR_DBL;
+            
+            col1.r += floor ( ( col2.r - col1.r ) * alpha_curr );
+            col1.g += floor ( ( col2.g - col1.g ) * alpha_curr );
+            col1.b += floor ( ( col2.b - col1.b ) * alpha_curr );
+            
+            if ( ( col1.a / 10.0 ) + ( col2.a / 10.0 ) > MAXCOLOR_DBL / 10.0 )
+                col1.a = MAXCOLOR_DBL;
+            else
+                col1.a += col2.a;
         }
         
         // Set new color
         curr->buf[ i ] = *( unsigned long long int *)&( ( rgba64 ){ col1.a, col1.b, col1.g, col1.r } );
     }
+    
+    // Select previous layer and delete it
     canv->currentLayer = canv->previousLayer;
     deleteLayer ( canv );
 }
