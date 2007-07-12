@@ -114,30 +114,6 @@ unsigned int currColor; // current color index
 unsigned int prevColor; // previous color index
 
 /*
-    Simple struct which holds rgb data
-*/
-typedef struct rgbdata
-{
-    unsigned int r, g, b;
-} rgbData;
-
-/*
-    Struct that holds rgba data in unsigned long long int
-*/
-typedef struct rgbadatal
-{
-    unsigned long long int r, g, b, a;
-} rgbaDataL;
-
-/*
-    Struct that holds rgba data in unsigned int
-*/
-typedef struct rgbadata
-{
-    unsigned int r, g, b, a;
-} rgbaData;
-
-/*
     A canvas holds all the information about a surface. A surface
     can be shown in a Window, can have frames (it always starts with 1
     frames), can have layers on the frames etc.
