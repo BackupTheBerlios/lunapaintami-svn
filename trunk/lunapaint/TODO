@@ -1,7 +1,6 @@
 TODO - 0.3.2
 
  * Fix crash sometimes when loading a unknown file format
- * Fix merging of two layers with opaque areas
 
  
  TODO - 0.3.3

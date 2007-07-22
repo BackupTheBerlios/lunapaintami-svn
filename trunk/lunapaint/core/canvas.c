@@ -594,15 +594,16 @@ void mergeLayers ( oCanvas *canv )
     if ( canv->currentLayer == canv->previousLayer )
         return;
         
-    gfxbuffer *curr = NULL, *prev = NULL, *pos = canv->buffer;
+    gfxbuffer *backBuf = NULL, *foreBuf = NULL, *pos = canv->buffer;
     
-    // Make sure that currentLayer is the highest sortorder
-    int tempCL = canv->currentLayer;
-    int tempPL = canv->previousLayer;
-    if ( canv->previousLayer > canv->currentLayer )
+    // Make sure that Foreground is the highest sortorder
+    ULONG Background = canv->currentLayer;
+    ULONG Foreground = canv->previousLayer;
+    if ( Foreground < Background )
     {
-        canv->currentLayer = tempPL;
-        canv->previousLayer = tempCL;
+        ULONG tmp = Background;
+        Background = Foreground;
+        Foreground = tmp;
     }
     
     
@@ -612,59 +613,69 @@ void mergeLayers ( oCanvas *canv )
     {
         int l = 0; for ( ; l < canv->totalLayers; l++ )
         {
-            if ( f == canv->currentFrame && l == canv->currentLayer )
-                curr = pos;
-            if ( f == canv->currentFrame && l == canv->previousLayer )
-                prev = pos;
+            if ( f == canv->currentFrame && l == Foreground )
+                foreBuf = pos;
+            if ( f == canv->currentFrame && l == Background )
+                backBuf = pos;
             pos = pos->nextbuf;
         }
     }
     
-    
-
     // Mix colors of previous selected and current gfx buffers
-    double popacity = prev->opacity / 100.0;
+    double foregroundOpacity = foreBuf->opacity / 100.0;
+    double backgroundOpacity = backBuf->opacity / 100.0;
+    
     int range = canv->width * canv->height;
     
     int i = 0; for ( ; i < range; i++ )
     {	
-        // Previous selected layer
-        rgba64 col1 = *( rgba64 *)&prev->buf[ i ];
+        // Layer to act as a background
+        rgba64 col1 = *( rgba64 *)&backBuf->buf[ i ];
         col1 = ( rgba64 ){ col1.a, col1.b, col1.g, col1.r };
-        if ( prev->opacity < 100 ) col1.a = col1.a * popacity;
+        if ( backBuf->opacity < 100 ) col1.a = col1.a * backgroundOpacity;
         
-        // Current selected layer
-        rgba64 col2 = *( rgba64 *)&curr->buf[ i ];	
+        // Layer to act as foreground to be rendered over background
+        rgba64 col2 = *( rgba64 *)&foreBuf->buf[ i ];	
         col2 = ( rgba64 ){ col2.a, col2.b, col2.g, col2.r };
+        if ( foreBuf->opacity < 100 ) col2.a = col2.a * foregroundOpacity;
         
-        // Disregard fully transparent source colors
-        if ( col1.a <= 0.0 )
-        { 
-            col1.r = col2.r; col1.g = col2.g; 
-            col1.b = col2.b; col1.a = col2.a;
+        // Get and set alpha
+        double alpha2 = col2.a / MAXCOLOR_DBL;
+        double alpha1 = col1.a / MAXCOLOR_DBL;
+        double alpham = alpha2 > alpha1 ? ( alpha2 + ( alpha1 / 2 ) ) : ( alpha1 + ( alpha2 / 2 ) );
+        if ( alpham > 1.0 ) alpham = 1.0;
+
+        // Blend colors
+        // TODO: Can be even more finetuned!
+        if ( col1.a != 0 && col2.a != 0 )
+        {   
+            float c1 = alpha1 * ( 1 - alpha2 );
+            float c2 = alpha2;
+            float c1c2 = c1 + c2;
+            
+            col1.r = ( (col1.r * c1 ) + ( col2.r * c2 ) ) / c1c2;
+            col1.g = ( (col1.g * c1 ) + ( col2.g * c2 ) ) / c1c2;
+            col1.b = ( (col1.b * c1 ) + ( col2.b * c2 ) ) / c1c2;
+            
+            col1.a = MAXCOLOR * alpham;
         }
-        else
+        // Copy color
+        else if ( col1.a == 0 )
         {
-            // Do the actual blending
-            double alpha_prev = col1.a / MAXCOLOR_DBL;  
-            double alpha_curr = col2.a / MAXCOLOR_DBL;
-            
-            col1.r += floor ( ( col2.r - col1.r ) * alpha_curr );
-            col1.g += floor ( ( col2.g - col1.g ) * alpha_curr );
-            col1.b += floor ( ( col2.b - col1.b ) * alpha_curr );
-            
-            if ( ( col1.a / 10.0 ) + ( col2.a / 10.0 ) > MAXCOLOR_DBL / 10.0 )
-                col1.a = MAXCOLOR_DBL;
-            else
-                col1.a += col2.a;
+            col1 = col2;
         }
+        //col1.a = MAXCOLOR;
         
         // Set new color
-        curr->buf[ i ] = *( unsigned long long int *)&( ( rgba64 ){ col1.a, col1.b, col1.g, col1.r } );
+        backBuf->buf[ i ] = 
+            *( unsigned long long int *)&( ( rgba64 ){ col1.a, col1.b, col1.g, col1.r } );
     }
     
+    // Make sure we have 100% opacity now
+    backBuf->opacity = 100;
+    
     // Select previous layer and delete it
-    canv->currentLayer = canv->previousLayer;
+    canv->currentLayer = Foreground;
     deleteLayer ( canv );
 }
 
@@ -739,8 +750,8 @@ void swapCanvasBuffers ( oCanvas *canv )
                 {
                     unsigned long long int *tmp = canv->swapbuffer;
                     canv->swapbuffer = pos->buf;
-                    canv->activebuffer = tmp;
                     pos->buf = tmp;
+                    canv->activebuffer = tmp;
                     return;
                 }
                 pos = pos->nextbuf;

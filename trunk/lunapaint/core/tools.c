@@ -78,8 +78,8 @@ BOOL toolBrush ( )
                 if ( y1 <= brushTool.ContourMinY ) brushTool.ContourMinY = y1;
             }
         }
-        // Draw a line
-        // and get back absolute buffer coorinates
+        // Draw a line and get back
+        // absolute buffer coorinates
         else
         {
             rect = drawLine ( 
