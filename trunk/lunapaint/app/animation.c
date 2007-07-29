@@ -83,7 +83,7 @@ void Init_AnimationWindow ( )
 
 void Update_AnimValues ( )
 {
-    if ( globalActiveCanvas == NULL ) return;
+    if ( !globalActiveCanvas ) return;
     
     int currAnimMin = ( int )XGET ( AnimationSlider, MUIA_Numeric_Min );
     int currAnimMax = ( int )XGET ( AnimationSlider, MUIA_Numeric_Max );

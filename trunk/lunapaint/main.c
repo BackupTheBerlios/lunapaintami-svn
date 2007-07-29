@@ -45,10 +45,7 @@
 char *Version = VERSIONSTRING;
 
 void doEvents ( )
-{
-    if ( globalActiveWindow == NULL ) return;
-    if ( globalActiveCanvas == NULL ) return;
-        
+{       
     // Go through events
     if ( globalActiveWindow->isActive )
     {
@@ -115,9 +112,10 @@ int main ( int argc, char *argv[] )
         // Check for signals from GUI
         if ( checkSignalBreak ( &sigs ) )
             break;	
-        
+            
         // Execute pending events
-        doEvents ( );
+        if ( globalActiveWindow && globalActiveCanvas )
+            doEvents ( );
         
         // Reset events
         globalEvents = -1;
@@ -128,7 +126,7 @@ int main ( int argc, char *argv[] )
         // Delayed canvas redraw
         if ( redrawTimes == 1 )
         {
-            if ( globalActiveWindow != NULL )
+            if ( globalActiveWindow )
                 DoMethod ( globalActiveWindow->area, MUIM_Draw );
             redrawTimes--;       
         }

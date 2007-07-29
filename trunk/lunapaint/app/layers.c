@@ -131,7 +131,7 @@ AROS_UFH3 ( void, acknowledgeLayNameFunc,
     AROS_USERFUNC_INIT
     
     // Fix it
-    if ( globalActiveCanvas != NULL )
+    if ( globalActiveCanvas )
     {
         gfxbuffer *buf = globalActiveCanvas->buffer;
         int max = globalActiveCanvas->totalFrames * globalActiveCanvas->totalLayers;
@@ -166,7 +166,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
         case MUIM_Draw:
             
             // Some rules for when to redraw
-            if ( globalActiveWindow == NULL || globalActiveCanvas == NULL )
+            if ( !globalActiveWindow || !globalActiveCanvas )
             {
                 layerRenderBlank ( );
                 set ( LayerName, MUIA_String_Contents, ( IPTR )"\0" );            
@@ -236,7 +236,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             return ( IPTR )layerMinMax ( CLASS, self, ( struct MUIP_AskMinMax * )message );
 
         case MUIM_PrevFrame:
-            if ( globalActiveCanvas != NULL && !IgnoreFramechange )
+            if ( globalActiveCanvas && !IgnoreFramechange )
             {
                 PrevFrame ( globalActiveCanvas );
                 set ( AnimationSlider, MUIA_Numeric_Value, ( globalActiveCanvas->currentFrame + 1 ) );
@@ -246,7 +246,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
         
         case MUIM_NextFrame:
-            if ( globalActiveCanvas != NULL && !IgnoreFramechange )
+            if ( globalActiveCanvas && !IgnoreFramechange )
             {
                 NextFrame ( globalActiveCanvas );
                 set ( AnimationSlider, MUIA_Numeric_Value, ( globalActiveCanvas->currentFrame + 1 ) );
@@ -256,7 +256,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
 
         case MUIM_GotoFrame:
-            if ( globalActiveCanvas != NULL && !IgnoreFramechange )
+            if ( globalActiveCanvas && !IgnoreFramechange )
             {
                 int num = XGET ( AnimationSlider, MUIA_Numeric_Value );
                 num = ( num - 1 < 0 ) ? 0 : ( num - 1 );
@@ -268,7 +268,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
 
         case MUIM_CanvasAddLayer:
-            if ( globalActiveCanvas != NULL )
+            if ( globalActiveCanvas )
             {
                 addLayer ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;            
@@ -278,20 +278,20 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
             
         case MUIM_CanvasSwapLayer:
-            if ( 
-                globalActiveCanvas != NULL && 
-                globalActiveCanvas->currentLayer != globalActiveCanvas->previousLayer 
-            )
+            if ( globalActiveCanvas )
             {
-                swapLayers ( globalActiveCanvas );
-                globalActiveWindow->layersChg = TRUE;            
-                winHasChanged ( );
-                return 0;
+                if ( globalActiveCanvas->currentLayer != globalActiveCanvas->previousLayer )
+                {
+                    swapLayers ( globalActiveCanvas );
+                    globalActiveWindow->layersChg = TRUE;            
+                    winHasChanged ( );
+                    return 0;
+                }
             }
             break;
 
         case MUIM_CanvasDeleteLayer:
-            if ( globalActiveCanvas != NULL )
+            if ( globalActiveCanvas )
             {
                 deleteLayer ( globalActiveCanvas );
                 setActiveBuffer ( globalActiveCanvas );
@@ -302,7 +302,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
             
         case MUIM_CanvasMergeLayer:
-            if ( globalActiveCanvas != NULL )
+            if ( globalActiveCanvas )
             {
                 mergeLayers ( globalActiveCanvas );
                 setActiveBuffer ( globalActiveCanvas );
@@ -313,7 +313,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
         
         case MUIM_CanvasCopyLayer:
-            if ( globalActiveCanvas != NULL )
+            if ( globalActiveCanvas )
             {
                 copyLayers ( globalActiveCanvas );
                 globalActiveWindow->layersChg = TRUE;
@@ -323,7 +323,7 @@ BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
             break;
 
         case MUIM_ChangeOnionskin:
-            if ( globalActiveCanvas != NULL )
+            if ( globalActiveCanvas )
             {
                 int num = 0;
                 get ( CycleOnionSkin, MUIA_Cycle_Active, &num );

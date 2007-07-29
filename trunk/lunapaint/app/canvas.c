@@ -65,9 +65,9 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
                 RGBitmapRedraw ( CLASS, self );
                 return ( IPTR )NULL; 
             }
-            return DoSuperMethodA ( CLASS, self, message );         
+            return DoSuperMethodA ( CLASS, self, message );
         
-        case MUIM_Redraw:
+       case MUIM_Redraw:
             if ( globalActiveCanvas )
             {
                 MUI_Redraw ( globalActiveWindow->area, MADF_DRAWUPDATE );
@@ -88,7 +88,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
             return ( IPTR )RGBitmapHandleInput ( CLASS, self, ( struct MUIP_HandleInput *)message );
         
         case MUIM_Setup:
-            {      
+            {   
                 AskMinMaxTimes = 0;
                 isScrolling = FALSE;
                 isZooming = FALSE;
@@ -98,7 +98,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
         
         case MUIM_Cleanup:
             MUI_RejectIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
-            return ( IPTR )NULL;
+            return DoSuperMethodA ( CLASS, self, message );
         
         case MUIM_CanvasActivate:
             {
@@ -128,7 +128,7 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
             return ( IPTR )NULL;
         
         case MUIM_CanvasDeactivate:
-            if ( globalActiveWindow != NULL )
+            if ( globalActiveWindow != NULL && !fullscreenEditing )
             {
                 struct RGBitmapData *data = INST_DATA ( CLASS, self );
                 data->window->isActive = FALSE;
@@ -152,6 +152,13 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
                 // Move scrollbars
                 globalActiveCanvas->offsetx += globalActiveCanvas->visibleWidth * 0.5;
                 globalActiveCanvas->offsety += globalActiveCanvas->visibleHeight * 0.5;
+                
+                // Workaround for fullscreen - TODO: must be made accurate later
+                if ( fullscreenEditing )
+                {
+                    globalActiveCanvas->offsetx = 0;
+                    globalActiveCanvas->offsety = 0;
+                }
                 
                 // Update GUI
                 winHasChanged ( );
@@ -196,11 +203,16 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
         
         case MUIM_AskMinMax:
             DoSuperMethodA ( CLASS, self, message );
-            return ( IPTR )CanvasAskMinMax ( CLASS, self, ( struct MUIP_AskMinMax* )message );
+            CanvasAskMinMax ( CLASS, self, ( struct MUIP_AskMinMax* )message );
+            break;
+            
             
         case MUIM_CloseCanvasWin:
-            removeActiveWindow ( CLASS, self );
-            layerRenderBlank ( );
+            if ( !fullscreenEditing )
+            {
+                removeActiveWindow ( CLASS, self );
+                layerRenderBlank ( );
+            }
             return ( IPTR )NULL;
         
         default:  
@@ -302,6 +314,28 @@ void checkKeyboardShortcuts ( UWORD valu )
         case RAWKEY_F7: set ( tbxCycPaintMode, MUIA_Cycle_Active, 8 ); break;
         case RAWKEY_F8: set ( tbxCycPaintMode, MUIA_Cycle_Active, 2 ); break;
         case RAWKEY_F9: set ( tbxCycPaintMode, MUIA_Cycle_Active, 3 ); break;
+        
+        // Toggle toolbox
+        case RAWKEY_F11: 
+            {
+                BOOL boxopen = XGET ( toolbox, MUIA_Window_Open );
+                if ( boxopen )
+                    set ( toolbox, MUIA_Window_Open, FALSE );
+                else
+                    set ( toolbox, MUIA_Window_Open, TRUE );
+            }
+            break;
+        
+        // Toggle fullscreen mode
+        case RAWKEY_F12:
+            if ( !fullscreenEditing )
+            {
+                if ( !globalActiveWindow ) return;
+                showFullscreenWindow ( globalActiveCanvas );
+            }
+            else  hideFullscreenWindow ( );
+            break;
+        
         case RAWKEY_UP: moveScrollbarUp (  ); break;
         case RAWKEY_DOWN: moveScrollbarDown (  ); break;
         case RAWKEY_LEFT: moveScrollbarLeft (  ); break;
@@ -366,19 +400,25 @@ void moveScrollbarRight ( )
 
 void constrainOffset ( oCanvas *canvas )
 {
+    // Get some vars
     int zoom = canvas->zoom;
-    int vWidth = ( double )canvas->visibleWidth / zoom;
-    int vHeight = ( double )canvas->visibleHeight / zoom;
-    int cWidth = canvas->width * zoom;
-    int cHeight = canvas->height * zoom;
+    int vWidth = ( double )XGET ( globalActiveWindow->area, MUIA_Width ) / zoom;
+    int vHeight = ( double )XGET ( globalActiveWindow->area, MUIA_Height ) / zoom;
+    int cWidth = canvas->width;
+    int cHeight = canvas->height;
+    int ox = canvas->offsetx / zoom;
+    int oy = canvas->offsety / zoom;
     
-    if ( canvas->offsetx < 0 ) canvas->offsetx = 0;
-    else if ( canvas->offsetx + vWidth >= cWidth  )
-        canvas->offsetx = cWidth - vWidth;
-    if ( canvas->offsety < 0 ) canvas->offsety = 0;
-    else if ( canvas->offsety + vHeight >= cHeight )
-        canvas->offsety = cHeight - vHeight;
-        
+    // Bounds
+    if ( ox < 0 ) canvas->offsetx = 0;
+    else if ( ox + vWidth >= cWidth ) canvas->offsetx = ( cWidth - vWidth ) * zoom;
+    if ( oy < 0 ) canvas->offsety = 0;
+    else if ( oy + vHeight >= cHeight ) canvas->offsety = ( cHeight - vHeight ) * zoom;
+       
+    // Update the visible width
+    canvas->visibleWidth = vWidth;
+    canvas->visibleHeight = vHeight;
+            
     // Snap to zoom
     SnapOffsetToZoom ( canvas );
 }
@@ -386,24 +426,72 @@ void constrainOffset ( oCanvas *canvas )
 void winHasChanged ( )
 {	
     globalActiveCanvas->winHasChanged = TRUE;
-    DoMethod ( globalActiveWindow->container, MUIM_Group_InitChange );
-    DoMethod ( globalActiveWindow->container, MUIM_Group_ExitChange );
+    
+    // Where the container of the canvas area is
+    Object *Container = fullscreenEditing ? fullscreenGroup : globalActiveWindow->container;
+    
+    DoMethod ( Container, MUIM_Group_InitChange );
+    
+    // Special options for this mode
+    // when in fullscreen mode we can change the canvas area size
+    if ( fullscreenEditing )
+    {
+        // Prepare the fullscreen window
+        scaleFullscreenWindow ( );
+        
+        ULONG gWidth = XGET( windowFullscreen, MUIA_Width );
+        ULONG gHeight = XGET( windowFullscreen, MUIA_Height );
+        
+        if ( gWidth > globalActiveCanvas->width * globalActiveCanvas->zoom )
+            gWidth = globalActiveCanvas->width * globalActiveCanvas->zoom;
+        if ( gHeight > globalActiveCanvas->height * globalActiveCanvas->zoom )
+            gHeight = globalActiveCanvas->height * globalActiveCanvas->zoom;
+        
+        set ( Container, MUIA_FixWidth, gWidth );
+        set ( Container, MUIA_FixHeight, gHeight );
+        globalActiveCanvas->visibleWidth = gWidth;
+        globalActiveCanvas->visibleHeight = gWidth;
+    }
+    DoMethod ( Container, MUIM_Group_ExitChange );
 }
 
 IPTR CanvasAskMinMax ( Class *CLASS,Object *self, struct MUIP_AskMinMax *message )
 {   
     struct RGBitmapData *data = INST_DATA ( CLASS, self );
     
+    // This one is needed when askminmax is asked with reopening windows that
+    // have been _hidden_ (not disposed), like when going into fullscreen mode
+    if ( !globalActiveWindow )
+    {
+        globalActiveWindow = data->window;
+        globalActiveCanvas = data->window->canvas;
+    }
+    
+    // Where the container of the canvas area is
+    Object *Container = fullscreenEditing ? fullscreenGroup : globalActiveWindow->container;
+    
     int calcwidth = data->window->canvas->width * data->window->canvas->zoom;
     int calcheight = data->window->canvas->height * data->window->canvas->zoom;
     
     int tWidth = 0, minWidth = 0, tHeight = 0, minHeight = 0;
-    tWidth = XGET ( globalActiveWindow->container, MUIA_Width );
-    tHeight = XGET ( globalActiveWindow->container, MUIA_Height );
+    
+    if ( fullscreenEditing )
+    {
+        tWidth = lunaPubScreen->Width;
+        tHeight = lunaPubScreen->Height;
+    }
+    else
+    {
+        tWidth = XGET ( Container, MUIA_Width );
+        tHeight = XGET ( Container, MUIA_Height );
+    }
+    
     minWidth = globalActiveCanvas->width * globalActiveCanvas->zoom;
     minHeight = globalActiveCanvas->height * globalActiveCanvas->zoom;
+    
     if ( minWidth > tWidth ) minWidth = tWidth;
     if ( minHeight > tHeight ) minHeight = tHeight;
+    
     if ( AskMinMaxTimes > 0 )   
     {
         message->MinMaxInfo->MinWidth += minWidth;
@@ -418,8 +506,8 @@ IPTR CanvasAskMinMax ( Class *CLASS,Object *self, struct MUIP_AskMinMax *message
     message->MinMaxInfo->DefWidth += calcwidth;
     message->MinMaxInfo->DefHeight += calcheight;
     message->MinMaxInfo->MaxWidth += calcwidth;
-    message->MinMaxInfo->MaxHeight += calcheight;      
-
+    message->MinMaxInfo->MaxHeight += calcheight;
+    
     return ( IPTR )NULL;
 }
 
@@ -427,6 +515,12 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
 {	    
     // Get stored data
     struct RGBitmapData *data = INST_DATA ( CLASS, self );
+
+    // We must not be out of bounds
+    constrainOffset ( globalActiveCanvas );
+
+    // Alters if in fullscreen mode or not
+    Object *Container = fullscreenEditing ? fullscreenGroup : data->window->container;
 
     // Get image dimensions multiplied by zoom
     unsigned int imageWidth = ( unsigned int )( data->window->canvas->width );
@@ -445,8 +539,8 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
     int arealeft = XGET ( self, MUIA_LeftEdge );
 
     // Update known container size
-    unsigned int cvisWidth = XGET ( data->window->container, MUIA_Width );
-    unsigned int cvisHeight = XGET ( data->window->container, MUIA_Height );
+    unsigned int cvisWidth = XGET ( Container, MUIA_Width );
+    unsigned int cvisHeight = XGET ( Container, MUIA_Height );
     data->window->contWidth = cvisWidth;
     data->window->contHeight = cvisHeight;
 
@@ -564,7 +658,7 @@ void SnapOffsetToZoom ( oCanvas *canv )
 }
 
 void UpdateCanvasInfo ( WindowList *win )
-{
+{ 
     unsigned char frameText[ 32 ];
     unsigned char layerText[ 32 ];
     int frame = ( int )( win->canvas->currentFrame + 1 ); 
@@ -775,6 +869,7 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
                         if ( globalCurrentTool == LUNA_TOOL_BRUSH ) brushTool.RecordContour = TRUE;
                     }               
                 }
+                
                 // Inactivizers happen everywhere
                 if ( msg->imsg->Code == SELECTUP )
                 {				
@@ -832,7 +927,7 @@ void addCanvaswindow (
 )
 {
     WindowList *temp = canvases; // Put current in temp
-    canvases = AllocVec ( sizeof ( WindowList ), MEMF_ANY );
+    canvases = AllocVec ( sizeof ( WindowList ), MEMF_CLEAR );
 
     struct MUI_CustomClass *mcc = 
         MUI_CreateCustomClass ( 
@@ -1034,7 +1129,136 @@ void addCanvaswindow (
     globalActiveWindow = canvases;
     globalActiveCanvas = canvases->canvas;
     
-    globalWindowIncrement ++;
+    globalWindowIncrement++;
+}
+
+void showFullscreenWindow ( oCanvas *canvas )
+{
+    // Set some vars, we need no interference
+    fullscreenEditing = TRUE;    
+    
+    // Hide all other canvas windows
+    WindowList *l = canvases;
+    do
+    {
+        set ( l->win, MUIA_Window_Open, FALSE );
+    }
+    while ( ( l = l->nextwin ) );
+    
+    if ( !windowFullscreen )
+    {
+        windowFullscreen = WindowObject,
+            MUIA_Window_Title, ( IPTR )NULL,
+            MUIA_Window_SizeGadget, FALSE,
+            MUIA_Window_DepthGadget, FALSE,
+            MUIA_Window_CloseGadget, FALSE,
+            MUIA_Window_TopEdge, 0,
+            MUIA_Window_LeftEdge, 0,
+            MUIA_Window_Width, MUIV_Window_Width_Screen ( 100 ),
+            MUIA_Window_Height, MUIV_Window_Height_Screen ( 100 ),
+            MUIA_Window_DragBar, FALSE,
+            MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+            MUIA_Window_MouseObject, ( IPTR )canvases->mouse,
+            MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
+            MUIA_Window_UseRightBorderScroller, FALSE,
+            MUIA_Window_UseBottomBorderScroller, FALSE,      
+            MUIA_Window_IsSubWindow, FALSE,
+            MUIA_Window_Backdrop, TRUE,
+            MUIA_Window_Borderless, TRUE,
+            WindowContents, ( IPTR )VGroup,
+                MUIA_Background, ( IPTR )"5:Lunapaint:data/backdrop.png",
+                InnerSpacing ( 0, 0 ),
+                Child, ( IPTR )( fsTopEdge = RectangleObject, MUIA_Weight, 1, End ),
+                Child, ( IPTR )HGroup, 
+                    InnerSpacing ( 0, 0 ),
+                    Child, ( IPTR )( fsLeftEdge = RectangleObject, MUIA_Weight, 1, End ),
+                    Child, ( IPTR )( fullscreenGroup = VGroup,
+                        MUIA_Weight, 20000,
+                    End ),
+                    Child, ( IPTR )( fsRightEdge = RectangleObject, MUIA_Weight, 1, End ),
+                End, 
+                Child, ( IPTR )( fsBottomEdge = RectangleObject, MUIA_Weight, 1, End ),
+            End,
+        End;
+        DoMethod ( PaintApp, OM_ADDMEMBER, ( IPTR )windowFullscreen );
+    }
+    DoMethod ( globalActiveWindow->container, MUIM_Group_InitChange );
+    DoMethod ( globalActiveWindow->container, OM_REMMEMBER, ( IPTR )globalActiveWindow->area );
+    DoMethod ( globalActiveWindow->container, MUIM_Group_ExitChange );
+    DoMethod ( fullscreenGroup, MUIM_Group_InitChange );
+    DoMethod ( fullscreenGroup, OM_ADDMEMBER, ( IPTR )globalActiveWindow->area );
+    DoMethod ( fullscreenGroup, MUIM_Group_ExitChange );
+    
+    scaleFullscreenWindow ( );
+    
+    set ( windowFullscreen, MUIA_Window_Open, TRUE );
+}
+
+void hideFullscreenWindow ( )
+{
+    // Let us hide the fullscreen window
+    set ( windowFullscreen, MUIA_Window_Open, FALSE );
+    DoMethod ( fullscreenGroup, MUIM_Group_InitChange );
+    DoMethod ( fullscreenGroup, OM_REMMEMBER, ( IPTR )globalActiveWindow->area );
+    DoMethod ( fullscreenGroup, MUIM_Group_ExitChange );
+    DoMethod ( globalActiveWindow->container, MUIM_Group_InitChange );
+    DoMethod ( globalActiveWindow->container, OM_ADDMEMBER, ( IPTR )globalActiveWindow->area );
+    DoMethod ( globalActiveWindow->container, MUIM_Group_ExitChange );
+    
+    // Show all other canvas windows
+    WindowList *l = canvases;
+    do
+    {
+        set ( l->win, MUIA_Window_Open, TRUE );
+    }
+    while ( ( l = l->nextwin ) );
+    
+    // Last part
+    fullscreenEditing = FALSE;
+}
+
+void scaleFullscreenWindow ( )
+{
+    // Ideal width/height
+    ULONG width = globalActiveCanvas->width * globalActiveCanvas->zoom;
+    ULONG height = globalActiveCanvas->height * globalActiveCanvas->zoom;
+    
+    // Optimal width/height
+    if ( width >= lunaPubScreen->Width ) 
+    {
+        width = lunaPubScreen->Width;
+        set ( fsLeftEdge, MUIA_ShowMe, FALSE );
+        set ( fsRightEdge, MUIA_ShowMe, FALSE );
+    }
+    else
+    {
+        set ( fsLeftEdge, MUIA_ShowMe, TRUE );
+        set ( fsRightEdge, MUIA_ShowMe, TRUE );
+    }
+    if ( height > lunaPubScreen->Height ) 
+    {
+        height = lunaPubScreen->Height;
+        set ( fsTopEdge, MUIA_ShowMe, FALSE );
+        set ( fsBottomEdge, MUIA_ShowMe, FALSE );
+    }
+    else
+    {
+        set ( fsTopEdge, MUIA_ShowMe, TRUE );
+        set ( fsBottomEdge, MUIA_ShowMe, TRUE );
+    }
+    
+    // Scale
+    set ( fullscreenGroup, MUIA_FixWidth, width );
+    set ( fullscreenGroup, MUIA_FixHeight, height );
+    set ( globalActiveWindow->area, MUIA_FixWidth, width );
+    set ( globalActiveWindow->area, MUIA_FixHeight, height );
+}
+
+void centerFullscreenWindow ( )
+{
+    // Center
+    set ( windowFullscreen, MUIA_Window_LeftEdge, MUIV_Window_LeftEdge_Centered );
+    set ( windowFullscreen, MUIA_Window_TopEdge, MUIV_Window_TopEdge_Centered );
 }
 
 Object *getCanvaswindowById ( unsigned int id )

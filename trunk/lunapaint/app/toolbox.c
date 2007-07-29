@@ -321,7 +321,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                     // TODO: Could projectName remain used?
                     addCanvaswindow ( width, height, 1, frames, TRUE ); 
                     STRPTR txtbuf = ( STRPTR )NULL;
-                    get (	nwStringPrjName, MUIA_String_Contents, &txtbuf );
+                    get ( nwStringPrjName, MUIA_String_Contents, &txtbuf );
                     set ( globalActiveWindow->win, MUIA_Window_Title, ( IPTR )txtbuf );
                     set ( globalActiveWindow->win, MUIA_Window_Open, TRUE );
                     set ( nwWindow, MUIA_Window_Open, FALSE );
@@ -467,7 +467,27 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
                         }	
                     }
                 }
-            break;
+                break;
+            
+            case IDCMP_MOUSEMOVE:
+            
+                if ( globalActiveCanvas && globalActiveWindow )
+                {
+                    ULONG mousex = lunaPubScreen->MouseX;
+                    ULONG mousey = lunaPubScreen->MouseY;
+                    ULONG ox = globalActiveCanvas->offsetx;
+                    ULONG oy = globalActiveCanvas->offsety;
+                    ULONG zoom = globalActiveCanvas->zoom;
+                    
+                    Object *Area = fullscreenEditing ? globalActiveWindow->area : fullscreenGroup;
+                    
+                    cMouseX = ( ( mousex - XGET ( Area, MUIA_LeftEdge ) + ox ) / zoom );
+                    cMouseY = ( ( mousey - XGET ( Area, MUIA_TopEdge ) + oy ) / zoom );
+                    
+                    dMouseX = cMouseX, dMouseY = cMouseY;
+                }
+            
+                break;
             
             default: break;
         }
@@ -488,8 +508,8 @@ void Init_ToolboxWindow ( )
         NULL, MUIC_Rectangle, NULL, 0, &tbxPreview
     );
     
-    static const char *arr_fillmode[] = { "Draw only", "Fill shapes", "Draw/Fill", NULL };
-    static const char *arr_colorctrl[] = { "Add alpha", "Keep alpha", NULL };
+    static const char *arr_fillmode[] = { "Draw", "Fill", "Both", NULL };
+    static const char *arr_colorctrl[] = { "Add", "Lock", NULL };
     static const char *arr_grid[] = { "Grid off", "Grid on", NULL };
     static const char *arr_grdz[] = { "2", "3", "4", "5", "6", "7", "8", "9", "10", NULL };
     static const char *arr_drawmodes[] = { 
@@ -699,95 +719,110 @@ void Init_ToolboxWindow ( )
                             MUIA_Group_SameSize, TRUE,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 50,
-                                Child, ( IPTR )TextObject, 
-                                    MUIA_Text_Contents, ( IPTR )"Paintmode:", 
+                                Child, ( IPTR )TextObject,
+                                    MUIA_Text_Contents, ( IPTR )"Paintmode:",
                                 End,
                                 Child, ( IPTR )( tbxCycPaintMode = CycleObject,
                                     MUIA_Cycle_Entries, &arr_drawmodes,
                                 End ),
-                            End,
-                            Child, ( IPTR )VGroup,
-                                Child, ( IPTR )RectangleObject,
-                                    MUIA_FixWidth, 4,
+                                Child, ( IPTR )HGroup,
+                                    Child, ( IPTR )TextObject,
+                                        MUIA_Weight, 50,
+                                        MUIA_Text_Contents, ( IPTR )"Draw/Fill:",
+                                    End,
+                                    Child, ( IPTR )TextObject,
+                                        MUIA_Weight, 50,
+                                        MUIA_Text_Contents, ( IPTR )"Alpha:",
+                                    End,
+                                End,
+                                Child, ( IPTR )HGroup,
+                                    Child, ( IPTR )( tbxCycFillmode = CycleObject,
+                                        MUIA_Cycle_Entries, ( IPTR )arr_fillmode,
+                                        MUIA_Cycle_Active, 0,
+                                        MUIA_Weight, 50,
+                                    End ),
+                                    Child, ( IPTR )( tbxCycColorCtrl = CycleObject,
+                                        MUIA_Cycle_Entries, ( IPTR )arr_colorctrl,
+                                        MUIA_Cycle_Active, 0,
+                                        MUIA_Weight, 50,
+                                    End ),
                                 End,
                             End,
                             Child, ( IPTR )VGroup,
-                                MUIA_Weight, 25,
-                                Child, ( IPTR )( 
-                                    antiImage = HGroup,    
-                                        MUIA_Frame, MUIV_Frame_Button,
-                                        MUIA_InputMode, MUIV_InputMode_RelVerify,
-                                        Child, ImageObject,
-                                            MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/antialias.png",
-                                            MUIA_Frame, MUIV_Frame_None,
-                                        End,
-                                    End
-                                ),
-                                Child, ( IPTR )( 
-                                    antiOffImage = HGroup,    
-                                        MUIA_Frame, MUIV_Frame_Button,
-                                        MUIA_InputMode, MUIV_InputMode_RelVerify,
-                                        Child, ImageObject,
-                                            MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/antialias_off.png",
-                                            MUIA_Frame, MUIV_Frame_None,
-                                        End,
-                                    End
-                                ),
-                            End,
-                            Child, ( IPTR )VGroup,
-                                Child, ( IPTR )RectangleObject,
-                                    MUIA_FixWidth, 4,
+                                Child, ( IPTR )VGroup,
+                                    Child, ( IPTR )RectangleObject,
+                                        MUIA_FixWidth, 4,
+                                    End,
                                 End,
                             End,
                             Child, ( IPTR )VGroup,
-                                MUIA_Weight, 25,
-                                Child, ( IPTR )( 
-                                    featherImage = HGroup,    
-                                        MUIA_Frame, MUIV_Frame_Button,
-                                        MUIA_InputMode, MUIV_InputMode_RelVerify,
-                                        Child, ImageObject,
-                                            MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/feathered.png",
-                                            MUIA_Frame, MUIV_Frame_None,
-                                        End,
-                                    End
-                                ),
-                                Child, ( IPTR )( 
-                                    solidImage  = HGroup,    
-                                        MUIA_Frame, MUIV_Frame_Button,
-                                        MUIA_InputMode, MUIV_InputMode_RelVerify,
-                                        Child, ImageObject,
-                                            MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/solid.png",
-                                            MUIA_Frame, MUIV_Frame_None,
-                                        End,
-                                    End 
-                                ),
+                                Child, ( IPTR )TextObject,
+                                    MUIA_Text_Contents, ( IPTR )"Brush shape:",
+                                End,
+                                Child, ( IPTR )HGroup,
+                                    MUIA_Weight, 25,
+                                    Child, ( IPTR )( 
+                                        antiImage = HGroup,    
+                                            MUIA_Frame, MUIV_Frame_Button,
+                                            MUIA_InputMode, MUIV_InputMode_RelVerify,
+                                            Child, ImageObject,
+                                                MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/antialias.png",
+                                                MUIA_Frame, MUIV_Frame_None,
+                                            End,
+                                        End
+                                    ),
+                                    Child, ( IPTR )( 
+                                        antiOffImage = HGroup,    
+                                            MUIA_Frame, MUIV_Frame_Button,
+                                            MUIA_InputMode, MUIV_InputMode_RelVerify,
+                                            Child, ImageObject,
+                                                MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/antialias_off.png",
+                                                MUIA_Frame, MUIV_Frame_None,
+                                            End,
+                                        End
+                                    ),
+                                End,
+                                Child, ( IPTR )HGroup,
+                                    MUIA_Weight, 25,
+                                    Child, ( IPTR )( 
+                                        featherImage = HGroup,    
+                                            MUIA_Frame, MUIV_Frame_Button,
+                                            MUIA_InputMode, MUIV_InputMode_RelVerify,
+                                            Child, ImageObject,
+                                                MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/feathered.png",
+                                                MUIA_Frame, MUIV_Frame_None,
+                                            End,
+                                        End
+                                    ),
+                                    Child, ( IPTR )( 
+                                        solidImage  = HGroup,    
+                                            MUIA_Frame, MUIV_Frame_Button,
+                                            MUIA_InputMode, MUIV_InputMode_RelVerify,
+                                            Child, ImageObject,
+                                                MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/solid.png",
+                                                MUIA_Frame, MUIV_Frame_None,
+                                            End,
+                                        End 
+                                    ),
+                                End,
                             End,
                         End ),
-                        Child, ( IPTR )HGroup,
-                            Child, ( IPTR )( tbxCycFillmode = CycleObject,
-                                MUIA_Cycle_Entries, ( IPTR )arr_fillmode,
-                                MUIA_Cycle_Active, 0,
-                                MUIA_Weight, 50,
-                            End ),
-                            Child, ( IPTR )( tbxCycColorCtrl = CycleObject,
-                                MUIA_Cycle_Entries, ( IPTR )arr_colorctrl,
-                                MUIA_Cycle_Active, 0,
-                                MUIA_Weight, 50,
-                            End ),
-                        End,
-                        Child, ( IPTR )HGroup,
-                            MUIA_Frame, MUIV_Frame_None,
-                            Child, ( IPTR )( tbxCycGrid = CycleObject,
-                                MUIA_Cycle_Entries, &arr_grid,
-                                MUIA_Weight, 60,
-                            End ),
-                            Child, ( IPTR )( tbxCyc_GridSize = CycleObject,
-                                MUIA_Cycle_Entries, &arr_grdz,
-                                MUIA_Weight, 40,
-                            End ),
-                        End,
                     End,
                 End ),
+                Child, ( IPTR )RectangleObject,
+                    MUIA_Rectangle_HBar, TRUE,
+                End,
+                Child, ( IPTR )HGroup,
+                    MUIA_Frame, MUIV_Frame_None,
+                    Child, ( IPTR )( tbxCycGrid = CycleObject,
+                        MUIA_Cycle_Entries, &arr_grid,
+                        MUIA_Weight, 60,
+                    End ),
+                    Child, ( IPTR )( tbxCyc_GridSize = CycleObject,
+                        MUIA_Cycle_Entries, &arr_grdz,
+                        MUIA_Weight, 40,
+                    End ),
+                End,
                 Child, ( IPTR )RectangleObject,
                     MUIA_Rectangle_HBar, TRUE,
                 End,
@@ -949,6 +984,7 @@ void Init_ToolboxMethods ( )
         PaintApp, MUIM_Notify, MUIA_Application_MenuAction, MUIV_EveryTime,
         ( IPTR )toolbox, 3, MUIM_CallHook, ( IPTR )&getMenu_hook, MUIV_EveryTime
     );
+    
     DoMethod (
         tbxCycPaintMode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_SetPaintMode
@@ -1313,6 +1349,20 @@ void checkMenuEvents ( int udata )
             }
             break;
             
+        case 402:
+            {
+                if ( !fullscreenEditing )
+                {
+                    if ( !globalActiveWindow ) return;
+                    showFullscreenWindow ( globalActiveCanvas );
+                }
+                else
+                {
+                    hideFullscreenWindow ( );
+                }
+            }
+            break;  
+          
         // Program preferences
         case 900:
             set ( PrefsWindow, MUIA_Window_Open, TRUE );

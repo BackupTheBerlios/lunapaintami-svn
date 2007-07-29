@@ -168,6 +168,7 @@ void Init_Application ( )
     globalBrushMode = 0; // normal
     MouseHasMoved = FALSE;
     redrawTimes = 0;
+    fullscreenEditing = FALSE;
     
     // Open the toolbox and declare the app running!
     if ( GlobalPrefs.ScreenmodeType != 0 )

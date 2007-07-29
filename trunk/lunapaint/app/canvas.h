@@ -122,7 +122,15 @@
 
 BOOL isZooming;
 BOOL isScrolling;
+BOOL fullscreenEditing;
 int AskMinMaxTimes;
+
+/*
+    For editing in fullscreen mode
+*/
+Object *windowFullscreen;
+Object *fullscreenGroup;
+Object *fsTopEdge, *fsLeftEdge, *fsRightEdge, *fsBottomEdge;
 
 /*
     Setup keyboard shortcuts on canvas and toolbox
@@ -188,6 +196,14 @@ void addCanvaswindow (
     unsigned int layers, unsigned int frames,
     BOOL generateCanvas 
 );
+
+/*
+    Show/Hide the fullscreen editing window
+*/
+void showFullscreenWindow ( oCanvas *canvas );
+void hideFullscreenWindow ( );
+void scaleFullscreenWindow ( );
+void centerFullscreenWindow ( );
 
 /*
     Contstrain offset values within scope of canvas
