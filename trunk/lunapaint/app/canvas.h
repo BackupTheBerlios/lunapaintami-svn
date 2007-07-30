@@ -185,7 +185,7 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
 /*
     Store mouse coordinates into the global variables
 */
-void getMouseCoordinates ( struct MUIP_HandleInput *msg, struct RGBitmapData *data, int ox, int oy );
+void getMouseCoordinates ( struct MUIP_HandleInput *msg, struct RGBitmapData *data );
 
 /*
     This function adds a canvas window to the canvas window list
@@ -209,6 +209,11 @@ void centerFullscreenWindow ( );
     Contstrain offset values within scope of canvas
 */
 void constrainOffset ( oCanvas *canvas );
+
+/*
+    Test if we're hitting "walls"
+*/
+void snapToBounds ( int *x, int *y );
 
 /*
     This function sends back a pointer to a window object

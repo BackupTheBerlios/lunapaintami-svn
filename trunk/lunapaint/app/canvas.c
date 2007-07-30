@@ -150,15 +150,12 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
                 globalActiveCanvas->zoom++;
             
                 // Move scrollbars
-                globalActiveCanvas->offsetx += globalActiveCanvas->visibleWidth * 0.5;
-                globalActiveCanvas->offsety += globalActiveCanvas->visibleHeight * 0.5;
+                int zoomox = globalActiveCanvas->visibleWidth * 0.5;
+                int zoomoy = globalActiveCanvas->visibleHeight * 0.5;
                 
-                // Workaround for fullscreen - TODO: must be made accurate later
-                if ( fullscreenEditing )
-                {
-                    globalActiveCanvas->offsetx = 0;
-                    globalActiveCanvas->offsety = 0;
-                }
+                // Snap to zoom
+                globalActiveCanvas->offsetx += zoomox;
+                globalActiveCanvas->offsety += zoomoy;
                 
                 // Update GUI
                 winHasChanged ( );
@@ -181,7 +178,6 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
                 // Move scrollbars
                 globalActiveCanvas->offsetx -= globalActiveCanvas->visibleWidth * 0.5;
                 globalActiveCanvas->offsety -= globalActiveCanvas->visibleHeight * 0.5;
-                constrainOffset ( globalActiveCanvas );
                 
                 // Update GUI
                 winHasChanged ( );
@@ -406,22 +402,44 @@ void constrainOffset ( oCanvas *canvas )
     int vHeight = ( double )XGET ( globalActiveWindow->area, MUIA_Height ) / zoom;
     int cWidth = canvas->width;
     int cHeight = canvas->height;
-    int ox = canvas->offsetx / zoom;
-    int oy = canvas->offsety / zoom;
+    int ox = ( double )canvas->offsetx / zoom;
+    int oy = ( double )canvas->offsety / zoom;
     
     // Bounds
-    if ( ox < 0 ) canvas->offsetx = 0;
-    else if ( ox + vWidth >= cWidth ) canvas->offsetx = ( cWidth - vWidth ) * zoom;
-    if ( oy < 0 ) canvas->offsety = 0;
-    else if ( oy + vHeight >= cHeight ) canvas->offsety = ( cHeight - vHeight ) * zoom;
-       
-    // Update the visible width
-    canvas->visibleWidth = vWidth;
-    canvas->visibleHeight = vHeight;
+    if ( ox < 0 ) 
+        canvas->offsetx = 0;
+    else if ( ox + vWidth >= cWidth ) 
+        canvas->offsetx = ( cWidth - vWidth ) * zoom;
+    if ( oy < 0 ) 
+        canvas->offsety = 0;
+    else if ( oy + vHeight >= cHeight ) 
+        canvas->offsety = ( cHeight - vHeight ) * zoom;
             
     // Snap to zoom
-    SnapOffsetToZoom ( canvas );
+    canvas->offsetx = ( int )( canvas->offsetx / zoom ) * zoom;
+    canvas->offsety = ( int )( canvas->offsety / zoom ) * zoom;
 }
+
+void snapToBounds ( int *x, int *y )
+{
+    // Get some vars
+    int zoom = globalActiveCanvas->zoom;
+    int vWidth = ( double )XGET ( globalActiveWindow->area, MUIA_Width );
+    int vHeight = ( double )XGET ( globalActiveWindow->area, MUIA_Height );
+    int cWidth = globalActiveCanvas->width * zoom;
+    int cHeight = globalActiveCanvas->height * zoom;
+    
+    // Adapt x/y in bounds
+    if ( *x < 0 ) 
+        *x = 0;
+    else if ( *x + vWidth >= cWidth ) 
+        *x = floor( ( cWidth - vWidth ) / zoom ) * zoom;
+    if ( *y < 0 ) 
+        *y = 0;
+    else if ( *y + vHeight >= cHeight ) 
+        *y = floor( ( cHeight - vHeight ) / zoom ) * zoom;
+}
+
 
 void winHasChanged ( )
 {	
@@ -516,9 +534,6 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
     // Get stored data
     struct RGBitmapData *data = INST_DATA ( CLASS, self );
 
-    // We must not be out of bounds
-    constrainOffset ( globalActiveCanvas );
-
     // Alters if in fullscreen mode or not
     Object *Container = fullscreenEditing ? fullscreenGroup : data->window->container;
 
@@ -559,9 +574,6 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
         areaHeight != data->currentareaheight
     )
     {	
-        // Snap the coordinates to zoom level
-        SnapOffsetToZoom ( NULL );
-        
         // Set scrollbars
         set ( data->window->scrollH, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsetx );
         set ( data->window->scrollV, MUIA_Prop_First, ( IPTR )globalActiveCanvas->offsety );
@@ -575,8 +587,8 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
         globalActiveCanvas->offsetx = XGET ( data->window->scrollH, MUIA_Prop_First );
         globalActiveCanvas->offsety = XGET ( data->window->scrollV, MUIA_Prop_First );
         
-        // Snap the coordinates to zoom level
-        SnapOffsetToZoom ( NULL );
+        // Keep offset sane
+        constrainOffset ( globalActiveCanvas );
         
         data->currentzoom = globalActiveCanvas->zoom;
         data->currentareawidth = areaWidth;
@@ -585,7 +597,7 @@ IPTR RGBitmapRedraw ( Class *CLASS, Object *self )
     
     // Update the screen buffer
     if ( data->window->canvas->winHasChanged )
-    {
+    {   
         int Tool = globalCurrentTool;      
         globalCurrentTool = -1;
         
@@ -653,8 +665,8 @@ void SnapOffsetToZoom ( oCanvas *canv )
     if ( canv == NULL ) canv = globalActiveCanvas;
     // Contstrain offset to zoom
     int	*ofx = &canv->offsetx, *ofy = &canv->offsety, zoom = canv->zoom;
-    *ofx = ( int )( ( double )*ofx / zoom ) * zoom;
-    *ofy = ( int )( ( double )*ofy / zoom ) * zoom;
+    *ofx = ( int )( *ofx / zoom ) * zoom;
+    *ofy = ( int )( *ofy / zoom ) * zoom;
 }
 
 void UpdateCanvasInfo ( WindowList *win )
@@ -679,6 +691,9 @@ void UpdateCanvasInfo ( WindowList *win )
 
 IPTR ScrollCanvas ( int x, int y )
 {	
+    // Ajust to not collide with canvas bounds
+    snapToBounds ( &x, &y );
+    
     // Remove any prevous toolpreview
     int currTool = globalCurrentTool;
     globalCurrentTool = -1;
@@ -686,10 +701,10 @@ IPTR ScrollCanvas ( int x, int y )
     globalCurrentTool = currTool;
     
     // Get coordinates
-    ULONG areaWidth = XGET ( globalActiveWindow->area, MUIA_Width );
-    ULONG areaHeight = XGET ( globalActiveWindow->area, MUIA_Height );
-    ULONG areaLeft = XGET ( globalActiveWindow->area, MUIA_LeftEdge );
-    ULONG areaTop = XGET ( globalActiveWindow->area, MUIA_TopEdge );
+    ULONG areaWidth =   XGET ( globalActiveWindow->area, MUIA_Width );
+    ULONG areaHeight =  XGET ( globalActiveWindow->area, MUIA_Height );
+    ULONG areaLeft =    XGET ( globalActiveWindow->area, MUIA_LeftEdge );
+    ULONG areaTop =     XGET ( globalActiveWindow->area, MUIA_TopEdge );
             
     // find diff and align to zoom
     int diffx = x -  ( int )globalActiveCanvas->offsetx;
@@ -835,7 +850,7 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
                 if ( !data->window->isActive )
                 {
                     data->window->isActive = TRUE;
-                    getMouseCoordinates ( msg, data, ox, oy );
+                    getMouseCoordinates ( msg, data );
                     dMouseX = cMouseX, dMouseY = cMouseY;
                     break;
                 }
@@ -882,16 +897,14 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
                 break;
                 
             case IDCMP_RAWKEY:
-                
                 checkKeyboardShortcuts ( msg->imsg->Code );
-                
                 break;
         }
         
         // Update mouse coordiates
         if ( movement == 1 )
         {
-            getMouseCoordinates ( msg, data, ox, oy );
+            getMouseCoordinates ( msg, data );
             if ( !MouseButtonL && !MouseButtonR ) 
                 dMouseX = cMouseX, dMouseY = cMouseY;
         }
@@ -899,8 +912,10 @@ IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *
     return 0;
 }
 
-void getMouseCoordinates ( struct MUIP_HandleInput *msg, struct RGBitmapData *data, int ox, int oy )
+void getMouseCoordinates ( struct MUIP_HandleInput *msg, struct RGBitmapData *data )
 {
+    int ox = globalActiveCanvas->offsetx;
+    int oy = globalActiveCanvas->offsety;
     eMouseX = ( int )msg->imsg->MouseX - data->arealeft;
     eMouseY = ( int )msg->imsg->MouseY - data->areatop;
     cMouseX = ( eMouseX + ox ) / globalActiveCanvas->zoom;

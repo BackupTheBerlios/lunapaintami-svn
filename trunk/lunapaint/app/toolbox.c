@@ -489,6 +489,10 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
             
                 break;
             
+            case IDCMP_RAWKEY:
+                checkKeyboardShortcuts ( msg->imsg->Code );
+                break;
+            
             default: break;
         }
     }

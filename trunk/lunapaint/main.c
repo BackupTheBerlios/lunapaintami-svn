@@ -24,8 +24,6 @@
 #include <exec/types.h>
 #include <libraries/mui.h>
 
-#define AROS 1
-
 #include "math/math.h"
 
 #include "common.h"
@@ -33,7 +31,7 @@
 #include "core/drawtools.h"
 #include "core/tools.h"
 
-#ifdef AROS
+#ifdef __AROS__
 #define MUIM_Think 9999
 #include "app/gui.h"
 #include "app/parts.h"
@@ -105,8 +103,10 @@ int main ( int argc, char *argv[] )
     currColor = 0;
     globalColor = 0;
     
+    // Starts up the application
     Init_Application ( );
 
+    // Main loop
     while ( getSignals ( &sigs ) )
     {
         // Check for signals from GUI
@@ -133,6 +133,7 @@ int main ( int argc, char *argv[] )
         if ( redrawTimes > 0 ) redrawTimes--;
     }
 
+    // Exists the application and cleans up reserved resources
     Exit_Application ( );
 
     return 0;
