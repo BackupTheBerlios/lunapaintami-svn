@@ -130,7 +130,24 @@ int AskMinMaxTimes;
 */
 Object *windowFullscreen;
 Object *fullscreenGroup;
-Object *fsTopEdge, *fsLeftEdge, *fsRightEdge, *fsBottomEdge;
+
+/*
+    For our dispatcher:
+*/
+IPTR MUIM_RGB_Draw ( Class *CLASS, Object *self, Msg message );
+IPTR MUIM_RGB_Redraw ( );
+IPTR MUIM_RGB_RedrawArea ( );
+IPTR MUIM_RGB_HandleInput ( Class *CLASS, Object *self, Msg message );
+IPTR MUIM_RGB_Setup ( Class *CLASS, Object *self, Msg message );
+IPTR MUIM_RGB_Cleanup ( Class *CLASS, Object *self, Msg message );   
+IPTR MUIM_RGB_ScrollingNotify ( );
+IPTR MUIM_RGB_CanvasActivate ( Class *CLASS, Object *self, Msg message );
+IPTR MUIM_RGB_CanvasDeactivate ( Class *CLASS, Object *self, Msg message );
+IPTR MUIM_RGB_ZoomIn ( );
+IPTR MUIM_RGB_ZoomOut ( );       
+IPTR MUIM_RGB_ShowAll ( );
+IPTR MUIM_RGB_AskMinMax ( Class *CLASS, Object *self, Msg message ); 
+IPTR MUIM_RGB_CloseCanvasWin ( Class *CLASS, Object *self, Msg message ); 
 
 /*
     Setup keyboard shortcuts on canvas and toolbox
@@ -147,13 +164,9 @@ void moveScrollbarRight ( );
 
 /*
     Redraw the area object with canvas data
+    Private function!!
 */
-IPTR RGBitmapRedraw ( Class *CLASS, Object *self );
-
-/*
-    Return min default and max sizes of canvas
-*/
-IPTR CanvasAskMinMax ( Class *CLASS,Object *self, struct MUIP_AskMinMax *message );
+IPTR _RGBitmapRedraw ( Class *CLASS, Object *self );
 
 /*
     Update Frame: 1/1 etc
@@ -177,15 +190,9 @@ void SnapOffsetToZoom ( oCanvas *canv );
 void winHasChanged ( );
 
 /*
-    Handle input events on area, like pressed mouse buttons, mouse movements and so on.
-    Also, store the state of events in self.
-*/
-IPTR RGBitmapHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg );
-
-/*
     Store mouse coordinates into the global variables
 */
-void getMouseCoordinates ( struct MUIP_HandleInput *msg, struct RGBitmapData *data );
+void getMouseCoordinates ( );
 
 /*
     This function adds a canvas window to the canvas window list
@@ -203,7 +210,6 @@ void addCanvaswindow (
 void showFullscreenWindow ( oCanvas *canvas );
 void hideFullscreenWindow ( );
 void scaleFullscreenWindow ( );
-void centerFullscreenWindow ( );
 
 /*
     Contstrain offset values within scope of canvas
@@ -254,6 +260,11 @@ void blitAreaRect (
 );
 
 /*
+    Special mode, blit overlay toolpreview
+*/
+void blitToolPreview ( int x, int y, int w, int h );
+
+/*
     Removes previous tool preview blit from the painting
 */
 void removePrevToolPreview ( );
@@ -263,5 +274,16 @@ void removePrevToolPreview ( );
     to show the current brush or a clipbrush
 */
 void callToolPreview ( );
+
+/*
+    Get geometry of the canvas area
+    PRIVATE functions
+*/
+ULONG _getAreaWidth ( );
+ULONG _getAreaHeight ( );
+ULONG _getAreaTop ( );
+ULONG _getAreaLeft ( );
+ULONG _getAreaOffsetX ( );
+ULONG _getAreaOffsetY ( );
 
 #endif

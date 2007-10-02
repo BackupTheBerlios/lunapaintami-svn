@@ -212,6 +212,11 @@ inline unsigned int *renderCanvas (
 );
 
 /*
+    Scroll the canvas screen storage by x,y (destructive moving)
+*/ 
+void scrollScreenStorage ( oCanvas *canvas, int x, int y );
+
+/*
     Draw all layers onto the screenbuffer constrained by rect
 */
 BOOL redrawScreenbufferRect ( 

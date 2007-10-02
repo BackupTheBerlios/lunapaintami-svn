@@ -84,6 +84,7 @@ void doEvents ( )
         // Show outline of tool
         callToolPreview ( );
     }
+    getMouseCoordinates ( );
 }
 
 int main ( int argc, char *argv[] )
@@ -102,6 +103,7 @@ int main ( int argc, char *argv[] )
     prevColor = 0;
     currColor = 0;
     globalColor = 0;
+    BOOL keyIsDown = FALSE;
     
     // Starts up the application
     Init_Application ( );
@@ -112,6 +114,18 @@ int main ( int argc, char *argv[] )
         // Check for signals from GUI
         if ( checkSignalBreak ( &sigs ) )
             break;	
+            
+        // Execute keyboard events on key press
+        if ( evalRawKey >= IECODE_ASCII_FIRST && evalRawKey < IECODE_ASCII_LAST )
+        {
+            if ( !keyIsDown )
+            {
+                keyIsDown = TRUE;
+                checkKeyboardShortcuts ( evalRawKey );
+            }
+        }
+        if ( evalRawKey & IECODE_UP_PREFIX )
+            keyIsDown = FALSE;
             
         // Execute pending events
         if ( globalActiveWindow && globalActiveCanvas )

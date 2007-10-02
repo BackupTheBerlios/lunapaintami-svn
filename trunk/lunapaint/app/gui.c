@@ -98,6 +98,9 @@ void Init_Application ( )
     
     InitLunaScreen ( );
     
+    // Initialize the events listener
+    InitEvents ( );
+    
     // Let's initialize the used palette!
     initPalette ( );
     
@@ -127,6 +130,7 @@ void Init_Application ( )
         MUIA_Application_Author, ( IPTR )"Hogne Titlestad",
         MUIA_Application_Copyright, ( IPTR )"Hogne Titlestad",
         MUIA_Application_Description, ( IPTR )"A 64-bit paint application for AROS.",
+        MUIA_Application_SingleTask, TRUE,
         SubWindow, ( IPTR )toolbox,
         SubWindow, ( IPTR )WindowLayers,
         SubWindow, ( IPTR )WindowAnimation,
@@ -208,6 +212,9 @@ void Exit_Application ( )
         CloseLibrary ( ( struct Library *)IntuitionBase );
     if ( DOSBase != NULL )
         CloseLibrary ( ( struct Library *)DOSBase );
+    
+    // Shutdown events
+    ShutdownEvents ( );
     
     
     // Free all tool buffers

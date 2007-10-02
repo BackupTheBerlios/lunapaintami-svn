@@ -1,10 +1,13 @@
-TODO - 0.3.2
+TODO - 0.3.3
+ 
+ * DONE Trails on brushes
+ * DONE Global keyboard shortcuts
+ * DONE Fullscreen editing
+ * DONE Fixed layer stack order
+ 
+TODO - 0.3.4
 
  * Fix crash sometimes when loading a unknown file format
-
- 
- TODO - 0.3.3
- 
  * Fix flimmer on scrolling layers
  * Optimize usage of text buffer size (now it has a bounding box)
  * Add font preview area

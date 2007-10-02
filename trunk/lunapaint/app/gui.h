@@ -42,6 +42,8 @@
 #include "../aros/aros.h"
 #endif
 
+#include "events.h"
+
 /*
     GUI includes
 */

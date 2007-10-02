@@ -130,6 +130,8 @@ void nextPaletteColor ( )
 
 IPTR tbxPaintPreview ( )
 {
+    if ( !XGET( toolbox, MUIA_Window_Open ) ) return 0;
+    
     unsigned int w = XGET ( tbxAreaPreview, MUIA_Width );
     unsigned int h = XGET ( tbxAreaPreview, MUIA_Height );
     unsigned int t = XGET ( tbxAreaPreview, MUIA_TopEdge );
@@ -361,6 +363,8 @@ BOOPSI_DISPATCHER_END
 
 IPTR tbxPaletteRedraw ( )
 {
+    if ( !XGET ( toolbox, MUIA_Window_Open ) ) return 0;
+    
     int topedge = 0, leftedge = 0, w = 0, h = 0;
     get ( tbxAreaPalette, MUIA_TopEdge, &topedge );
     get ( tbxAreaPalette, MUIA_LeftEdge, &leftedge );
@@ -413,6 +417,8 @@ IPTR tbxPaletteRedraw ( )
 
 IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
 {
+    if ( !XGET ( toolbox, MUIA_Window_Open ) ) return 0;
+    
     int topedge = 0, leftedge = 0, w = 0, h = 0;
     get ( tbxAreaPalette, MUIA_TopEdge, &topedge );
     get ( tbxAreaPalette, MUIA_LeftEdge, &leftedge );
@@ -467,30 +473,6 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
                         }	
                     }
                 }
-                break;
-            
-            case IDCMP_MOUSEMOVE:
-            
-                if ( globalActiveCanvas && globalActiveWindow )
-                {
-                    ULONG mousex = lunaPubScreen->MouseX;
-                    ULONG mousey = lunaPubScreen->MouseY;
-                    ULONG ox = globalActiveCanvas->offsetx;
-                    ULONG oy = globalActiveCanvas->offsety;
-                    ULONG zoom = globalActiveCanvas->zoom;
-                    
-                    Object *Area = fullscreenEditing ? globalActiveWindow->area : fullscreenGroup;
-                    
-                    cMouseX = ( ( mousex - XGET ( Area, MUIA_LeftEdge ) + ox ) / zoom );
-                    cMouseY = ( ( mousey - XGET ( Area, MUIA_TopEdge ) + oy ) / zoom );
-                    
-                    dMouseX = cMouseX, dMouseY = cMouseY;
-                }
-            
-                break;
-            
-            case IDCMP_RAWKEY:
-                checkKeyboardShortcuts ( msg->imsg->Code );
                 break;
             
             default: break;

@@ -527,6 +527,7 @@ IPTR layerHandleInput ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg
                 {
                     // TODO: Subtract vertical scroll offset...
                     int wantedLayer = ( ( double )( ( int )msg->imsg->MouseY - topEdge + propFirst ) / LAYERTHUMBSIZE );
+                    wantedLayer = globalActiveCanvas->totalLayers - wantedLayer - 1;
                     if ( wantedLayer < 0 ) wantedLayer = 0;
                     if ( wantedLayer >= globalActiveCanvas->totalLayers )
                         wantedLayer = globalActiveCanvas->totalLayers - 1;
@@ -668,30 +669,32 @@ BOOL layerRender ( Class *CLASS, Object *self )
         {
             if ( f == globalActiveCanvas->currentFrame )
             {
-                int lOffsetY = ( LAYERTHUMBSIZE * l ) - propFirst;
+                // Get draw offset with highest layernumber shown on top (newest on top of stack)
+                int lOffsetY = ( LAYERTHUMBSIZE * ( globalActiveCanvas->totalLayers - l - 1 ) ) - propFirst;
                 
                 int y = 0; for ( ; y < LAYERTHUMBSIZE; y ++ )
                 {
                     int py = ( double )( y - VSpace ) / imageHeight * globalActiveCanvas->height;
+                    int lOffsetYy = y + lOffsetY;
                     
                     int x = ux; for ( ; x < uw; x++ )
                     {
                         int px = ( double )( x - HSpace ) / imageWidth * globalActiveCanvas->width;
                         
                         // Draw only what's in view in the widget
-                        if ( 
-                            x >= ux && x < uxuw && ( y + lOffsetY ) >= uy && 
-                            ( y + lOffsetY ) < uyuh
-                        )
+                        if ( x >= ux && x < uxuw && lOffsetYy >= uy && lOffsetYy < uyuh )
                         {
                             // offset to plot in tmpBuf                  
-                            int off = ( ( y + lOffsetY ) * areaWidth ) + x;
+                            int off = lOffsetYy * areaWidth + x;
                             
                             // within the frame                  
                             if ( x >= HSpace && x < imageWidth + HSpace && y >= VSpace && y < imageHeight + VSpace )
                             {            
                                 // Frame                     
-                                if ( x == HSpace || x == HSpace + imageWidth - 1 || y == VSpace || y == VSpace + imageHeight - 1 )
+                                if ( 
+                                    x == HSpace || x == HSpace + imageWidth - 1 || 
+                                    y == VSpace || y == VSpace + imageHeight - 1 
+                                )
                                 {
                                     if ( l == globalActiveCanvas->currentLayer )
                                         LayersWidgetTmpBuf[ off ] = 0xffffff;
@@ -789,7 +792,7 @@ void RenderLayerNames ( int x, int y, int w, int h )
         int f = i / canv->totalLayers;
         if ( f == canv->currentFrame )
         {
-            int y = l * LAYERTHUMBSIZE - ioff;
+            int y = ( canv->totalLayers - l - 1 ) * LAYERTHUMBSIZE - ioff;
             // Layer name:
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset );
             Text ( _rp ( obj ), buf->name, strlen ( buf->name ) );

@@ -404,6 +404,25 @@ inline unsigned int *renderCanvas (
     return tempBuf;
 }
 
+// Scroll the canvas screen storage
+void scrollScreenStorage ( oCanvas *canvas, int x, int y )
+{
+    if ( !canvas->screenstorage ) return;
+    unsigned int *tmpBuf = AllocVec ( canvas->scrStorageHeight * canvas->scrStorageWidth * 4, MEMF_ANY );
+    int sy = 0; for ( ; sy < canvas->scrStorageHeight; sy++ )
+    {
+        int frOffsetY = sy * canvas->scrStorageWidth;
+        int toOffsetY = ( ( sy - y ) % canvas->scrStorageHeight ) * canvas->scrStorageWidth;
+        int sx = 0; for ( ; sx < canvas->scrStorageWidth; sx++ )
+        {
+            int toOffsetX = ( sx - x ) % canvas->scrStorageWidth;
+            tmpBuf[ toOffsetY + toOffsetX ] = canvas->screenstorage[ frOffsetY + sx ];
+        }
+    }
+    FreeVec ( canvas->screenstorage );
+    canvas->screenstorage = tmpBuf;
+}
+
 BOOL redrawScreenbufferRect ( 
     oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw, unsigned int rh, 
     BOOL updateStorage
@@ -418,7 +437,7 @@ BOOL redrawScreenbufferRect (
     int zoomedWidth = rw * zoom;
     int zoomedHeight = rh * zoom;
     
-    // Update screenbuffer:
+    // Update screenbuffer for small blits (brush previews etc):
     
     int datalen = canvas->visibleWidth * canvas->visibleHeight;   
     int datasize = 4 * datalen;
@@ -430,17 +449,16 @@ BOOL redrawScreenbufferRect (
         FreeVec ( canvas->screenbuffer );
     canvas->screenbuffer = AllocVec ( datasize, MEMF_ANY );	
     
-    int y = 0, x = 0; rgba32 tmp = { 0, 0, 0, 0 };
+    int y = 0, x = 0;
     for ( ; y < limity; y++ )
     {	
         int tempzoomy 		= zoomedWidth * y;
         int screenzoomy 	= canvas->visibleWidth * y;
         
+        // Set resulting color in ABGR format
         for ( x = 0; x < limitx; x++ )
         {
-            // Set resulting color in ABGR format
-            tmp = *( rgba32 *)&tempBuf[ tempzoomy + x ];
-            canvas->screenbuffer[ screenzoomy + x ] = *( unsigned int *)&tmp;
+            canvas->screenbuffer[ screenzoomy + x ] = tempBuf[ tempzoomy + x ];
         }
     }
     
@@ -458,6 +476,31 @@ BOOL redrawScreenbufferRect (
         memcpy ( canvas->screenstorage, canvas->screenbuffer, datasize );
         canvas->winHasChanged = FALSE;
     }
+    // Update only the part that's been blitted to tempBuf 
+    // (except tool previews)
+    else if ( canvas->screenstorage && tempBuf )
+    {
+        rx = rx * zoom - globalActiveCanvas->offsetx;
+        ry = ry * zoom - globalActiveCanvas->offsety;
+        
+        for ( y = 0; y < zoomedHeight; y++ )
+        {
+            int sy = y + ry;
+            if ( sy < 0 || sy >= canvas->scrStorageHeight ) continue;
+            
+            int syw = sy * canvas->scrStorageWidth;
+            int yw = y * zoomedWidth;
+            
+            for ( x = 0; x < zoomedWidth; x++ )
+            {
+                int sx = x + rx; 
+                
+                if ( sx < 0 || sx >= canvas->scrStorageWidth ) continue;
+                
+                canvas->screenstorage[ syw + sx ] = tempBuf[ yw + x ];
+            }
+        }
+    }
     
     // Free temp buffer and exit function
     if ( tempBuf != NULL ) FreeVec ( tempBuf );
@@ -468,8 +511,8 @@ BOOL redrawScreenbuffer ( oCanvas *canvas )
 {
     int offsetx 	= canvas->offsetx / canvas->zoom;
     int offsety 	= canvas->offsety / canvas->zoom;
-    int width 		= canvas->visibleWidth / canvas->zoom + 1;
-    int height 		= canvas->visibleHeight / canvas->zoom + 1;
+    int width 		= ( canvas->visibleWidth + 1 ) / canvas->zoom; // +1 is to draw one extra pixel if not everything
+    int height 		= ( canvas->visibleHeight + 1 ) / canvas->zoom; // fits into the visible width/height on aspect
     
     if ( !redrawScreenbufferRect ( canvas, offsetx, offsety, width, height, TRUE ) )
         return FALSE;

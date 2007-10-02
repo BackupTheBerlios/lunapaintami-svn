@@ -102,6 +102,7 @@ typedef struct sWinList
     unsigned int							contWidth;		// Known container width
     unsigned int							contHeight;		// Known container height
     
+    Object                                  *infocontainer; // Containing frame info etc
     Object									*container; 	// Containing the area
     Object									*area;			// MUI area data
     Object									*scrollgrp;		// Scrollgroup
@@ -133,11 +134,15 @@ typedef struct sWinList
 */
 struct RGBitmapData
 {
-    int								arealeft;				// Offset relative to window
-    int								areatop;				// --||--
+    int								zuneAreaLeft;   		// Offset relative to window
+    int								zuneAreaTop;			// --||--
+    int                             rgbAreaLeft;            // Offset relative to draw rect
+    int                             rgbAreaTop;             //
     int								currentzoom;			// Current zoom level
-    int								currentareawidth; 	    // current width of paint area
-    int								currentareaheight;	    // current height of paint area
+    int                             zuneAreaWidth;          // Zune area width
+    int                             zuneAreaHeight;         // Zune area height
+    int								rgbAreaWidth; 	        // current width of paint area
+    int								rgbAreaHeight;	        // current height of paint area
     unsigned int                    scrollPosH;             // Remembered scroll pos
     unsigned int                    scrollPosV;             // Remembered scroll pos
     unsigned int                    scrollEntriesH;         // Remembered scroll pos
