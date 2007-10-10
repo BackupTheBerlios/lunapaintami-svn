@@ -124,6 +124,21 @@ void Init_TextToBrushMethods ( )
         ttbw_RenderButton, 2, MUIM_CallHook, &RenderTextToBrush_hook 
     );
     
+    // Disable the keyboard when this window is activated
+    DoMethod (
+        textToBrushWindow, MUIM_Notify, MUIA_Window_Activate, TRUE,
+        textToBrushWindow, 2, MUIM_CallHook, &DisableKeyboard_hook
+    );
+    DoMethod ( textToBrushWindow, MUIM_Notify, MUIA_Window_Open, TRUE, 
+        textToBrushWindow, 2, MUIM_CallHook, &DisableKeyboard_hook );
+    // Enable the keyboard when this window is deactivated
+    DoMethod (
+        textToBrushWindow, MUIM_Notify, MUIA_Window_Activate, FALSE,
+        textToBrushWindow, 2, MUIM_CallHook, &EnableKeyboard_hook
+    );
+    DoMethod ( textToBrushWindow, MUIM_Notify, MUIA_Window_Open, FALSE, 
+        textToBrushWindow, 2, MUIM_CallHook, &EnableKeyboard_hook );
+    
     // TODO: Make these paths be configurable
     // Get all fonts listed out
     STRPTR SearchFolders[] = { "Ram:", "Sys:Fonts/", "Sys:Fonts/TrueType/", NULL };

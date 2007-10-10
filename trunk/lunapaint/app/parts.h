@@ -66,6 +66,8 @@
 #include "../config.h"
 #include "../core/definitions.h"
 
+BOOL keyboardEnabled;
+
 /*
     For the pubscreen
 */

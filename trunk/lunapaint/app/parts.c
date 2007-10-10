@@ -22,6 +22,8 @@
 
 char *getFilename ( )
 {		
+    keyboardEnabled = FALSE;
+    
     // Get filename
     struct Library *IntuitionBase, *AslBase;
     BOOL result;
@@ -74,6 +76,9 @@ char *getFilename ( )
     }
     end:
     FreeFileRequest ( aslfileReq );
+    
+    keyboardEnabled = TRUE;
+    
     return file;
 }
 

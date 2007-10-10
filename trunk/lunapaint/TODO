@@ -7,6 +7,8 @@ TODO - 0.3.3
  
 TODO - 0.3.4
 
+ * Fix redrawing of canvas around image when moving windows over it
+ * Implement configurable "activate windows on hover"
  * Fix crash sometimes when loading a unknown file format
  * Fix flimmer on scrolling layers
  * Optimize usage of text buffer size (now it has a bounding box)
@@ -18,3 +20,4 @@ TODO - 0.3.4
  * Dropshadow filter
  * ASL Requestors in their own processes
  * Guassian blur filter
+ * Simple undo/redo like in dpaint

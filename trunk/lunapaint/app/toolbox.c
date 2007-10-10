@@ -1094,6 +1094,7 @@ void checkMenuEvents ( int udata )
             
         case 599:
             set ( nwWindow, MUIA_Window_Open, TRUE );
+            keyboardEnabled = FALSE;
             break;
             
         case 600:

@@ -209,7 +209,6 @@ void addCanvaswindow (
 */
 void showFullscreenWindow ( oCanvas *canvas );
 void hideFullscreenWindow ( );
-void scaleFullscreenWindow ( );
 
 /*
     Contstrain offset values within scope of canvas

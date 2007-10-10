@@ -22,10 +22,10 @@
 #ifndef _lunapaint_config_
 #define _lunapaint_config_
 
-#define LUNA_VERSION "0.3.3"
-#define LUNA_SCREEN_TITLE "Lunapaint v0.3.3, 2007-08-06"
-#define LUNA_ABOUT_TEXT "Lunapaint v0.3.3\n\nAuthor: Hogne Titlestad (m0ns00n)\nE-Mail: hogga@sub-ether.org\nUrl: http://www.sub-ether.org/lunapaint\n\nSpecial thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
-#define VERSIONSTRING "$VER: Lunapaint v0.3.3 (06.08.07) by Hogne (m0ns00n) Titlestad\n"
+#define LUNA_VERSION "0.3.3b"
+#define LUNA_SCREEN_TITLE "Lunapaint v0.3.3b, 2007-10-07"
+#define LUNA_ABOUT_TEXT "Lunapaint v0.3.3b\n\nAuthor: Hogne Titlestad (m0ns00n)\nE-Mail: hogga@sub-ether.org\nUrl: http://www.sub-ether.org/lunapaint\n\nSpecial thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
+#define VERSIONSTRING "$VER: Lunapaint v0.3.3b (07.10.07) by Hogne (m0ns00n) Titlestad\n"
 
 typedef struct LunapaintPrefs
 {

@@ -148,4 +148,15 @@ void Init_NewProjectMethods ( )
         nwTemplates, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         nwTemplates, 2, MUIM_CallHook, &template_hook
     );
+    
+    // Disable the keyboard when this window is activated
+    DoMethod (
+        nwWindow, MUIM_Notify, MUIA_Window_Activate, TRUE,
+        nwWindow, 2, MUIM_CallHook, &DisableKeyboard_hook
+    );
+    // Enable the keyboard when this window is deactivated
+    DoMethod (
+        nwWindow, MUIM_Notify, MUIA_Window_Activate, FALSE,
+        nwWindow, 2, MUIM_CallHook, &EnableKeyboard_hook
+    );
 }

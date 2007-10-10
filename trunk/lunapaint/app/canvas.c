@@ -244,6 +244,9 @@ IPTR MUIM_RGB_CanvasActivate ( Class *CLASS, Object *self, Msg message )
 {
     struct RGBitmapData *data = INST_DATA ( CLASS, self );
     
+    // We can use keyboard shortcuts
+    keyboardEnabled = TRUE;
+    
     // Quicky update these two globals
     globalActiveWindow = data->window;
     globalActiveCanvas = data->window->canvas;
@@ -496,6 +499,9 @@ void checkKeyboardShortcuts ( UWORD valu )
         // Toggle toolbox
         case RAWKEY_F12: 
             {
+                // Don't hide the toolbox if we're not in fullscreen and we're not having a canvas window
+                if ( GlobalPrefs.ScreenmodeType == 0 && !fullscreenEditing && !globalActiveWindow ) break;
+                
                 BOOL boxopen = XGET ( toolbox, MUIA_Window_Open );
                 if ( boxopen ) set ( toolbox, MUIA_Window_Open, FALSE );
                 else set ( toolbox, MUIA_Window_Open, TRUE );
@@ -1096,6 +1102,9 @@ void addCanvaswindow (
         canvases->scrollH, MUIM_Notify, MUIA_Prop_First, MUIV_EveryTime,
         ( IPTR )canvases->area, 1, MUIM_ScrollingNotify
     );
+    
+    DoMethod ( canvases->win, MUIM_Notify, MUIA_Window_Open, TRUE, 
+        canvases->win, 2, MUIM_CallHook, &EnableKeyboard_hook );
 
     // Set global thingies
     globalActiveWindow = canvases;
@@ -1112,6 +1121,7 @@ void showFullscreenWindow ( oCanvas *canvas )
     
     // Set some vars, we need no interference
     fullscreenEditing = TRUE;    
+    keyboardEnabled = TRUE;
     
     // Hide all other canvas windows
     WindowList *l = canvases;
@@ -1159,7 +1169,12 @@ void showFullscreenWindow ( oCanvas *canvas )
     
     set ( windowFullscreen, MUIA_Window_Open, TRUE );
     
-    scaleFullscreenWindow ( );
+    // Ideal width/height
+    WORD width = lunaPubScreen->Width;
+    WORD height = lunaPubScreen->Height;
+    struct Window *win = ( struct Window *)XGET ( windowFullscreen, MUIA_Window_Window );  
+    ChangeWindowBox( win, 0, 0, width, height );
+    
     globalCurrentTool = Tool;
 }
 
@@ -1199,18 +1214,6 @@ void hideFullscreenWindow ( )
     ChangeWindowBox( win, 0, 0, width, height );
     
     globalCurrentTool = Tool;
-}
-
-void scaleFullscreenWindow ( )
-{
-    if ( XGET ( windowFullscreen, MUIA_Window_Open ) )
-    {
-        // Ideal width/height
-        WORD width = lunaPubScreen->Width;
-        WORD height = lunaPubScreen->Height;
-        struct Window *win = ( struct Window *)XGET ( windowFullscreen, MUIA_Window_Window );  
-        ChangeWindowBox( win, 0, 0, width, height );
-    }
 }
 
 Object *getCanvaswindowById ( unsigned int id )

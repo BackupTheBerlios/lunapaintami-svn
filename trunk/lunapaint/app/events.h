@@ -1,6 +1,6 @@
 /****************************************************************************
 *                                                                           *
-* text_to_brush.h -- Lunapaint, http://www.sub-ether.org/lunapaint          *
+* easyevents.h -- Lunapaint, http://www.sub-ether.org/lunapaint             *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
@@ -19,67 +19,41 @@
 *                                                                           *
 ****************************************************************************/
 
-#ifndef _text_to_brush_h
-#define _text_to_brush_h
-
-#define MAX_FONTNUM 			1024
-#define FONTREAD_BUFSIZE 	4096
-
+#ifndef _events_h_
+#define _events_h_
+#define DEBUG 1
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef __AROS__
-#include "../aros/aros.h"
-#endif
-
-#include <exec/types.h>
-#include <datatypes/datatypes.h>
-#include <libraries/asl.h>
-#include <libraries/mui.h>
-#include <cybergraphx/cybergraphics.h>
-
-#include <math.h>
-#include <diskfont/diskfont.h>
-#include <proto/diskfont.h>
-#include <proto/exec.h>
-#include <proto/intuition.h>
-#include <proto/datatypes.h>
-#include <proto/muimaster.h>
-#include <proto/cybergraphics.h>
-#include <clib/alib_protos.h>
-#include <ft2build.h>  
-#include FT_FREETYPE_H
-#include <string.h>
-
-#define DEBUG 1
+#include <devices/input.h>
+#include <devices/inputevent.h>
+#include <devices/rawkeycodes.h>
 #include <aros/debug.h>
+#include <exec/exec.h>
+#include <proto/exec.h>
 
-#include "parts.h"
-#include "toolbox.h"
-#include "layers.h"
-#include "project.h"
-#include "events.h"
+#include "canvas.h"
 
-Object *textToBrushWindow;
-Object *ttbw_TextString;
-Object *ttbw_RenderButton;
-Object *ttbw_FontListview;
-Object *ttbw_FontList;
-Object *ttbw_FontSizeListview;
-Object *ttbw_FontSizeList;
+#define eventMouseButtonLeft        0x00000001
+#define eventMouseButtonRight       0x00000002
+#define eventMouseX                 0x00000010
+#define eventMouseY                 0x00000011
 
-STRPTR FontList[ MAX_FONTNUM ];
+struct IOStdReq *gameInput;
+struct MsgPort *gameInputPort;
+struct Interrupt *gameInputInterrupt;
 
-struct Hook RenderTextToBrush_hook;
+struct Hook DisableKeyboard_hook;
+struct Hook EnableKeyboard_hook;
 
-void Init_TextToBrushWindow ( );
-void Init_TextToBrushMethods ( );
-void Exit_TextToBrushWindow ( );
-void RenderTextToBrushBuffer ( );
-Affrect RenderTextToBuffer ( 
-    unsigned char *text, char *font, 
-    int size, unsigned int **buffer
-);
+BOOL evalMouseButtonL;
+BOOL evalMouseButtonR;
+LONG evalMouseX;
+LONG evalMouseY;
+ULONG evalRawKey;
+ULONG releaseKey;
+
+BOOL InitEvents ( );
+void ShutdownEvents ( );
+IPTR CheckEvent ( ULONG event );
 
 #endif
-

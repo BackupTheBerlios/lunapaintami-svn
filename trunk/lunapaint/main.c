@@ -103,7 +103,9 @@ int main ( int argc, char *argv[] )
     prevColor = 0;
     currColor = 0;
     globalColor = 0;
+    
     BOOL keyIsDown = FALSE;
+    keyboardEnabled = TRUE;
     
     // Starts up the application
     Init_Application ( );
@@ -115,15 +117,19 @@ int main ( int argc, char *argv[] )
         if ( checkSignalBreak ( &sigs ) )
             break;	
             
-        // Execute keyboard events on key press
-        if ( evalRawKey >= IECODE_ASCII_FIRST && evalRawKey < IECODE_ASCII_LAST )
+        if ( keyboardEnabled )
         {
-            if ( !keyIsDown )
+            // Execute keyboard events on key press
+            if ( evalRawKey >= IECODE_ASCII_FIRST && evalRawKey < IECODE_ASCII_LAST )
             {
-                keyIsDown = TRUE;
-                checkKeyboardShortcuts ( evalRawKey );
+                if ( !keyIsDown )
+                {
+                    keyIsDown = TRUE;
+                    checkKeyboardShortcuts ( evalRawKey );
+                }
             }
         }
+        // We always register keyup strokes
         if ( evalRawKey & IECODE_UP_PREFIX )
             keyIsDown = FALSE;
             

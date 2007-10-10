@@ -32,6 +32,7 @@
 #include <libraries/mui.h>
 #include <cybergraphx/cybergraphics.h>
 
+#include <proto/utility.h>
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/gadtools.h>
