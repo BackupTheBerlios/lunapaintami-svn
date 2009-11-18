@@ -37,8 +37,8 @@
 
 #include "definitions.h"
 #include "color.h"
-#include "../common.h"
-#include "../math/math.h"
+#include "common.h"
+#include "math/math.h"
 
 // Use this to interrupt redrawing
 BOOL abortRedraw;
@@ -55,7 +55,7 @@ typedef struct valuelist
 // Tool Line
 typedef struct tool_LineData
 {
-    int mode;									// The mode 
+    int mode;									// The mode
     double x;									// Draw from
     double y;									// -||-
     double dx, dy;								// Destination x, y (draw to)
@@ -93,7 +93,7 @@ toolBrushData brushTool;
 // Tool Circle
 typedef struct tool_CircleData
 {
-    int mode;								// The mode 
+    int mode;								// The mode
     int x, y;								// Draw from
     int ox;									// start offset x
     int oy;									// start offset y
@@ -109,7 +109,7 @@ toolCircleData circleTool;
 // Tool Rectangle
 typedef struct tool_RectangleData
 {
-    int mode;								// The mode 
+    int mode;								// The mode
     double x;									// Draw from
     double y;									// -||-
     double dx, dy;							// Destination x, y (draw to)
@@ -125,7 +125,7 @@ toolRectData rectangleTool;
 // Tool Clipbrush
 typedef struct tool_ClipBrush
 {
-    int mode;								// The mode 
+    int mode;								// The mode
     double x;									// Draw from
     double y;									// -||-
     double dx, dy;							// Destination x, y (draw to)
@@ -141,7 +141,7 @@ toolClipBrushData clipbrushTool;
 /*
     Initialize a canvas and return a struct with a canvas in it
 */
-oCanvas* Init_Canvas ( 
+oCanvas* Init_Canvas (
     unsigned int w, unsigned int h, unsigned int layers, unsigned int frames, BOOL generateBuffers
 );
 
@@ -206,20 +206,20 @@ void Destroy_Buffer ( oCanvas *canv );
     Draw the layers etc and return an unsigned int buffer for use by
     redrawScreenbufferRect and others
 */
-inline unsigned int *renderCanvas ( 
-    oCanvas *canvas, unsigned int rx, unsigned int ry, 
+inline unsigned int *renderCanvas (
+    oCanvas *canvas, unsigned int rx, unsigned int ry,
     unsigned int rw, unsigned int rh, BOOL Transparent
 );
 
 /*
     Scroll the canvas screen storage by x,y (destructive moving)
-*/ 
+*/
 void scrollScreenStorage ( oCanvas *canvas, int x, int y );
 
 /*
     Draw all layers onto the screenbuffer constrained by rect
 */
-BOOL redrawScreenbufferRect ( 
+BOOL redrawScreenbufferRect (
     oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw, unsigned int rh,
     BOOL updateStorage
 );
@@ -277,13 +277,13 @@ void swapCanvasBuffers ( oCanvas *canv );
 
 
 /*
-    Draw preview of current tool / hover version 
+    Draw preview of current tool / hover version
 */
 inline unsigned int drawToolPreview ( int x, int y );
 
 /*
     Use the value list
-*/ 
+*/
 void addListValue ( double x, double y, ValueList **lst );
 void freeValueList ( ValueList **lst );
 

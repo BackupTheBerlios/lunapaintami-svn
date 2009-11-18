@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -50,7 +50,7 @@
 #include "parts.h"
 #include "toolbox.h"
 
-#include "../config.h"
+#include "config.h"
 
 // Some defines for palette actions
 #ifndef MUIM_Palette_Copy

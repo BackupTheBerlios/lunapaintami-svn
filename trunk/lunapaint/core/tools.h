@@ -26,12 +26,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../common.h"
+#include "common.h"
 #include "canvas.h"
 
 #ifdef AROS
-#include "../app/canvas.h"
-#include "../app/toolbox.h"
+#include "app/canvas.h"
+#include "app/toolbox.h"
 #endif
 
 #include "drawtools.h"

@@ -45,8 +45,8 @@
 #include "layers.h"
 #include "preferences.h"
 
-#include "../config.h"
-#include "../core/effects.h"
+#include "config.h"
+#include "core/effects.h"
 
 #define DEBUG 1
 #include <aros/debug.h>

@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -48,16 +48,16 @@
 #include <proto/datatypes.h>
 #include <clib/alib_protos.h>
 #include <string.h>
-#include <MUI/TextEditor_mcc.h>
+#include <mui/TextEditor_mcc.h>
 
 #define DEBUG 1
 #include <aros/debug.h>
 
 #include "gui.h"
 #include "parts.h"
-#include "../config.h"
-#include "../core/canvas.h"
-#include "../core/definitions.h"
+#include "config.h"
+#include "core/canvas.h"
+#include "core/definitions.h"
 
 Object *projectWindow;
 

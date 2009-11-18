@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../common.h"
-#include "../math/math.h"
-#include "../app/toolbox.h"
+#include "common.h"
+#include "math/math.h"
+#include "app/toolbox.h"
 #include "canvas.h"
 
 #define PI 3.14159265358979323846264f
@@ -47,25 +47,25 @@ void fEmptyStack ( int *fStack );
 // endpoint is if you are doing this in a draw operation
 // where you don't want to draw over a coord two times
 Affrect drawLine (
-    double x1, double y1, double x2, double y2, 
+    double x1, double y1, double x2, double y2,
     int bufferwidth, int bufferheight,
     unsigned long long int *buffer, BOOL subtract_endpoint
 );
 // Draws a line used on an unsigned char buffer (used for internal stuff)
-void drawLineCharbuf ( 
-    double x1, double y1, double x2, double y2, 
+void drawLineCharbuf (
+    double x1, double y1, double x2, double y2,
     int bufferwidth, int bufferheight,
     unsigned char *buffer, unsigned char value
 );
 
-Affrect plotBrush ( 
+Affrect plotBrush (
     double x, double y,
     int bufferwidth, int bufferheight,
     unsigned long long int *buffer
 );
 
-inline void pixelAntialias ( 
-    double x, double y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf 
+inline void pixelAntialias (
+    double x, double y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf
 );
 
 inline void pixelPlain (
@@ -77,15 +77,15 @@ inline unsigned long long int processPixel ( rgba64 origCol, rgba64 paintCol, do
 
 Affrect floodFill (
     int x, int y,
-    int bufferwidth, int bufferheight, 
-    unsigned long long int color, 
+    int bufferwidth, int bufferheight,
+    unsigned long long int color,
     unsigned long long int clickColor,
-    unsigned long long int *buffer, 
+    unsigned long long int *buffer,
     unsigned int threshold
 );
 
 void fillCharbuf (
-    int x, int y, int bufferwidth, int bufferheight, 
+    int x, int y, int bufferwidth, int bufferheight,
     unsigned char *buffer, unsigned char value
 );
 

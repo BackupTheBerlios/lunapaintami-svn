@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -51,11 +51,11 @@
 
 #include "gui.h"
 
-#include "../config.h"
+#include "config.h"
 
 #define ID_LUNAPAINT MAKE_ID('L','U','N','A')
 #define SCREENMODE_TYPE_WORKBENCH 0
-#define SCREENMODE_TYPE_CLONE 1 
+#define SCREENMODE_TYPE_CLONE 1
 #define SCREENMODE_TYPE_OWN 2
 
 struct Hook PrefsHandler_hook;

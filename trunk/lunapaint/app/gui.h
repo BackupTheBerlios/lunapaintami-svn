@@ -39,7 +39,7 @@
 #include <string.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include "events.h"
@@ -107,7 +107,7 @@ void Init_Application ( );
 void Exit_Application ( );
 
 /*
-    Get signals 
+    Get signals
 */
 int getSignals ( ULONG *sigs );
 

@@ -1,3 +1,0 @@
-gcc -O3 -fno-strict-aliasing -funroll-loops -Wall -o Ram:paint main.c core/drawtools.c core/canvas.c core/color.c core/tools.c core/effects.c math/math.c app/gui.c app/about_window.c app/toolbox.c app/layers.c app/animation.c app/palette_editor.c app/canvas.c app/parts.c app/new_image.c app/export_import.c app/project.c app/preferences.c app/text_to_brush.c app/events.c -lMUI -lPNG -lZ -lfreetype2 -laros -lexec -s
-
-copy ram:paint lunapaint:LunapaintBeta

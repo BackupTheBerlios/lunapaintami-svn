@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -46,7 +46,7 @@
 #include <clib/alib_protos.h>
 #include <string.h>
 
-#include "../config.h"
+#include "config.h"
 #include "parts.h"
 
 Object *aboutWindow, *aboutWindowOk;

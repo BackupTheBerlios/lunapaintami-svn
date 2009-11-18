@@ -29,7 +29,7 @@
 #include <stdlib.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -47,7 +47,7 @@
 #include <proto/muimaster.h>
 #include <proto/cybergraphics.h>
 #include <clib/alib_protos.h>
-#include <ft2build.h>  
+#include <ft2build.h>
 #include FT_FREETYPE_H
 #include <string.h>
 
@@ -76,8 +76,8 @@ void Init_TextToBrushWindow ( );
 void Init_TextToBrushMethods ( );
 void Exit_TextToBrushWindow ( );
 void RenderTextToBrushBuffer ( );
-Affrect RenderTextToBuffer ( 
-    unsigned char *text, char *font, 
+Affrect RenderTextToBuffer (
+    unsigned char *text, char *font,
     int size, unsigned int **buffer
 );
 

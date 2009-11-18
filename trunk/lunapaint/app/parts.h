@@ -44,7 +44,7 @@
 #include <stdio.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -63,8 +63,8 @@
 #include <cybergraphx/cybergraphics.h>
 #include <string.h>
 
-#include "../config.h"
-#include "../core/definitions.h"
+#include "config.h"
+#include "core/definitions.h"
 
 BOOL keyboardEnabled;
 
@@ -85,10 +85,10 @@ typedef struct rect__struct
 /*
     A linked list consisting of windowID and a window object
 */
-typedef struct sWinList 
+typedef struct sWinList
 {
     Object 									*win;					// The MUI window
-    
+
     Object									*projectWin;	// Project window
     Object									*projBtnOk;		// Project ok button
     Object									*projName;		// Project name
@@ -96,14 +96,14 @@ typedef struct sWinList
     Object									*projDesc;		// Project description
     struct 		Hook					 	projHook;		// Function hook to change the proj info
     char									*filename;		// The filename
-    
+
     int										rRectX;			// RedrawRect X
     int										rRectY;			// RedrawRect Y
     int										rRectW;			// RedrawRect W
     int										rRectH;			// RedrawRect H
     unsigned int							contWidth;		// Known container width
     unsigned int							contHeight;		// Known container height
-    
+
     Object                                  *infocontainer; // Containing frame info etc
     Object									*container; 	// Containing the area
     Object									*area;			// MUI area data
@@ -127,12 +127,12 @@ typedef struct sWinList
     RectStruct							 	prevBlit;		// previous blitted area
     struct 		Hook						CanvasKey_hook; // Hook for input keys
     struct 		sWinList 			        *nextwin;		// Next window in list
-    
-    
+
+
 } WindowList;
 
 /*
-    The data struct for the custom area class 
+    The data struct for the custom area class
 */
 struct RGBitmapData
 {

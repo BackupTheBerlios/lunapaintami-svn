@@ -105,7 +105,7 @@
 #endif
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include "parts.h"
@@ -113,12 +113,12 @@
 #include "layers.h"
 #include "project.h"
 
-#include "../config.h"
+#include "config.h"
 
-#include "../core/canvas.h"
-#include "../core/tools.h"
-#include "../math/math.h"
-#include "../common.h"
+#include "core/canvas.h"
+#include "core/tools.h"
+#include "math/math.h"
+#include "common.h"
 
 BOOL isZooming;
 BOOL isScrolling;
@@ -139,15 +139,15 @@ IPTR MUIM_RGB_Redraw ( );
 IPTR MUIM_RGB_RedrawArea ( );
 IPTR MUIM_RGB_HandleInput ( Class *CLASS, Object *self, Msg message );
 IPTR MUIM_RGB_Setup ( Class *CLASS, Object *self, Msg message );
-IPTR MUIM_RGB_Cleanup ( Class *CLASS, Object *self, Msg message );   
+IPTR MUIM_RGB_Cleanup ( Class *CLASS, Object *self, Msg message );
 IPTR MUIM_RGB_ScrollingNotify ( );
 IPTR MUIM_RGB_CanvasActivate ( Class *CLASS, Object *self, Msg message );
 IPTR MUIM_RGB_CanvasDeactivate ( Class *CLASS, Object *self, Msg message );
 IPTR MUIM_RGB_ZoomIn ( );
-IPTR MUIM_RGB_ZoomOut ( );       
+IPTR MUIM_RGB_ZoomOut ( );
 IPTR MUIM_RGB_ShowAll ( );
-IPTR MUIM_RGB_AskMinMax ( Class *CLASS, Object *self, Msg message ); 
-IPTR MUIM_RGB_CloseCanvasWin ( Class *CLASS, Object *self, Msg message ); 
+IPTR MUIM_RGB_AskMinMax ( Class *CLASS, Object *self, Msg message );
+IPTR MUIM_RGB_CloseCanvasWin ( Class *CLASS, Object *self, Msg message );
 
 /*
     Setup keyboard shortcuts on canvas and toolbox
@@ -198,10 +198,10 @@ void getMouseCoordinates ( );
     This function adds a canvas window to the canvas window list
     ( canwinlist )
 */
-void addCanvaswindow ( 
-    unsigned int width, unsigned int height, 
+void addCanvaswindow (
+    unsigned int width, unsigned int height,
     unsigned int layers, unsigned int frames,
-    BOOL generateCanvas 
+    BOOL generateCanvas
 );
 
 /*
@@ -253,8 +253,8 @@ IPTR removeActiveWindow ( Class *CLASS, Object *self );
 /*
     Blit over a rect to the area from a canvas
 */
-void blitAreaRect ( 
-    int x, int y, int w, int h, 
+void blitAreaRect (
+    int x, int y, int w, int h,
     oCanvas* canvas, struct RastPort *rp
 );
 

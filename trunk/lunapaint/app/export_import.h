@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -53,8 +53,8 @@
 
 #include "parts.h"
 #include "canvas.h"
-#include "../core/canvas.h"
-#include "../config.h"
+#include "core/canvas.h"
+#include "config.h"
 
 #define DEBUG 1
 
@@ -98,7 +98,7 @@ void makeExportWindow ( );
 void makeImportWindow ( );
 
 /*
-    Create an image from an animation by the choices done in the 
+    Create an image from an animation by the choices done in the
     gui
 */
 void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename );

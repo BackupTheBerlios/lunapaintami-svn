@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include <exec/types.h>
@@ -43,12 +43,12 @@
 #include <string.h>
 
 #ifndef __AROS__
-#include "../aros/aros.h"
+#include "aros/aros.h"
 #endif
 
 #include "canvas.h"
 
-#include "../config.h"
+#include "config.h"
 
 Object *WindowLayers;
 Object *WidgetLayers;
@@ -94,7 +94,7 @@ void layerRenderBlank ( );
 
 /*
     This function renders the layer widget
-*/ 
+*/
 BOOL layerRender ( Class *CLASS, Object *self );
 
 /*
