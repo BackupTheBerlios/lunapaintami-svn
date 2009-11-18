@@ -2,7 +2,7 @@ CC=i386-aros-gcc
 CFLAGS=-fno-strict-aliasing -funroll-loops -Wall -Wno-pointer-sign -I.
 LDFLAGS=-lmui -lpng -lz -lfreetype2
 
-EXE=LunaPaint
+EXE=../LunaPaint
 
 OBJS = \
 main.o \
