@@ -2,6 +2,7 @@
 *                                                                           *
 * gui.h -- Lunapaint, http://www.sub-ether.org/lunapaint                    *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *

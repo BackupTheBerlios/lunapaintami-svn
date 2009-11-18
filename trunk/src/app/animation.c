@@ -2,6 +2,7 @@
 *                                                                           *
 * animation.c -- Lunapaint, http://www.sub-ether.org/lunapaint              *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -42,7 +43,7 @@ void Init_AnimationWindow ( )
                     End ),
                 End,
             End,
-            Child, ( IPTR )( AnimationSlider = SliderObject, 
+            Child, ( IPTR )( AnimationSlider = SliderObject,
                 MUIA_Group_Horiz, TRUE,
                 MUIA_Numeric_Min, 1,
                 MUIA_Numeric_Max, 1,
@@ -59,18 +60,18 @@ void Init_AnimationWindow ( )
             End,
         End,
     End;
-    
+
     // Animation
     DoMethod (
         ButtonAnimNext, MUIM_Notify, MUIA_Pressed, FALSE,
         ( IPTR )WidgetLayers, 1, MUIM_NextFrame
     );
-    DoMethod ( 
+    DoMethod (
         ButtonAnimPrev, MUIM_Notify, MUIA_Pressed, FALSE,
         ( IPTR )WidgetLayers, 1, MUIM_PrevFrame
     );
     DoMethod (
-        AnimationSlider, MUIM_Notify, 
+        AnimationSlider, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
         ( IPTR )WidgetLayers, 1, MUIM_GotoFrame
     );
@@ -84,12 +85,12 @@ void Init_AnimationWindow ( )
 void Update_AnimValues ( )
 {
     if ( !globalActiveCanvas ) return;
-    
+
     int currAnimMin = ( int )XGET ( AnimationSlider, MUIA_Numeric_Min );
     int currAnimMax = ( int )XGET ( AnimationSlider, MUIA_Numeric_Max );
     int currAnimTot = ( int )XGET ( AnimationSlider, MUIA_Numeric_Value );
     int currOnionSk = ( int )XGET ( CycleOnionSkin, MUIA_Cycle_Active );
-    
+
     IgnoreFramechange = TRUE;
     if ( currAnimMin != 1 )
         set ( AnimationSlider, MUIA_Numeric_Min, 1 );

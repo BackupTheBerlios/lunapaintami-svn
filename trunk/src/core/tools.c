@@ -2,6 +2,7 @@
 *                                                                           *
 * tool.c -- Lunapaint, http://www.sub-ether.org/lunapaint                   *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -30,9 +31,9 @@ BOOL toolBrush ( )
         makeToolBrush ( );
         brushTool.initialized = TRUE;
     }
-    
+
     if ( MouseButtonL || MouseButtonR )
-    {	
+    {
         WindowList *window = globalActiveWindow;
 
         // Remember old values
@@ -40,15 +41,15 @@ BOOL toolBrush ( )
         pMouseY = dMouseY;
         dMouseX = cMouseX;
         dMouseY = cMouseY;
-    
+
         // Draw from - to
         double x1 = pMouseX;
         double y1 = pMouseY;
         double x2 = dMouseX;
         double y2 = dMouseY;
-        
+
         Affrect rect = { 0, 0, 0, 0 };
-        
+
         // Setup or empty the contour buffer for filled drawing
         if ( brushTool.RecordContour && brushTool.ContourBuffer == NULL && filledDrawing != DRAW_DRAW )
         {
@@ -57,15 +58,15 @@ BOOL toolBrush ( )
             brushTool.ContourMaxX = x2;
             brushTool.ContourMaxY = y2;
         }
-        
+
         // Plot
         if ( y2 == y1 && x2 == x1 )
         {
             // plot brush
-            rect = plotBrush ( 
+            rect = plotBrush (
                 x1, y1,
-                globalActiveCanvas->width, 
-                globalActiveCanvas->height, 
+                globalActiveCanvas->width,
+                globalActiveCanvas->height,
                 globalActiveCanvas->activebuffer
             );
             // Add coordinates to contour buffer if filling
@@ -82,9 +83,9 @@ BOOL toolBrush ( )
         // absolute buffer coorinates
         else
         {
-            rect = drawLine ( 
-                x1, y1, x2, y2, 
-                globalActiveCanvas->width, 
+            rect = drawLine (
+                x1, y1, x2, y2,
+                globalActiveCanvas->width,
                 globalActiveCanvas->height,
                 globalActiveCanvas->activebuffer,
                 TRUE
@@ -104,13 +105,13 @@ BOOL toolBrush ( )
                 if ( y2 <= brushTool.ContourMinY ) brushTool.ContourMinY = y2;
             }
         }
-        
+
         // Update affected screen
         // blitAreaRect only takes absolute buffer coordinates
         blitAreaRect (
-            rect.x, rect.y, 
+            rect.x, rect.y,
             rect.w, rect.h,
-            globalActiveCanvas, 
+            globalActiveCanvas,
             _rp ( window->area )
         );
         return TRUE;
@@ -131,51 +132,51 @@ BOOL toolBrush ( )
 void toolBrushFill ( )
 {
     // Make a buffer with brushsize margin
-    int margin = ( 
-        ( 
-            brushTool.width > brushTool.height ? 
-                brushTool.width : 
-                brushTool.height 
-        ) / 2.0 
+    int margin = (
+        (
+            brushTool.width > brushTool.height ?
+                brushTool.width :
+                brushTool.height
+        ) / 2.0
     ) + 2;
-    
+
     // Double mardin.. optimization
     int margin2 = margin * 2;
     int MinX = brushTool.ContourMinX;
     int MinY = brushTool.ContourMinY;
     int MaxX = brushTool.ContourMaxX;
     int MaxY = brushTool.ContourMaxY;
-    
+
     int bufwidth = ( MaxX - MinX ) + margin2;
     int bufheight = ( MaxY - MinY ) + margin2;
     int size = bufheight * bufwidth;
     unsigned char *pixelBuffer = AllocVec ( size, MEMF_ANY );
-    
+
     // Clear buffer with 1
     int i = 0; for ( ; i < size; i++ ) pixelBuffer[ i ] = 1;
-    
+
     // Draw shape
-    ValueList *ptr = brushTool.ContourBuffer;	
+    ValueList *ptr = brushTool.ContourBuffer;
     double px = ( ptr->x - MinX ) + margin, py = ( ptr->y - MinY ) + margin, dx = 0, dy = 0;
     while ( ptr != NULL )
     {
         dx = ( ptr->x - MinX ) + margin; // draw x - margin offset
-        dy = ( ptr->y - MinY ) + margin; // 
+        dy = ( ptr->y - MinY ) + margin; //
         drawLineCharbuf ( px, py, dx, dy, bufwidth, bufheight, pixelBuffer, 2 );
         ptr = ptr->Next;
         px = dx; // previous x
         py = dy; // p y
     }
-    
+
     // Connect shape, head to tail
     ptr = brushTool.ContourBuffer;
     dx = ( ptr->x - MinX ) + margin;
     dy = ( ptr->y - MinY ) + margin;
     drawLineCharbuf ( px, py, dx, dy, bufwidth, bufheight, pixelBuffer, 2 );
-    
+
     // Fill outside area
     fillCharbuf ( 0, 0, bufwidth, bufheight, pixelBuffer, 2 );
-    
+
     // Put pixels on canvas
     for ( i = 0; i < size; i++ )
     {
@@ -184,15 +185,15 @@ void toolBrushFill ( )
         {
             int x = ( i % bufwidth ) + MinX - margin;
             int y = ( i / bufwidth ) + MinY - margin;
-            plotBrush ( 
+            plotBrush (
                 x, y,
-                globalActiveCanvas->width, 
-                globalActiveCanvas->height, 
+                globalActiveCanvas->width,
+                globalActiveCanvas->height,
                 globalActiveCanvas->activebuffer
             );
         }
     }
-    
+
     // Remove outline and redraw outline
     if ( brushTool.antialias )
     {
@@ -205,7 +206,7 @@ void toolBrushFill ( )
             while ( ptr != NULL )
             {
                 dx = ptr->x + x[ z ]; // draw x - with 1px offset
-                dy = ptr->y + y[ z ]; // 
+                dy = ptr->y + y[ z ]; //
                 drawLine ( px, py, dx, dy, globalActiveCanvas->width, globalActiveCanvas->width, globalActiveCanvas->activebuffer, 0 );
                 ptr = ptr->Next;
                 px = dx; // previous x
@@ -217,10 +218,10 @@ void toolBrushFill ( )
             drawLine ( px, py, dx, dy, globalActiveCanvas->width, globalActiveCanvas->width, globalActiveCanvas->activebuffer, 0 );
         }
     }
-    
+
     // Clean up
     FreeVec ( pixelBuffer );
-    
+
 }
 
 
@@ -228,17 +229,17 @@ void makeToolBrush ( )
 {
     if ( brushTool.buffer != NULL )
         FreeVec ( brushTool.buffer );
-    
+
     int buflen = brushTool.width * brushTool.height;
     brushTool.buffer = AllocVec ( buflen * 8, MEMF_ANY );
-    
+
     // Only one radius is used when generating circular brushes
     double hRad = brushTool.width / 2.0;
-    
-    rgbaDataL rgba = canvasColorToRGBA_ull ( 
+
+    rgbaDataL rgba = canvasColorToRGBA_ull (
         PaletteToBuffercolor ( globalColor )
     );
-    
+
     unsigned long long int a = 0;
     unsigned long long int alpha = MAXCOLOR;
 
@@ -248,7 +249,7 @@ void makeToolBrush ( )
         int x = i % brushTool.width;
         int y = i / brushTool.width;
         double dist = getDistance ( hRad, hRad, x, y );
-        if ( dist > hRad ) 
+        if ( dist > hRad )
             a = 0;
         else
         {
@@ -266,30 +267,30 @@ BOOL toolFill ( )
 {
     if ( MouseButtonL && !isFilling )
     {
-        isFilling = TRUE;   
+        isFilling = TRUE;
         int x = cMouseX;
         int y = cMouseY;
-                
-        unsigned long long int ccolor = 
+
+        unsigned long long int ccolor =
             PaletteToBuffercolor ( globalColor );
         unsigned long long int dcolor =
             globalActiveCanvas->activebuffer[ ( y * globalActiveCanvas->width ) + x ];
-        
+
         // Only fill if dest color is not current color!
         // No filling on color which is being filled with!
         // That would produce ill results!
         if ( ccolor != dcolor )
         {
-            floodFill ( 
-                x, y,  
+            floodFill (
+                x, y,
                 globalActiveCanvas->width, globalActiveCanvas->height,
                 ccolor, dcolor,
-                globalActiveCanvas->activebuffer, 255 
+                globalActiveCanvas->activebuffer, 255
             );
         }
         globalActiveCanvas->winHasChanged = TRUE;
         DoMethod ( globalActiveWindow->area, MUIM_Draw, FALSE );
-        isFilling = FALSE;      
+        isFilling = FALSE;
         return TRUE;
     }
     return FALSE;
@@ -307,12 +308,12 @@ BOOL toolLine ( )
         lineTool.w = 0;
         lineTool.initialized = 1;
     }
-    
+
     // Pressing the mouse button
     if ( MouseButtonL || MouseButtonR )
     {
         if ( lineTool.mode == 0 )
-        {	
+        {
             lineTool.x = ( int )cMouseX;
             lineTool.y = ( int )cMouseY;
             lineTool.mode = 1;
@@ -321,12 +322,12 @@ BOOL toolLine ( )
         {
             double curX = ( int )cMouseX;
             double curY = ( int )cMouseY;
-            
+
             if ( lineTool.w )
-                FreeVec ( lineTool.buffer );	
-            
+                FreeVec ( lineTool.buffer );
+
             double ox = 0, oy = 0, w = 0, h = 0;
-            
+
             if ( lineTool.x > curX )
             {
                 ox = curX - 1;
@@ -347,36 +348,36 @@ BOOL toolLine ( )
                 oy = lineTool.y - 1;
                 h = curY - lineTool.y + 2;
             }
-            
+
             // Include the brushsize in the calculation
             int datawidth = ( int )( w + brushTool.width );
             int dataheight = ( int )( h + brushTool.height );
             int datasize = datawidth * dataheight * 8;
             lineTool.buffer = AllocVec ( datasize, MEMF_ANY|MEMF_CLEAR );
-            
+
             // Draw line on tool buffer without feather or antialias
-            
+
             int xoff = brushTool.width / 2.0;
             int yoff = brushTool.height / 2.0;
-            
+
             lineTool.ox = ox - xoff;
             lineTool.oy = oy - yoff;
-            lineTool.w = datawidth; 
+            lineTool.w = datawidth;
             lineTool.h = dataheight;
             lineTool.dx = curX;
             lineTool.dy = curY;
-            
-            drawLine ( 
+
+            drawLine (
                 lineTool.x - ox + xoff,
                 lineTool.y - oy + yoff,
-                curX - ox + xoff, 
+                curX - ox + xoff,
                 curY - oy + yoff,
-                lineTool.w, 
-                lineTool.h,	
+                lineTool.w,
+                lineTool.h,
                 lineTool.buffer,
                 FALSE
             );
-            
+
             return TRUE;
         }
     }
@@ -387,19 +388,19 @@ BOOL toolLine ( )
         if ( lineTool.mode == 1 )
         {
             Affrect rect = drawLine (
-                lineTool.x, 
-                lineTool.y, 
-                lineTool.dx, 
+                lineTool.x,
+                lineTool.y,
+                lineTool.dx,
                 lineTool.dy,
-                globalActiveCanvas->width, 
+                globalActiveCanvas->width,
                 globalActiveCanvas->height,
-                globalActiveCanvas->activebuffer, 
+                globalActiveCanvas->activebuffer,
                 FALSE
             );
             blitAreaRect (
-                rect.x, rect.y, 
+                rect.x, rect.y,
                 rect.w, rect.h,
-                globalActiveCanvas, 
+                globalActiveCanvas,
                 _rp ( globalActiveWindow->area )
             );
             lineTool.mode = 0;
@@ -420,12 +421,12 @@ BOOL toolRectangle ( )
         rectangleTool.w = 0;
         rectangleTool.initialized = 1;
     }
-    
+
     // Pressing the mouse button
     if ( MouseButtonL || MouseButtonR )
     {
         if ( rectangleTool.mode == 0 )
-        {	
+        {
             rectangleTool.x = ( int )cMouseX;
             rectangleTool.y = ( int )cMouseY;
             rectangleTool.mode = 1;
@@ -434,12 +435,12 @@ BOOL toolRectangle ( )
         {
             double curX = ( int )cMouseX;
             double curY = ( int )cMouseY;
-            
+
             if ( rectangleTool.w )
-                FreeVec ( rectangleTool.buffer );	
-            
+                FreeVec ( rectangleTool.buffer );
+
             double ox = 0, oy = 0, w = 0, h = 0;
-            
+
             if ( rectangleTool.x > curX )
             {
                 ox = curX - 1;
@@ -460,34 +461,34 @@ BOOL toolRectangle ( )
                 oy = rectangleTool.y - 1;
                 h = curY - rectangleTool.y + 2;
             }
-            
+
             // Include the brushsize in the calculation
             int datawidth = ( int )( w + brushTool.width );
             int dataheight = ( int )( h + brushTool.height );
             int datasize = datawidth * dataheight * 8;
             rectangleTool.buffer = AllocVec ( datasize, MEMF_ANY|MEMF_CLEAR );
-            
+
             // Draw line on tool buffer without feather or antialias
-            
+
             int xoff = brushTool.width / 2.0;
             int yoff = brushTool.height / 2.0;
-            
+
             rectangleTool.ox = ox - xoff;
             rectangleTool.oy = oy - yoff;
-            rectangleTool.w = datawidth; 
+            rectangleTool.w = datawidth;
             rectangleTool.h = dataheight;
             rectangleTool.dx = curX;
             rectangleTool.dy = curY;
-            
+
             double x1 = rectangleTool.x - ox + xoff;
             double y1 = rectangleTool.y - oy + yoff;
             double x2 = curX - ox + xoff;
             double y2 = curY - oy + yoff;
-            
+
             // Make visible
             int oldMode = brushTool.paintmode;
             brushTool.paintmode = LUNA_PAINTMODE_NORMAL;
-            
+
             if ( filledDrawing != DRAW_DRAW )
             {
                 int oldw = brushTool.width, oldh = brushTool.height;
@@ -496,14 +497,14 @@ BOOL toolRectangle ( )
                 BOOL ba = brushTool.antialias;
                 brushTool.antialias = FALSE;
                 makeToolBrush ( );
-                
+
                 int starty = y1 > y2 ? y2 : y1;
                 int endy = y1 > y2 ? y1 : y2;
-                
+
                 int y; for ( y = starty; y <= endy; y++ )
                 {
-                    drawLine ( 
-                        x1, y, x2, y, 
+                    drawLine (
+                        x1, y, x2, y,
                         rectangleTool.w, rectangleTool.h, rectangleTool.buffer, FALSE
                     );
                 }
@@ -512,33 +513,33 @@ BOOL toolRectangle ( )
                 brushTool.antialias = ba;
                 makeToolBrush ( );
             }
-            
+
             if ( filledDrawing == DRAW_DRAW || filledDrawing == DRAW_DRAWFILLED )
             {
-                drawLine ( 
+                drawLine (
                     x1, y1, x2, y1,
-                    rectangleTool.w, rectangleTool.h,	
+                    rectangleTool.w, rectangleTool.h,
                     rectangleTool.buffer, TRUE
                 );
-                drawLine ( 
+                drawLine (
                     x2, y1, x2, y2,
-                    rectangleTool.w, rectangleTool.h,	
+                    rectangleTool.w, rectangleTool.h,
                     rectangleTool.buffer, TRUE
                 );
-                drawLine ( 
+                drawLine (
                     x2, y2, x1, y2,
-                    rectangleTool.w, rectangleTool.h,	
+                    rectangleTool.w, rectangleTool.h,
                     rectangleTool.buffer, TRUE
                 );
-                drawLine ( 
+                drawLine (
                     x1, y2, x1, y1,
-                    rectangleTool.w, rectangleTool.h,	
+                    rectangleTool.w, rectangleTool.h,
                     rectangleTool.buffer, TRUE
                 );
             }
-            
+
             brushTool.paintmode = oldMode;
-            
+
             return TRUE;
         }
     }
@@ -552,7 +553,7 @@ BOOL toolRectangle ( )
             double y1 = rectangleTool.y;
             double x2 = rectangleTool.dx;
             double y2 = rectangleTool.dy;
-            
+
             if ( filledDrawing != DRAW_DRAW )
             {
                 int oldw = brushTool.width, oldh = brushTool.height;
@@ -561,14 +562,14 @@ BOOL toolRectangle ( )
                 BOOL ba = brushTool.antialias;
                 brushTool.antialias = FALSE;
                 makeToolBrush ( );
-                
+
                 int starty = y1 > y2 ? y2 : y1;
                 int endy = y1 > y2 ? y1 : y2;
-                
+
                 int y; for ( y = starty; y <= endy; y++ )
                 {
-                    drawLine ( 
-                        x1, y, x2, y, 
+                    drawLine (
+                        x1, y, x2, y,
                         globalActiveCanvas->width, globalActiveCanvas->height,
                         globalActiveCanvas->activebuffer, FALSE
                     );
@@ -578,7 +579,7 @@ BOOL toolRectangle ( )
                 brushTool.antialias = ba;
                 makeToolBrush ( );
             }
-            
+
             if ( filledDrawing == DRAW_DRAW || filledDrawing == DRAW_DRAWFILLED )
             {
                 drawLine (
@@ -602,14 +603,14 @@ BOOL toolRectangle ( )
                     globalActiveCanvas->activebuffer, TRUE
                 );
             }
-            
+
             blitAreaRect (
-                rectangleTool.ox, rectangleTool.oy, 
+                rectangleTool.ox, rectangleTool.oy,
                 rectangleTool.w, rectangleTool.h,
-                globalActiveCanvas, 
+                globalActiveCanvas,
                 _rp ( globalActiveWindow->area )
             );
-            
+
             rectangleTool.mode = 0;
             return TRUE;
         }
@@ -630,47 +631,47 @@ BOOL toolCircle ( )
         circleTool.bufheight = 0;
         circleTool.initialized = 1;
     }
-    
+
     // Pressing the mouse button
     if ( MouseButtonL || MouseButtonR )
     {
         if ( circleTool.mode == 0 )
-        {	
+        {
             circleTool.x = ( int )cMouseX;
             circleTool.y = ( int )cMouseY;
             circleTool.mode = 1;
         }
         else
-        {	
+        {
             if ( circleTool.buffer != NULL )
-                FreeVec ( circleTool.buffer );	
-            
+                FreeVec ( circleTool.buffer );
+
             int cirWidth = abs ( circleTool.x - ( int )cMouseX );
             int cirHeight = abs ( circleTool.y - ( int )cMouseY );
-            
+
             // Include the brushsize in the calculation
             int datawidth = ( int )( cirWidth * 2 ) + brushTool.width + 1;
             int dataheight = ( int )( cirHeight * 2 ) + brushTool.height + 1;
             int datasize = datawidth * dataheight * 8;
-        
+
             circleTool.buffer = AllocVec ( datasize, MEMF_ANY|MEMF_CLEAR );
-            
+
             double offx = brushTool.width / 2.0;
             double offy = brushTool.height / 2.0;
-            
+
             circleTool.ox = circleTool.x - cirWidth - offx;
             circleTool.oy = circleTool.y - cirHeight - offy;
-            circleTool.w = cirWidth; 
+            circleTool.w = cirWidth;
             circleTool.h = cirHeight;
             circleTool.bufwidth = datawidth;
             circleTool.bufheight = dataheight;
-            
+
             // Make sure preview is visible
             int oldMode = brushTool.paintmode;
             brushTool.paintmode = LUNA_PAINTMODE_NORMAL;
-            drawCircle ( 
-                cirWidth + offx, 
-                cirHeight + offy, 
+            drawCircle (
+                cirWidth + offx,
+                cirHeight + offy,
                 cirWidth, cirHeight,
                 datawidth, dataheight,
                 circleTool.buffer
@@ -684,7 +685,7 @@ BOOL toolCircle ( )
     else
     {
         if ( circleTool.mode == 1 )
-        {	
+        {
             Affrect rect = drawCircle (
                 circleTool.ox + circleTool.w + ( brushTool.width / 2.0 ),
                 circleTool.oy + circleTool.h + ( brushTool.height / 2.0 ),
@@ -692,11 +693,11 @@ BOOL toolCircle ( )
                 globalActiveCanvas->width, globalActiveCanvas->height,
                 globalActiveCanvas->activebuffer
             );
-        
+
             blitAreaRect (
-                rect.x, rect.y, 
+                rect.x, rect.y,
                 rect.w, rect.h,
-                globalActiveCanvas, 
+                globalActiveCanvas,
                 _rp ( globalActiveWindow->area )
             );
             circleTool.mode = 0;
@@ -717,46 +718,46 @@ BOOL toolClipBrush ( )
         clipbrushTool.w = 0;
         clipbrushTool.initialized = 1;
     }
-    
+
     // Pressing the mouse button
     if ( MouseButtonL || MouseButtonR )
     {
         if ( clipbrushTool.mode == 0 )
-        {	
+        {
             // Yes why -1, it's how it works when getting the coord
             // has something to do with the line tool?
             clipbrushTool.x = ( int )cMouseX;
             clipbrushTool.y = ( int )cMouseY;
-            
+
             // snap to bounds
             if ( clipbrushTool.x < 0 ) clipbrushTool.x = 0;
-            if ( clipbrushTool.x >= globalActiveCanvas->width ) 
+            if ( clipbrushTool.x >= globalActiveCanvas->width )
                 clipbrushTool.x = globalActiveCanvas->width - 1;
             if ( clipbrushTool.y < 0 ) clipbrushTool.y = 0;
-            if ( clipbrushTool.y >= globalActiveCanvas->height ) 
+            if ( clipbrushTool.y >= globalActiveCanvas->height )
                 clipbrushTool.y = globalActiveCanvas->height - 1;
-                
-            // Coords measured, go on 
+
+            // Coords measured, go on
             clipbrushTool.mode = 1;
         }
         else
         {
             double curX = ( int )cMouseX;
             double curY = ( int )cMouseY;
-            
+
             // snap to bounds
             if ( curX < 0 ) curX = 0;
-            if ( curX > globalActiveCanvas->width ) 
+            if ( curX > globalActiveCanvas->width )
                 curX = globalActiveCanvas->width;
             if ( curY < 0 ) curY = 0;
-            if ( curY > globalActiveCanvas->height ) 
+            if ( curY > globalActiveCanvas->height )
                 curY = globalActiveCanvas->height;
-            
+
             if ( clipbrushTool.buffer != NULL )
-                FreeVec ( clipbrushTool.buffer );	
-            
+                FreeVec ( clipbrushTool.buffer );
+
             double ox = 0, oy = 0, w = 0, h = 0;
-            
+
             if ( clipbrushTool.x > curX )
             {
                 ox = curX;
@@ -777,31 +778,31 @@ BOOL toolClipBrush ( )
                 oy = clipbrushTool.y;
                 h = curY - clipbrushTool.y;
             }
-            
+
             // Make sure we have w / h
             if ( !w ) w = 1;
             if ( !h ) h = 1;
-            
+
             int datawidth = ( int )w;
             int dataheight = ( int )h;
             int datasize = datawidth * dataheight;
-            
+
             clipbrushTool.buffer = AllocVec ( datasize * 8, MEMF_ANY|MEMF_CLEAR );
-            
+
             // Draw line on tool buffer without feather or antialias
             clipbrushTool.ox = ( int )ox;
             clipbrushTool.oy = ( int )oy;
-            clipbrushTool.w = ( int )w; 
+            clipbrushTool.w = ( int )w;
             clipbrushTool.h = ( int )h;
             clipbrushTool.dx = curX;
             clipbrushTool.dy = curY;
-            
-            double x1 = 0; 
+
+            double x1 = 0;
             double y1 = 0;
             double x2 = w - 1;
             double y2 = h - 1;
-            
-            
+
+
             int bw = brushTool.width;
             int bh = brushTool.height;
             int bo = brushTool.opacity;
@@ -810,8 +811,8 @@ BOOL toolClipBrush ( )
             int ct = brushTool.paintmode;
             BOOL ba = brushTool.antialias;
             BOOL bf = brushTool.feather;
-            
-            // Configure brush tool to make 
+
+            // Configure brush tool to make
             // the rect drawing
             brushTool.width = 1;
             brushTool.height = 1;
@@ -822,29 +823,29 @@ BOOL toolClipBrush ( )
             brushTool.feather = FALSE;
             brushTool.paintmode = LUNA_PAINTMODE_NORMAL;
             makeToolBrush ( );
-            
+
             // Draw rect
-            drawLine ( 
+            drawLine (
                 x1, y1, x2, y1,
-                clipbrushTool.w, clipbrushTool.h,	
+                clipbrushTool.w, clipbrushTool.h,
                 clipbrushTool.buffer, TRUE
             );
-            drawLine ( 
+            drawLine (
                 x2, y1, x2, y2,
-                clipbrushTool.w, clipbrushTool.h,	
+                clipbrushTool.w, clipbrushTool.h,
                 clipbrushTool.buffer, TRUE
             );
-            drawLine ( 
+            drawLine (
                 x2, y2, x1, y2,
-                clipbrushTool.w, clipbrushTool.h,	
+                clipbrushTool.w, clipbrushTool.h,
                 clipbrushTool.buffer, TRUE
             );
-            drawLine ( 
+            drawLine (
                 x1, y2, x1, y1,
-                clipbrushTool.w, clipbrushTool.h,	
+                clipbrushTool.w, clipbrushTool.h,
                 clipbrushTool.buffer, TRUE
             );
-            
+
             // Restore old brush settings
             brushTool.width = bw;
             brushTool.height = bh;
@@ -863,18 +864,18 @@ BOOL toolClipBrush ( )
     else
     {
         if ( clipbrushTool.mode == 1 )
-        {	
+        {
             if ( clipbrushTool.w > 0 && clipbrushTool.h > 0 )
             {
                 // Free brush tool buffer if not freed
                 if ( brushTool.buffer != NULL )
                     FreeVec ( brushTool.buffer );
-                    
+
                 // Allocate new space
                 brushTool.buffer = AllocVec ( clipbrushTool.w * clipbrushTool.h * 8, MEMF_ANY );
                 brushTool.width = clipbrushTool.w;
                 brushTool.height = clipbrushTool.h;
-                
+
                 // Copy from current active layer to brushtool
                 int y = 0; for ( ; y < brushTool.height; y++ )
                 {
@@ -883,26 +884,26 @@ BOOL toolClipBrush ( )
                     int x = 0; for ( ; x < brushTool.width; x++ )
                     {
                         int offset = yamul + ( ( int )clipbrushTool.ox + x );
-                        brushTool.buffer[ ybmul + x ] = 
+                        brushTool.buffer[ ybmul + x ] =
                             globalActiveCanvas->activebuffer[ offset ];
                     }
                 }
-                
+
                 blitAreaRect (
-                    clipbrushTool.ox, clipbrushTool.oy, 
+                    clipbrushTool.ox, clipbrushTool.oy,
                     clipbrushTool.w, clipbrushTool.h,
-                    globalActiveCanvas, 
+                    globalActiveCanvas,
                     _rp ( globalActiveWindow->area )
                 );
-                
+
             }
-            
+
             clipbrushTool.mode = 0;
-            
+
             // Set draw tool now
             DoMethod ( paletteRect, MUIM_SetTool_Draw, FALSE );
             DoMethod ( tbxAreaPreview, MUIM_Draw );
-            
+
             return TRUE;
         }
     }
@@ -912,18 +913,18 @@ BOOL toolClipBrush ( )
 BOOL toolColorPicker ( )
 {
     if ( MouseButtonL || MouseButtonR )
-    {	
-        unsigned long long int color = globalActiveCanvas->activebuffer[ 
+    {
+        unsigned long long int color = globalActiveCanvas->activebuffer[
             ( int )( cMouseY ) * globalActiveCanvas->width + ( int )( cMouseX )
         ];
-        
+
         rgba64 result = *( rgba64 *)&( color );
-        
+
         if ( globalColorMode == LUNA_COLORMODE_SNAP )
             result = snapToPalette ( result, TRUE );
-            
+
         globalColor = canvasToWindowPixel ( *( unsigned long long int *)&result );
-        
+
         makeToolBrush ( );
     }
     return FALSE;

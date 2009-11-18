@@ -2,6 +2,7 @@
 *                                                                           *
 * palette_editor.c -- Lunapaint, http://www.sub-ether.org/lunapaint         *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -32,10 +33,10 @@ AROS_UFH3 ( ULONG, paletteSave_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     savePalette ( );
     return ( IPTR )NULL;
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -50,11 +51,11 @@ AROS_UFH3 ( ULONG, paletteClose_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     set ( paletteWindow, MUIA_Window_Open, FALSE );
     DoMethod ( tbxAreaPalette, MUIM_Draw );
     return ( IPTR )NULL;
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -69,12 +70,12 @@ AROS_UFH3 ( ULONG, paletteLoad_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     loadPalette ( );
     tbxPaletteRedraw ( );
-    
+
     return ( IPTR )NULL;
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -88,39 +89,39 @@ AROS_UFH3 ( ULONG, rgbslider_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     // Set current selected color
-    
+
     int R = XGET ( palSlideR, MUIA_Numeric_Value );
     int G = XGET ( palSlideG, MUIA_Numeric_Value );
     int B = XGET ( palSlideB, MUIA_Numeric_Value );
-    
+
     if ( currColor >= 0 && currColor < 256 )
         globalPalette[ currColor ] = RGBtoPaletteColor ( R, G, B );
-        
+
     updateColorPreview ( ); PaletteRedraw ( currColor );
-    
+
     return 0;
-        
+
     AROS_USERFUNC_EXIT
 }
 
 
-/* 
+/*
     Dispatcher for our palette area
 */
 BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
 {
     switch ( message->MethodID )
-    {		
+    {
         case MUIM_Draw:
-            return ( IPTR )PaletteRedraw ( -1 );		
-            
+            return ( IPTR )PaletteRedraw ( -1 );
+
         case MUIM_HandleInput:
             return ( IPTR )PaletteEvents ( CLASS, self, ( struct MUIP_HandleInput* )message );
-        
+
         case MUIM_Setup:
-        
+
             if ( 1 )
             {
                 // Update slider positions when the window is initialized
@@ -128,30 +129,30 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
-            }	
+            }
             MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
             return DoSuperMethodA ( CLASS, self, message );
-            
+
         case MUIM_Palette_Copy:
             return ( IPTR )PaletteActions ( MUIM_Palette_Copy );
-            
+
         case MUIM_Palette_Paste:
             return ( IPTR )PaletteActions ( MUIM_Palette_Paste );
-            
+
         case MUIM_Palette_Swap:
             return ( IPTR )PaletteActions ( MUIM_Palette_Swap );
-            
+
         case MUIM_Palette_Reverse:
             return ( IPTR )PaletteActions ( MUIM_Palette_Reverse );
-        
+
         case MUIM_Palette_Spread:
             return ( IPTR )PaletteActions ( MUIM_Palette_Spread );
-        
+
         case MUIM_Palette_Clear:
             return ( IPTR )PaletteActions ( MUIM_Palette_Clear );
-        
+
         /* Tool stuff (should be in a dispatcher in the toolbox! */
-        
+
         case MUIM_SetTool_Draw:
             if ( globalCurrentTool != LUNA_TOOL_CLIPBRUSH )
             {
@@ -161,47 +162,47 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
             globalCurrentTool = LUNA_TOOL_BRUSH;
             setToolbarActive ( );
             return 0;
-        
+
         case MUIM_SetTool_Fill:
-        
+
             // Make a small brush now
             globalCurrentTool = LUNA_TOOL_FILL;
             setToolbarActive ( );
             return 0;
-            
+
         case MUIM_SetTool_Line:
             globalCurrentTool = LUNA_TOOL_LINE;
             setToolbarActive ( );
             return 0;
-        
+
         case MUIM_SetTool_Rectangle:
             globalCurrentTool = LUNA_TOOL_RECTANGLE;
             setToolbarActive ( );
             return 0;
-        
+
         case MUIM_SetTool_Circle:
             globalCurrentTool = LUNA_TOOL_CIRCLE;
             setToolbarActive ( );
             return 0;
-        
+
         case MUIM_SetTool_ClipBrush:
             globalCurrentTool = LUNA_TOOL_CLIPBRUSH;
             globalBrushMode = 1; // clipbrush mode
             setToolbarActive ( );
             return 0;
-        
+
         case MUIM_SetTool_Colorpicker:
             globalCurrentTool = LUNA_TOOL_COLORPICKER;
             setToolbarActive ( );
             return 0;
-            
+
         case MUIM_ExecuteRevert:
             checkMenuEvents ( 595 );
             return 0;
-        
+
         /* End tool stuff */
-        
-        
+
+
         default:
             return DoSuperMethodA ( CLASS, self, message );
     }
@@ -210,7 +211,7 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
 BOOPSI_DISPATCHER_END
 
 IPTR PaletteRedraw ( int colorIndex )
-{	
+{
     BOOL WeAreOpen = FALSE; get ( paletteWindow, MUIA_Window_Open, &WeAreOpen );
     if ( !WeAreOpen ) return ( IPTR )NULL;
 
@@ -218,14 +219,14 @@ IPTR PaletteRedraw ( int colorIndex )
     int X = XGET ( paletteRect, MUIA_LeftEdge );
     int W = XGET ( paletteRect, MUIA_Width );
     int H = XGET ( paletteRect, MUIA_Height );
-    
+
     ULONG *tempBuf = AllocVec ( W * H * 4, MEMF_ANY );
-    
+
     double xslice = ( ( double )W / 16 );
     double yslice = ( ( double )H / 16 );
     double targetx = xslice * ( currColor % 16 );
     double targety = yslice * ( currColor / 16 );
-    
+
     int y = 0; for ( ; y < H; y++ )
     {
         int x = 0; for ( ; x < W; x++ )
@@ -234,13 +235,13 @@ IPTR PaletteRedraw ( int colorIndex )
             int inY = ( double )y / H * 16;
             int index = inY * 16 + inX;
             char check = ( y + x ) % 2;
-            
-            if ( 
+
+            if (
                 index == currColor &&
-                ( 
+                (
                     x == ( int )targetx || x == ( int )( targetx + xslice - 1 ) ||
-                    y == ( int )targety || y == ( int )( targety + yslice - 1 ) 
-                ) && 
+                    y == ( int )targety || y == ( int )( targety + yslice - 1 )
+                ) &&
                 check == 0
             )
             {
@@ -250,13 +251,13 @@ IPTR PaletteRedraw ( int colorIndex )
                 tempBuf[ y * W + x ] = globalPalette[ index ];
         }
     }
-    
+
     if ( globalBrushMode == 0 ) makeToolBrush ( );
-    
+
     // Plot all colors on screen
     if ( colorIndex == -1 )
     {
-        WritePixelArray ( 
+        WritePixelArray (
             tempBuf, 0, 0, 4 * W, _rp ( paletteRect ), X, Y, W, H, RECTFMT_RGBA
         );
     }
@@ -281,11 +282,11 @@ IPTR PaletteRedraw ( int colorIndex )
             RECTFMT_RGBA
         );
     }
-    
+
     FreeVec ( tempBuf );
 
     updateColorPreview ( );
-    
+
     return ( IPTR )NULL;
 }
 
@@ -309,7 +310,7 @@ IPTR PaletteEvents ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg )
                     slicey = ( ( double )he / 16 );
                     mousex = ( int )msg->imsg->MouseX - leftedge;
                     mousey = ( int )msg->imsg->MouseY - topedge;
-                    
+
                     // Only regard things happening in the palette area
                     // widget itself
                     if ( mousex >= 0 && mousey >= 0 && mousex < wi && mousey < he )
@@ -329,12 +330,12 @@ IPTR PaletteEvents ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg )
                         rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
                         set ( palSlideR, MUIA_Numeric_Value, colors.r );
                         set ( palSlideG, MUIA_Numeric_Value, colors.g );
-                        set ( palSlideB, MUIA_Numeric_Value, colors.b );					
+                        set ( palSlideB, MUIA_Numeric_Value, colors.b );
                     }
                 }
                 break;
             default:
-                break;	
+                break;
         }
     }
     return ( IPTR )NULL;
@@ -348,9 +349,9 @@ IPTR PaletteActions ( ULONG action )
             tempCopiedColor = *( globalPalette + currColor );
             tempCopiedColorExists = TRUE;
             break;
-            
+
         case MUIM_Palette_Paste:
-            
+
             if ( tempCopiedColorExists )
             {
                 // Paste copied color
@@ -361,11 +362,11 @@ IPTR PaletteActions ( ULONG action )
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
             }
-            
+
             break;
-            
+
         case MUIM_Palette_Swap:
-        
+
             // Swap two colors
             if ( prevColor != currColor )
             {
@@ -378,19 +379,19 @@ IPTR PaletteActions ( ULONG action )
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
                 // Redraw everything
-                PaletteRedraw ( -1 );	
+                PaletteRedraw ( -1 );
             }
-        
+
             break;
-            
+
         case MUIM_Palette_Reverse:
-            
+
             if ( currColor != prevColor )
             {
                 unsigned int firstCol = ( currColor > prevColor ) ? prevColor : currColor;
                 unsigned int lastCol = ( currColor > prevColor ) ? currColor : prevColor;
                 int span = ( int )lastCol - ( int )firstCol + 1;
-                unsigned int *temp = AllocVec ( 4 * span, MEMF_ANY );	
+                unsigned int *temp = AllocVec ( 4 * span, MEMF_ANY );
                 // Copy the present order
                 unsigned int i = 0; for ( ; i < span; i++ )
                 {
@@ -401,9 +402,9 @@ IPTR PaletteActions ( ULONG action )
                 {
                     globalPalette[ lastCol - i ] = temp[ i ];
                 }
-                
+
                 FreeVec ( temp );
-                
+
                 // Update slider positions
                 rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
@@ -412,9 +413,9 @@ IPTR PaletteActions ( ULONG action )
                 // Redraw everything
                 PaletteRedraw ( -1 );
             }
-        
+
             break;
-        
+
         case MUIM_Palette_Spread:
             if ( currColor != prevColor )
             {
@@ -438,10 +439,10 @@ IPTR PaletteActions ( ULONG action )
                     *( globalPalette + firstCol + i ) = RGBtoPaletteColor ( result.r, result.g, result.b );
                 }
                 // Redraw everything
-                PaletteRedraw ( -1 );	
+                PaletteRedraw ( -1 );
             }
             break;
-            
+
         case MUIM_Palette_Clear:
             if ( 1 )
             {
@@ -455,10 +456,10 @@ IPTR PaletteActions ( ULONG action )
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
                 // Redraw everything
-                PaletteRedraw ( -1 );	
+                PaletteRedraw ( -1 );
             }
             break;
-            
+
         default:
             break;
     }
@@ -468,15 +469,15 @@ IPTR PaletteActions ( ULONG action )
 void updateColorPreview ( )
 {
     // Update only color preview if we have an open window!
-    
+
     BOOL state;
-    
+
     get ( paletteWindow, MUIA_Window_Open, &state );
-    
+
     if ( state == TRUE )
     {
         int R, G, B, W, H, TE, LE;
-        
+
         get ( palSlideR, MUIA_Numeric_Value, &R );
         get ( palSlideG, MUIA_Numeric_Value, &G );
         get ( palSlideB, MUIA_Numeric_Value, &B );
@@ -484,18 +485,18 @@ void updateColorPreview ( )
         get ( palColRect, MUIA_LeftEdge, &LE );
         get ( palColRect, MUIA_Width, &W );
         get ( palColRect, MUIA_Height, &H );
-        
+
         ULONG *tempBuf = AllocVec ( 4 * ( W * H ), MEMF_ANY );
         unsigned int tempCol = RGBtoPaletteColor ( R, G, B );
-        
+
         int Y = 0; for ( ; Y < H; Y++ )
         {
             int X = 0; for ( ; X < W; X++ )
                 tempBuf[ ( W * Y ) + X ] = tempCol;
         }
-        WritePixelArray ( 
-            tempBuf, 0, 0, W * 4, _rp ( palColRect ), 
-            LE, TE, W, H, RECTFMT_RGBA 
+        WritePixelArray (
+            tempBuf, 0, 0, W * 4, _rp ( palColRect ),
+            LE, TE, W, H, RECTFMT_RGBA
         );
         FreeVec ( tempBuf );
     }
@@ -503,10 +504,10 @@ void updateColorPreview ( )
 
 void Init_PaletteWindow ( )
 {
-    struct MUI_CustomClass *mcc = 
-        MUI_CreateCustomClass ( 
-            NULL, MUIC_Rectangle, NULL, 
-            0, 
+    struct MUI_CustomClass *mcc =
+        MUI_CreateCustomClass (
+            NULL, MUIC_Rectangle, NULL,
+            0,
             &PaletteArea
         );
 
@@ -547,7 +548,7 @@ void Init_PaletteWindow ( )
                     End,
                     Child, ( IPTR )VGroup,
                         Child, ( IPTR )HGroup,
-                            Child, ( IPTR )GroupObject, 
+                            Child, ( IPTR )GroupObject,
                                 MUIA_Frame, MUIV_Frame_Group,
                                 Child, ( IPTR )( palColRect = RectangleObject,
                                     MUIA_FixHeight, 15,
@@ -561,13 +562,13 @@ void Init_PaletteWindow ( )
                                 MUIA_Numeric_Max, 255,
                                 MUIA_Numeric_Value, 0,
                             End ),
-                            Child, ( IPTR )( palSlideG = SliderObject, 
+                            Child, ( IPTR )( palSlideG = SliderObject,
                                 MUIA_Slider_Horiz, FALSE,
                                 MUIA_Numeric_Min, 0,
                                 MUIA_Numeric_Max, 255,
                                 MUIA_Numeric_Value, 0,
                             End ),
-                            Child, ( IPTR )( palSlideB = SliderObject, 
+                            Child, ( IPTR )( palSlideB = SliderObject,
                                 MUIA_Slider_Horiz, FALSE,
                                 MUIA_Numeric_Min, 0,
                                 MUIA_Numeric_Max, 255,
@@ -582,14 +583,14 @@ void Init_PaletteWindow ( )
                         MUIA_FixHeight, 10,
                         MUIA_Rectangle_HBar, TRUE,
                     End,
-                    Child, ( IPTR )GroupObject, 
+                    Child, ( IPTR )GroupObject,
                         MUIA_Frame, MUIV_Frame_Group,
                         Child, ( IPTR )( paletteRect = NewObject (
-                        mcc->mcc_Class, NULL,	
+                        mcc->mcc_Class, NULL,
                         MUIA_FixWidth, 256,
                         MUIA_FixHeight, 128,
                         TAG_DONE
-                        ) ),	
+                        ) ),
                     End,
                 End,
                 Child, HGroup,
@@ -615,30 +616,30 @@ void Init_PaletteMethods ( )
     set ( palSlideR, MUIA_Numeric_Value, colors.r );
     set ( palSlideG, MUIA_Numeric_Value, colors.g );
     set ( palSlideB, MUIA_Numeric_Value, colors.b );
-    
-    DoMethod ( 
+
+    DoMethod (
         palSlideR, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime,
         palSlideR, 3, MUIM_CallHook, &rgbslider_hook, MUIV_TriggerValue
     );
-    DoMethod ( 
+    DoMethod (
         palSlideG, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime,
         palSlideG, 3, MUIM_CallHook, &rgbslider_hook, MUIV_TriggerValue
     );
-    DoMethod ( 
+    DoMethod (
         palSlideB, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime,
         palSlideB, 3, MUIM_CallHook, &rgbslider_hook, MUIV_TriggerValue
     );
-    DoMethod ( 
-        palBtnUse, MUIM_Notify, 
-        MUIA_Pressed, FALSE, 
+    DoMethod (
+        palBtnUse, MUIM_Notify,
+        MUIA_Pressed, FALSE,
         paletteWindow, 3, MUIM_CallHook, &paletteClose_hook
     );
-    DoMethod ( 
-        paletteWindow, MUIM_Notify, 
-        MUIA_Window_CloseRequest, TRUE, 
+    DoMethod (
+        paletteWindow, MUIM_Notify,
+        MUIA_Window_CloseRequest, TRUE,
         paletteWindow, 3, MUIM_CallHook, &paletteClose_hook
     );
-    
+
     // Action buttons
     DoMethod (
         palBtnCopy, MUIM_Notify,
@@ -670,7 +671,7 @@ void Init_PaletteMethods ( )
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Palette_Clear
     );
-    
+
     // Load/Save
     DoMethod (
         palBtnSave, MUIM_Notify, MUIA_Pressed, FALSE,
@@ -683,7 +684,7 @@ void Init_PaletteMethods ( )
 }
 
 ULONG savePalette ( )
-{	
+{
     // We have a filename!!
     char *filename = getFilename ( );
     if ( filename != NULL )
@@ -702,11 +703,11 @@ ULONG savePalette ( )
 }
 
 ULONG loadPalette ( )
-{	
+{
     // We have a filename!!
     char *filename = getFilename ( );
     if ( filename != NULL )
-    {	
+    {
         // The aros way!
         BPTR myfile;
         if ( ( myfile = Open ( filename, MODE_OLDFILE ) ) != NULL )

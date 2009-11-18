@@ -2,6 +2,7 @@
 *                                                                           *
 * gui.c -- Lunapaint, http://www.sub-ether.org/lunapaint                    *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -22,10 +23,10 @@
 #include "gui.h"
 
 void Init_Application ( )
-{	
+{
     static struct NewMenu MyMenu[] = {
         {NM_TITLE, "Project"																    },
-            {NM_ITEM, "New project",						"N",			2, 0L, (APTR)599    },	
+            {NM_ITEM, "New project",						"N",			2, 0L, (APTR)599    },
             {NM_ITEM, "Load project",						"O",			2, 0L, (APTR)597	},
             {NM_ITEM, "Load datatype image",				"L",			2, 0L, (APTR)594	},
             {NM_ITEM, "Save project",						"S",			2, 0L, (APTR)598	},
@@ -56,7 +57,7 @@ void Init_Application ( )
             {NM_ITEM, NM_BARLABEL, 							0 , 			0, 0L, (APTR)0 	    },
             {NM_ITEM, "Flip brush vertically",			    NULL,			2, 0L, (APTR)748	},
             {NM_ITEM, "Flip brush horizontally",            NULL,           2, 0L, (APTR)749    },
-            {NM_ITEM, "Rotate brush 90 degrees",         NULL,              2, 0L, (APTR)751    },         
+            {NM_ITEM, "Rotate brush 90 degrees",         NULL,              2, 0L, (APTR)751    },
         {NM_TITLE, "Tools"																		},
             {NM_ITEM, "Draw", 								"D",			2, 0L, (APTR)850	},
             {NM_ITEM, "Line",								"V",			2, 0L, (APTR)851	},
@@ -66,7 +67,7 @@ void Init_Application ( )
             {NM_ITEM, "Fill",								"F",			2, 0L, (APTR)852	},
             {NM_ITEM, "Color picker",						"H",			2, 0L, (APTR)856	},
         {NM_TITLE, "Paint modes"																},
-            {NM_ITEM, "Normal", 							"1",			2, 0L, (APTR)800 	},	
+            {NM_ITEM, "Normal", 							"1",			2, 0L, (APTR)800 	},
             {NM_ITEM, "Color", 								"2",			2, 0L, (APTR)808 	},
             {NM_ITEM, "Colorize", 							"3",			2, 0L, (APTR)801 	},
             {NM_ITEM, "Lighten",							"4",			2, 0L, (APTR)804 	},
@@ -81,7 +82,7 @@ void Init_Application ( )
             {NM_ITEM, "Onion skin on/off",				    "'",			2, 0L, (APTR)825 	},
             {NM_ITEM, NM_BARLABEL, 							0 , 			0, 0L, (APTR)0 	    },
             {NM_ITEM, "Toggle animation window",		    NULL,			2, 0L, (APTR)400    },
-        {NM_TITLE, "Windows"																	},	
+        {NM_TITLE, "Windows"																	},
             {NM_ITEM, "Toggle layers window",			    NULL,			2, 0L, (APTR)401    },
             {NM_ITEM, "Toggle fullscreen editing",		    NULL,			2, 0L, (APTR)402	},
         {NM_TITLE, "Filters"																	},
@@ -90,20 +91,20 @@ void Init_Application ( )
             {NM_ITEM, "Program preferences",				"P",			2, 0L, (APTR)900	},
         {NM_END}
     };
-    mainPulldownMenu = MUI_MakeObject ( 
-        MUIO_MenustripNM, ( IPTR )MyMenu, (IPTR)NULL 
+    mainPulldownMenu = MUI_MakeObject (
+        MUIO_MenustripNM, ( IPTR )MyMenu, (IPTR)NULL
     );
-    
+
     loadPreferences ( );
-    
+
     InitLunaScreen ( );
-    
+
     // Initialize the events listener
     InitEvents ( );
-    
+
     // Let's initialize the used palette!
     initPalette ( );
-    
+
     // Init toolbox and related windows
     Init_AboutWindow ( );
     Init_ToolboxWindow ( );
@@ -116,7 +117,7 @@ void Init_Application ( )
     Init_Backdrop ( );
 
     // Initialize the gui for making a new project
-    nwNewWindow ( ); 
+    nwNewWindow ( );
     // Initialize the export window
     makeExportWindow ( );
     // Initialize the import window
@@ -144,17 +145,17 @@ void Init_Application ( )
         SubWindow, ( IPTR )AlertWindow,
         SubWindow, ( IPTR )textToBrushWindow,
         SubWindow, ( IPTR )LunaBackdrop,
-    End;	
-    
+    End;
+
     if ( PaintApp == NULL )
     {
         printf ( "Couldn't generate application object..\n" );
         Exit_Application ( );
         return;
     }
-    
-    Init_ToolboxMethods ( ); 
-    Init_PaletteMethods ( ); 
+
+    Init_ToolboxMethods ( );
+    Init_PaletteMethods ( );
     Init_NewProjectMethods ( );
     Init_TextToBrushMethods ( );
 
@@ -173,7 +174,7 @@ void Init_Application ( )
     MouseHasMoved = FALSE;
     redrawTimes = 0;
     fullscreenEditing = FALSE;
-    
+
     // Open the toolbox and declare the app running!
     if ( GlobalPrefs.ScreenmodeType != 0 )
         set ( LunaBackdrop, MUIA_Window_Open, TRUE );
@@ -188,35 +189,35 @@ void Exit_Application ( )
     // Delete canvases (free allocated memory)
     deleteCanvaswindows ( canvases );
 
-    if ( canvases != NULL ) 
+    if ( canvases != NULL )
         FreeVec ( canvases );
-    
+
     // Free up layers window buffers etc
     Exit_LayersWindow ( );
-    
+
     LockPubScreen ( ( STRPTR )"Lunapaint" );
-    
+
     // Dispose of the paint app
     if ( PaintApp != NULL )
         MUI_DisposeObject ( PaintApp );
-    
+
     UnlockPubScreen ( ( STRPTR )"Lunapaint", lunaPubScreen );
-    
+
     DOSBase = ( struct DosLibrary *)OpenLibrary ( "dos.library", 36 );
     IntuitionBase = ( struct IntuitionBase *)OpenLibrary ( "intuition.library", 36 );
-    
+
     if ( lunaPubScreen != NULL )
         CloseScreen ( lunaPubScreen );
-    
+
     if ( IntuitionBase != NULL )
         CloseLibrary ( ( struct Library *)IntuitionBase );
     if ( DOSBase != NULL )
         CloseLibrary ( ( struct Library *)DOSBase );
-    
+
     // Shutdown events
     ShutdownEvents ( );
-    
-    
+
+
     // Free all tool buffers
     if ( brushTool.buffer != NULL )
         FreeVec ( brushTool.buffer );
@@ -230,14 +231,14 @@ void Exit_Application ( )
         FreeVec ( rectangleTool.buffer );
     if ( clipbrushTool.buffer != NULL )
         FreeVec ( clipbrushTool.buffer );
-    
+
     // Free up palette
     if ( globalPalette != NULL )
         FreeVec ( globalPalette );
-    
+
     // Final cleanup with toolbox related things
     Exit_ToolboxWindow ( );
-    
+
     // Clean up fonts etc
     Exit_TextToBrushWindow ( );
 }
@@ -249,14 +250,14 @@ int checkSignalBreak ( ULONG *sigs )
         *sigs = Wait ( *sigs | SIGBREAKF_CTRL_C );
         if ( *sigs & SIGBREAKF_CTRL_C )
             return 1;
-    }	
+    }
     return 0;
 }
 
 int getSignals ( ULONG *sigs )
 {
     LONG result = DoMethod ( PaintApp, MUIM_Application_NewInput, ( IPTR )sigs );
-    
+
     if ( result	!= MUIV_Application_ReturnID_Quit )
     {
         return 1;
@@ -269,17 +270,17 @@ void InitLunaScreen ( )
     // Open some libraries for our pubscreen
     DOSBase = ( struct DosLibrary *)OpenLibrary ( "dos.library", 36 );
     IntuitionBase = ( struct IntuitionBase *)OpenLibrary ( "intuition.library", 36 );
-    
+
     if ( lunaPubScreen != NULL )
     {
         UnlockPubScreen ( ( STRPTR )"Lunapaint", lunaPubScreen );
         CloseScreen ( lunaPubScreen );
     }
-    
+
     // Open a clone screen
     if ( GlobalPrefs.ScreenmodeType == 1 )
     {
-        lunaPubScreen = OpenScreenTags ( 
+        lunaPubScreen = OpenScreenTags (
             lunaScreen,
             SA_Title, ( IPTR )LUNA_SCREEN_TITLE,
             SA_PubName, ( IPTR )"Lunapaint",
@@ -287,7 +288,7 @@ void InitLunaScreen ( )
             SA_SysFont, 1,
             SA_SharePens, TRUE,
             SA_LikeWorkbench, TRUE,
-            TAG_DONE 
+            TAG_DONE
         );
         PubScreenStatus( lunaPubScreen, 0 );
     }
@@ -296,17 +297,17 @@ void InitLunaScreen ( )
     {
         /*
         ULONG idok;
-        idok = BestCModeIDTags ( 
+        idok = BestCModeIDTags (
             CYBRBIDTG_NominalWidth, scrWidth,
             CYBRBIDTG_NominalHeight, scrHeight,
             CYBRBIDTG_Depth, scrDepth,
             TAG_DONE
         );
-        lunaPubScreen = OpenScreenTags ( 
+        lunaPubScreen = OpenScreenTags (
             lunaScreen,
-            SA_Width, scrWidth, 
-            SA_Height, scrHeight, 
-            SA_Depth, scrDepth, 
+            SA_Width, scrWidth,
+            SA_Height, scrHeight,
+            SA_Depth, scrDepth,
             SA_DisplayID, idok,
             SA_Title, ( IPTR )LUNA_SCREEN_TITLE,
             SA_PubName, ( IPTR )"Lunapaint",
@@ -314,7 +315,7 @@ void InitLunaScreen ( )
             SA_SysFont, 1,
             SA_SharePens, TRUE,
             SA_LikeWorkbench, TRUE,
-            TAG_DONE 
+            TAG_DONE
         );
         PubScreenStatus( lunaPubScreen, 0 );
         */
@@ -324,7 +325,7 @@ void InitLunaScreen ( )
     {
         lunaPubScreen = LockPubScreen ( ( UBYTE *)"Workbench" );
     }
-    
+
     // Close intuition for now
     CloseLibrary ( ( struct Library *)IntuitionBase );
     CloseLibrary ( ( struct Library *)DOSBase );
@@ -342,12 +343,12 @@ void HideOpenWindows ( )
     set ( exportWindow, MUIA_Window_Open, FALSE );
     set ( importWindow, MUIA_Window_Open, FALSE );
     set ( PrefsWindow, MUIA_Window_Open, FALSE );
-    set ( AlertWindow, MUIA_Window_Open, FALSE );	
+    set ( AlertWindow, MUIA_Window_Open, FALSE );
     set ( LunaBackdrop, MUIA_Window_Open, FALSE );
-    set ( textToBrushWindow, MUIA_Window_Open, FALSE );   
-    
+    set ( textToBrushWindow, MUIA_Window_Open, FALSE );
+
     /*WindowList *lst = canvases;
-    
+
     while ( lst != NULL )
     {
         set ( lst->win, MUIA_Window_Open, FALSE );
@@ -367,11 +368,11 @@ void ReopenWindows ( )
     set ( offsetWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( exportWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( importWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
-    set ( PrefsWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );	
-    set ( AlertWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );	
+    set ( PrefsWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
+    set ( AlertWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( LunaBackdrop, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
-    set ( textToBrushWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );   
-    
+    set ( textToBrushWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
+
     if ( GlobalPrefs.ScreenmodeType > 0 )
         set ( LunaBackdrop, MUIA_Window_Open, TRUE );
     set ( toolbox, MUIA_Window_Open, TRUE );
@@ -381,7 +382,7 @@ void Init_Backdrop ( )
 {
     ULONG window_Height = lunaPubScreen->Height;
     ULONG window_Delta = lunaPubScreen->BarHeight;
-    
+
     LunaBackdrop = WindowObject,
         MUIA_Window_Title, ( IPTR )NULL,
         MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
@@ -418,13 +419,13 @@ void Init_AlertWindow ( )
             Child, ( IPTR )( AlertOk = SimpleButton ( "OK" ) ),
         End,
     End;
-    DoMethod ( 
+    DoMethod (
         AlertWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-        AlertWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE 
+        AlertWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
-    DoMethod ( 
+    DoMethod (
         AlertOk, MUIM_Notify, MUIA_Pressed, FALSE,
-        AlertWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE 
+        AlertWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
 }
 

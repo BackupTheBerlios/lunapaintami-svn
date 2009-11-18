@@ -2,6 +2,7 @@
 *                                                                           *
 * text_to_brush.c -- Lunapaint, http://www.sub-ether.org/lunapaint          *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -31,37 +32,37 @@ AROS_UFH3 ( void, RenderTextToBrush_func,
     AROS_USERFUNC_INIT
 
     RenderTextToBrushBuffer ( );
-    
+
     AROS_USERFUNC_EXIT
 }
 
 void Init_TextToBrushWindow ( )
 {
     static const char *fontSizes[] = {
-        "6",  "8",  "9", "10", "11", "12", "13", "14", "15", "16", 
-        "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", 
-        "26", "28", "29", "30", "31", "32", "33", "34", "35", "36", 
-        "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", 
-        "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", 
-        "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", 
-        "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", 
-        "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", 
+        "6",  "8",  "9", "10", "11", "12", "13", "14", "15", "16",
+        "17", "18", "19", "20", "21", "22", "23", "24", "25", "26",
+        "26", "28", "29", "30", "31", "32", "33", "34", "35", "36",
+        "37", "38", "39", "40", "41", "42", "43", "44", "45", "46",
+        "47", "48", "49", "50", "51", "52", "53", "54", "55", "56",
+        "57", "58", "59", "60", "61", "62", "63", "64", "65", "66",
+        "67", "68", "69", "70", "71", "72", "73", "74", "75", "76",
+        "77", "78", "79", "80", "81", "82", "83", "84", "85", "86",
         "87", "88", "89", "90", NULL
     };
-    
+
     ttbw_FontSizeList = MUI_NewObject ( MUIC_List,
         MUIA_List_Title, "Size:",
         MUIA_Frame, MUIV_Frame_ReadList,
         MUIA_List_SourceArray, ( APTR )fontSizes,
         TAG_END
     );
-    
+
     ttbw_FontList = MUI_NewObject ( MUIC_List,
         MUIA_List_Title, "Fonts:",
         MUIA_Frame, MUIV_Frame_ReadList,
         TAG_END
     );
-    
+
     textToBrushWindow = WindowObject,
         MUIA_Window_Title, ( IPTR )"Render text to brush buffer",
         MUIA_Window_ScreenTitle, ( IPTR )"Render text to brush buffer",
@@ -69,7 +70,7 @@ void Init_TextToBrushWindow ( )
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_SizeGadget, TRUE,
         WindowContents, ( IPTR )VGroup,
-            Child, GroupObject, 
+            Child, GroupObject,
                 MUIA_FrameTitle, ( IPTR )"Select font",
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, HGroup,
@@ -80,7 +81,7 @@ void Init_TextToBrushWindow ( )
                             MUIA_Listview_List, ( IPTR )ttbw_FontList,
                         End ),
                     End,
-                    Child, VGroup, 
+                    Child, VGroup,
                         MUIA_Weight, 20,
                         Child, ( IPTR )( ttbw_FontSizeListview = ListviewObject,
                             MUIA_Listview_List, ( IPTR )ttbw_FontSizeList,
@@ -113,48 +114,48 @@ void Init_TextToBrushWindow ( )
 void Init_TextToBrushMethods ( )
 {
     DoMethod (
-        textToBrushWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, 
-        textToBrushWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE 
+        textToBrushWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
+        textToBrushWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
-    
+
     RenderTextToBrush_hook.h_Entry = ( HOOKFUNC )&RenderTextToBrush_func;
-    
+
     DoMethod (
-        ttbw_RenderButton, MUIM_Notify, MUIA_Pressed, FALSE, 
-        ttbw_RenderButton, 2, MUIM_CallHook, &RenderTextToBrush_hook 
+        ttbw_RenderButton, MUIM_Notify, MUIA_Pressed, FALSE,
+        ttbw_RenderButton, 2, MUIM_CallHook, &RenderTextToBrush_hook
     );
-    
+
     // Disable the keyboard when this window is activated
     DoMethod (
         textToBrushWindow, MUIM_Notify, MUIA_Window_Activate, TRUE,
         textToBrushWindow, 2, MUIM_CallHook, &DisableKeyboard_hook
     );
-    DoMethod ( textToBrushWindow, MUIM_Notify, MUIA_Window_Open, TRUE, 
+    DoMethod ( textToBrushWindow, MUIM_Notify, MUIA_Window_Open, TRUE,
         textToBrushWindow, 2, MUIM_CallHook, &DisableKeyboard_hook );
     // Enable the keyboard when this window is deactivated
     DoMethod (
         textToBrushWindow, MUIM_Notify, MUIA_Window_Activate, FALSE,
         textToBrushWindow, 2, MUIM_CallHook, &EnableKeyboard_hook
     );
-    DoMethod ( textToBrushWindow, MUIM_Notify, MUIA_Window_Open, FALSE, 
+    DoMethod ( textToBrushWindow, MUIM_Notify, MUIA_Window_Open, FALSE,
         textToBrushWindow, 2, MUIM_CallHook, &EnableKeyboard_hook );
-    
+
     // TODO: Make these paths be configurable
     // Get all fonts listed out
     STRPTR SearchFolders[] = { "Ram:", "Sys:Fonts/", "Sys:Fonts/TrueType/", NULL };
     LONG fontpos = 0;
     LONG fontfolderpos = 0;
-    
+
     while ( SearchFolders[ fontfolderpos ] != NULL )
     {
         BPTR lock;
         if ( ( lock = Lock ( ( CONST_STRPTR )SearchFolders[ fontfolderpos ], SHARED_LOCK ) ) != 0 )
-        {			
+        {
             struct FileInfoBlock *fib = AllocDosObject ( DOS_FIB, NULL );
             BOOL loop = Examine ( lock, fib );
-            
+
             while ( loop )
-            {	
+            {
                 if ( strlen ( fib->fib_FileName ) >= 5 && fib->fib_DirEntryType < 0 )
                 {
                     if ( strstr ( fib->fib_FileName, ".ttf" ) )
@@ -168,9 +169,9 @@ void Init_TextToBrushMethods ( )
                             if ( strcmp ( FontList[ i ], Fnt ) == 1 )
                                 found = 1;
                         }
-                        if ( found == 1 ) 
+                        if ( found == 1 )
                         {
-                            FreeVec ( Fnt ); 
+                            FreeVec ( Fnt );
                             FreeVec ( str );
                         }
                         else
@@ -182,9 +183,9 @@ void Init_TextToBrushMethods ( )
                     }
                 }
                 loop = ExNext ( lock, fib );
-            }         
+            }
             UnLock ( lock );
-            FreeDosObject( DOS_FIB, fib );         
+            FreeDosObject( DOS_FIB, fib );
         }
         fontfolderpos++;
     }
@@ -207,28 +208,28 @@ void Exit_TextToBrushWindow ( )
 void RenderTextToBrushBuffer ( )
 {
     STRPTR myFont = FontList[ XGET ( ttbw_FontList, MUIA_List_Active ) ];
-    
+
     // Get current font size
     int fontSize = 0;
     STRPTR fontSizeStr = NULL;
-    DoMethod ( 
-        ttbw_FontSizeList, MUIM_List_GetEntry, 
-        XGET ( ttbw_FontSizeList, MUIA_List_Active ), &fontSizeStr 
+    DoMethod (
+        ttbw_FontSizeList, MUIM_List_GetEntry,
+        XGET ( ttbw_FontSizeList, MUIA_List_Active ), &fontSizeStr
     );
     fontSize = atoi ( ( char * )fontSizeStr );
     STRPTR text = ( STRPTR )XGET ( ttbw_TextString, MUIA_String_Contents );
-    
+
     unsigned int *buffer = NULL;
     Affrect rect = RenderTextToBuffer ( text, ( char *)myFont, fontSize, &buffer );
     brushTool.width = rect.w;
     brushTool.height = rect.h;
     globalBrushMode = 1; // <- prevent brush generation (same as when using clipbrush)
-    
+
     // Convert to unsigned long long int from unsigned int
     int size = rect.w * rect.h;
     if ( size && buffer != NULL )
     {
-        if ( brushTool.buffer != NULL ) 
+        if ( brushTool.buffer != NULL )
             FreeVec ( brushTool.buffer );
         brushTool.buffer = AllocVec ( size * 8, MEMF_ANY );
         int i = 0; for ( ; i < size; i++ )
@@ -243,18 +244,18 @@ void RenderTextToBrushBuffer ( )
     }
 }
 
-Affrect RenderTextToBuffer ( 
-    unsigned char *text, char *font, 
+Affrect RenderTextToBuffer (
+    unsigned char *text, char *font,
     int size, unsigned int **buffer
 )
 {
     int error;
     FT_Library library;
-    FT_Face face; 
-    
-    if ( ( error = FT_Init_FreeType( &library ) ) ) 
+    FT_Face face;
+
+    if ( ( error = FT_Init_FreeType( &library ) ) )
     {
-        //printf ( "Couldn't initialize freetype library.\n" );   
+        //printf ( "Couldn't initialize freetype library.\n" );
         goto error;
     }
     if ( ( error = FT_New_Face( library, font, 0, &face ) ) )
@@ -262,16 +263,16 @@ Affrect RenderTextToBuffer (
         //printf ( "Couldn't initialize font face ( %s ).\n", font );
         goto error;
     }
-    if ( ( error = FT_Set_Pixel_Sizes( face, 0, size ) ) ) 
+    if ( ( error = FT_Set_Pixel_Sizes( face, 0, size ) ) )
     {
-        //printf ( "Couldn't set pixel sizes.\n" );   
+        //printf ( "Couldn't set pixel sizes.\n" );
         goto error;
     }
-    
+
     FT_GlyphSlot slot = face->glyph; // recommended ft2 shortcut >:-D
 
     int bufWidth = 0, bufHeight = 0, c = 0, halfHeight = 0;
-    
+
     // Calculate buffer size
     int textlen = strlen ( text );
     for ( c = 0; c < textlen; c++ )
@@ -284,16 +285,16 @@ Affrect RenderTextToBuffer (
             bufHeight = slot->bitmap.rows + slot->bitmap_top;
     }
     halfHeight = bufHeight; bufHeight = bufHeight * 2;
-    
+
     // Allocate memory for buffer and clear it, free if already allocated for
     int bufsize = bufWidth * bufHeight;
     unsigned int *buf = AllocVec ( bufsize * 4, MEMF_ANY|MEMF_CLEAR );
     *buffer = buf;
-    
+
     // Make the text
     int xpos = 0;
-    for ( c = 0; c < textlen; c++ ) 
-    { 
+    for ( c = 0; c < textlen; c++ )
+    {
         FT_UInt glyph_index;
         glyph_index = FT_Get_Char_Index( face, text[ c ] );
         if ( ( error = FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER ) ) ) continue;
@@ -308,9 +309,9 @@ Affrect RenderTextToBuffer (
             buf[ pos ] = ( rgb.r << 24 ) | ( rgb.g << 16 ) | ( rgb.b << 8 ) | slot->bitmap.buffer[ i ];
         }
         xpos += slot->advance.x >> 6;
-        
-    } 
-    
+
+    }
+
     // Return affected space
     Affrect rect;
     rect.x = 0; rect.y = 0;
@@ -318,7 +319,7 @@ Affrect RenderTextToBuffer (
     FT_Done_Face ( face );
     FT_Done_FreeType( library );
     return rect;
-    
+
     // We never should end up here..
     error:
     printf ( "Error initializing freetype library or its parts.\n" );

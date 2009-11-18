@@ -2,6 +2,7 @@
 *                                                                           *
 * parts.c -- Lunapaint, http://www.sub-ether.org/lunapaint                  *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -21,42 +22,42 @@
 #include "parts.h"
 
 char *getFilename ( )
-{		
+{
     keyboardEnabled = FALSE;
-    
+
     // Get filename
     struct Library *IntuitionBase, *AslBase;
     BOOL result;
-    
+
     // Create the asl file requestor and get a filename
     IntuitionBase = OpenLibrary ( "intuition.library", 0 );
     AslBase = OpenLibrary ( "asl.library", 0 );
     aslfileReq = AllocAslRequestTags ( ASL_FileRequest,
         ASLFR_Screen, lunaPubScreen,
-        TAG_DONE 
+        TAG_DONE
     );
     result = RequestFile ( aslfileReq );
     CloseLibrary ( IntuitionBase ); CloseLibrary ( AslBase );
-    
-    char *file = NULL; 
+
+    char *file = NULL;
     if ( result != FALSE )
     {
         // See if we have both file and drawer
         if ( aslfileReq->fr_Drawer == NULL || aslfileReq->fr_File == NULL )
             goto end;
-        
+
         file = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
-        
+
         // See if we have a trailing slash or a colon
         // This control is important to get right
         char lastChar = 0;
         BOOL hasColon = FALSE;
         int a = 0; for ( ; aslfileReq->fr_Drawer[ a ] != 0; a++ )
         {
-            lastChar = aslfileReq->fr_Drawer[ a ]; 
+            lastChar = aslfileReq->fr_Drawer[ a ];
             if ( lastChar == ':' ) hasColon = TRUE;
         }
-        if ( !hasColon && lastChar != '/' ) 
+        if ( !hasColon && lastChar != '/' )
         {
             sprintf ( file, "Lunapaint:%s/%s", aslfileReq->fr_Drawer, aslfileReq->fr_File );
         }
@@ -68,7 +69,7 @@ char *getFilename ( )
         {
             sprintf ( file, "%s/%s", aslfileReq->fr_Drawer, aslfileReq->fr_File );
         }
-        else 
+        else
         {
             FreeVec ( file );
             file = NULL;
@@ -76,9 +77,9 @@ char *getFilename ( )
     }
     end:
     FreeFileRequest ( aslfileReq );
-    
+
     keyboardEnabled = TRUE;
-    
+
     return file;
 }
 
@@ -90,7 +91,7 @@ unsigned int getFilesize ( char *filename )
     if ( filename != NULL )
     {
         FILE *fp = NULL;
-        
+
         if ( ( fp = Open ( filename, MODE_OLDFILE ) ) != NULL )
         {
             unsigned int size = 0;
@@ -101,9 +102,9 @@ unsigned int getFilesize ( char *filename )
             return size;
         }
     }
-    
+
     CloseLibrary ( DosBase );
-    
+
     return 0;
 }
 

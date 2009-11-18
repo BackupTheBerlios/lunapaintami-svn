@@ -2,6 +2,7 @@
 *                                                                           *
 * definitions.h -- Lunapaint, http://www.sub-ether.org/lunapaint            *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -50,7 +51,7 @@ struct LunapaintHeader
 };
 
 /*
-    A lunapaint object can be connected to 
+    A lunapaint object can be connected to
     a project
 */
 struct LunapaintObject
@@ -66,7 +67,7 @@ struct LunapaintObject
 #define LunaObj_LayerOpacity        1
 #define LunaObj_LayerVisibility     2
 #define LunaObj_LayerName           3
-struct LunaObjDesc 
+struct LunaObjDesc
 {
     unsigned int type;
     unsigned int layer;
@@ -90,13 +91,13 @@ struct LunapaintFormat
     A gfxbuffer is a 16 bits pr color buffer that holds
     graphics in nodes. Internally it's just a linked list
     of graphics. But externally, it does group buffers in
-    layers and frames. 
+    layers and frames.
     The list with 2 frames and three layers is like this for example:
     fr1_L1 - fr1_L2 - fr1_L3 - fr2_L1 - fr2_L2 - fr2_L3
     So first comes layers then frames. When resizing the animation
     or the layers, one has 4to restructure the list.
 */
-typedef struct gfxbuf {	
+typedef struct gfxbuf {
     struct gfxbuf *nextbuf;
     BOOL visible;
     char opacity;
@@ -130,20 +131,20 @@ typedef struct typeCanvas
     unsigned int                            previousLayer; 	    // Previously selected layer
     unsigned int 							totalLayers;
     unsigned char							onion;				// Modes of onion skin
-    
+
     unsigned int*							screenbuffer;		// Holds temp data for displaying
     unsigned int*							screenstorage;		// Stores the screenbuffer
     BOOL										winHasChanged;		// If the window has changed
     unsigned int							scrStorageWidth;	// Width of storage window
     unsigned int							scrStorageHeight;	// Height of storage window
     unsigned int							layerScrollPosV;	// Vertical scroll position in layers window
-    
+
     unsigned int							winEdgeWidth;		// Edge from canvas to window edge
     unsigned int							winEdgeHeight;		// --||--
     unsigned int							visibleWidth;		// Visible part of image
     unsigned int							visibleHeight;		// Visible part of image
     double									zoom;				// Amout of zoom on canvas
-    gfxbuffer* 								buffer;				// Linked list	
+    gfxbuffer* 								buffer;				// Linked list
     unsigned long long int* 			    activebuffer;		// Points to the current layer/frame
     unsigned long long int*				    swapbuffer;			// A swap buffer :-)
     unsigned int*							tmpBuf;				// Stores temp info if needed

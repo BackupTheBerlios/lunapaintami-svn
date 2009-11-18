@@ -2,6 +2,7 @@
 *                                                                           *
 * easyevents.h -- Lunapaint, http://www.sub-ether.org/lunapaint             *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -30,7 +31,7 @@ AROS_UFH3 ( void, DisableKeyboard_func,
     AROS_USERFUNC_INIT
 
     keyboardEnabled = FALSE;
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -43,7 +44,7 @@ AROS_UFH3 ( void, EnableKeyboard_func,
     AROS_USERFUNC_INIT
 
     keyboardEnabled = TRUE;
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -54,7 +55,7 @@ AROS_UFH3 ( struct InputEvent *, handleEvents,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     if ( event )
     {
         switch ( event->ie_Code )
@@ -77,9 +78,9 @@ AROS_UFH3 ( struct InputEvent *, handleEvents,
         if ( event->ie_Class == IECLASS_RAWKEY )
             evalRawKey = event->ie_Code;
     }
-    
+
     return event;
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -88,28 +89,28 @@ BOOL InitEvents ( )
     // Ready hooks
     EnableKeyboard_hook.h_Entry = ( HOOKFUNC )EnableKeyboard_func;
     DisableKeyboard_hook.h_Entry = ( HOOKFUNC )DisableKeyboard_func;
-    
+
     /* Setup all parts */
     gameInputPort = CreateMsgPort ( );
     if ( !gameInputPort ) return FALSE;
-    
+
     gameInput = ( struct IOStdReq *)CreateIORequest ( gameInputPort, sizeof ( struct IOStdReq ) );
     if ( !gameInput ) return FALSE;
-    
+
     BYTE inputsuccess = OpenDevice ( "input.device", 0, ( struct IORequest *)gameInput, 0 );
     if ( inputsuccess != 0 )
-    {   
+    {
         D(bug( "Failed to open input device, %d.\n", ( LONG )gameInput->io_Error ));
         return FALSE;
     }
-    
+
     gameInputInterrupt = AllocVec ( sizeof ( struct Interrupt ), MEMF_PUBLIC|MEMF_CLEAR );
     if ( !gameInputInterrupt )
     {
         ShutdownEvents ( );
         return FALSE;
     }
-    
+
     /* Add event handler */
     gameInputInterrupt->is_Code = ( APTR )&handleEvents;
     gameInputInterrupt->is_Data = NULL;
@@ -117,25 +118,25 @@ BOOL InitEvents ( )
     gameInputInterrupt->is_Node.ln_Name = "easyinput handler";
     gameInput->io_Command = IND_ADDHANDLER;
     gameInput->io_Data = ( APTR )gameInputInterrupt;
-    
+
     if ( DoIO ( ( struct IORequest *)gameInput ) )
     {
         ShutdownEvents ( );
         return FALSE;
     }
-    
+
     return TRUE;
 }
 
 void ShutdownEvents ( )
 {
     if ( !gameInput ) return;
-    
+
     /* Remove handler */
     gameInput->io_Command = IND_REMHANDLER;
     gameInput->io_Data = ( APTR )gameInputInterrupt;
     DoIO ( ( struct IORequest *)gameInput );
-    
+
     /* Close device and clean up */
     if ( gameInput->io_Error == 0 )
         CloseDevice ( ( struct IORequest *)gameInput );
@@ -153,7 +154,7 @@ IPTR CheckEvent ( ULONG event )
             break;
         case eventMouseButtonRight:
             return evalMouseButtonR;
-        default: 
+        default:
             return ( IPTR )FALSE;
     }
     return 0;

@@ -2,6 +2,7 @@
 *                                                                           *
 * layers.c -- Lunapaint, http://www.sub-ether.org/lunapaint                 *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -31,10 +32,10 @@ AROS_UFH3 ( void, changeOpacityFunc,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     // Fix it
     if ( globalActiveCanvas != NULL )
-    {        
+    {
         gfxbuffer *buf = globalActiveCanvas->buffer;
         char opacity = ( char )XGET( LayerOpacity, MUIA_Numeric_Value );
         int max = globalActiveCanvas->totalFrames * globalActiveCanvas->totalLayers;
@@ -50,7 +51,7 @@ AROS_UFH3 ( void, changeOpacityFunc,
         globalActiveWindow->layersChg = TRUE;
         DoMethod ( globalActiveWindow->area, MUIM_RedrawArea );
     }
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -61,7 +62,7 @@ AROS_UFH3 ( void, changeVisibilityFunc,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     // Fix it
     if ( globalActiveCanvas != NULL )
     {
@@ -81,24 +82,24 @@ AROS_UFH3 ( void, changeVisibilityFunc,
             }
             buf = buf->nextbuf;
         }
-        
+
         STRPTR message = AllocVec ( 7, MEMF_CLEAR );
         if ( visible )
         {
             sprintf ( message, "Hidden" );
             set ( LayerVisible, MUIA_Text_Contents, ( IPTR )message );
         }
-        else 
+        else
         {
             sprintf ( message, "Shown" );
             set ( LayerVisible, MUIA_Text_Contents, ( IPTR )message );
         }
         FreeVec ( message );
-        
+
         globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
     }
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -109,7 +110,7 @@ AROS_UFH3 ( void, acknowledgeOpacityFunc,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     // Fix it
     if ( globalActiveCanvas != NULL )
     {
@@ -118,7 +119,7 @@ AROS_UFH3 ( void, acknowledgeOpacityFunc,
         if ( integer > 100 ) integer = 100;
         set ( LayerOpacity, MUIA_Numeric_Value, integer );
     }
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -129,7 +130,7 @@ AROS_UFH3 ( void, acknowledgeLayNameFunc,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     // Fix it
     if ( globalActiveCanvas )
     {
@@ -150,14 +151,14 @@ AROS_UFH3 ( void, acknowledgeLayNameFunc,
         forceLayerRedraw = TRUE;
         DoMethod ( WidgetLayers, MUIM_Draw );
     }
-    
+
     AROS_USERFUNC_EXIT
 }
 
 IPTR _Layers_MUIM_Setup ( Class *CLASS, Object *self, Msg message )
 {
     MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
-    return DoSuperMethodA ( CLASS, self, message ); 
+    return DoSuperMethodA ( CLASS, self, message );
 }
 
 IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
@@ -166,7 +167,7 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
     if ( !globalActiveWindow || !globalActiveCanvas )
     {
         layerRenderBlank ( );
-        set ( LayerName, MUIA_String_Contents, ( IPTR )"\0" );            
+        set ( LayerName, MUIA_String_Contents, ( IPTR )"\0" );
         return ( IPTR )NULL;
     }
     else
@@ -178,21 +179,21 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
         {
             set ( LayerOpacity, MUIA_Numeric_Value, ( IPTR )buf->opacity );
             return ( IPTR )NULL;
-        }     
+        }
         int testWidth = XGET ( WidgetLayers, MUIA_Width );
         unsigned int posV = 0; get ( ScrollLayers, MUIA_Prop_First, &posV );
         if ( posV != globalActiveCanvas->layerScrollPosV )
             posV = 1;
         else posV = 0;
-        
+
         // If we changed active window
         if ( lastDrawnCanvas != globalActiveCanvas )
         {
             lastDrawnCanvas = globalActiveCanvas;
-            layerRender ( CLASS, self );  
+            layerRender ( CLASS, self );
             layersRepaintWindow ( CLASS, self );
             set ( LayerName, MUIA_String_Contents, ( IPTR )buf->name );
-            
+
             STRPTR vistx = AllocVec ( 7, MEMF_CLEAR );
             if ( buf->visible ) sprintf ( vistx, "Shown" );
             else sprintf ( vistx, "Hidden" );
@@ -200,17 +201,17 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
             FreeVec ( vistx );
         }
         // If we changed anything important
-        else if 
-        ( 
-            posV == 1 || 
-            LayersWidgetTmpBuf == NULL || 
-            globalActiveWindow->layersChg || 
-            layersWidgetWidth != testWidth || 
+        else if
+        (
+            posV == 1 ||
+            LayersWidgetTmpBuf == NULL ||
+            globalActiveWindow->layersChg ||
+            layersWidgetWidth != testWidth ||
             forceLayerRedraw
         )
-        {   
+        {
             layerRender ( CLASS, self );
-            forceLayerRedraw = FALSE;                           
+            forceLayerRedraw = FALSE;
             layersRepaintWindow ( CLASS, self );
             set ( LayerName, MUIA_String_Contents, ( IPTR )buf->name );
             STRPTR vistx = AllocVec ( 7, MEMF_CLEAR );
@@ -220,7 +221,7 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
             set ( LayerVisible, MUIA_Text_Contents, ( IPTR )vistx );
             FreeVec ( vistx );
         }
-        UpdateCanvasInfo ( globalActiveWindow );            
+        UpdateCanvasInfo ( globalActiveWindow );
         globalActiveWindow->layersChg = FALSE;
         return ( IPTR )NULL;
     }
@@ -230,23 +231,23 @@ IPTR _Layers_MUIM_HandleInput ( Class *CLASS, Object *self, Msg message )
 {
     if ( globalActiveCanvas == NULL || globalActiveWindow == NULL )
         return 0;
-        
+
     struct MUIP_HandleInput *msg = ( struct MUIP_HandleInput *)message;
-        
+
     int topEdge = 0, leftEdge = 0, areaWidth = 0, areaHeight = 0, propFirst = 0;
-    
+
     get ( WidgetLayers, MUIA_Width, &areaWidth );
     get ( WidgetLayers, MUIA_Height, &areaHeight );
     get ( WidgetLayers, MUIA_TopEdge, &topEdge );
     get ( WidgetLayers, MUIA_LeftEdge, &leftEdge );
     get ( ScrollLayers, MUIA_Prop_First, &propFirst );
-    
+
     if ( msg->imsg )
     {
         switch ( msg->imsg->Class )
         {
             case IDCMP_MOUSEBUTTONS:
-                if ( 
+                if (
                     ( int )msg->imsg->MouseX - leftEdge >= 0 &&
                     ( int )msg->imsg->MouseX - leftEdge < areaWidth &&
                     ( int )msg->imsg->MouseY - topEdge >= 0 &&
@@ -265,17 +266,17 @@ IPTR _Layers_MUIM_HandleInput ( Class *CLASS, Object *self, Msg message )
                         globalActiveCanvas->currentLayer = wantedLayer;
                         gfxbuffer *buf = getActiveGfxbuffer ( globalActiveCanvas );
                         set ( LayerOpacity, MUIA_Numeric_Value, ( IPTR )buf->opacity );
-                        set ( LayerName, MUIA_String_Contents, ( STRPTR )buf->name );                  
+                        set ( LayerName, MUIA_String_Contents, ( STRPTR )buf->name );
                         setActiveBuffer ( globalActiveCanvas );
-                    }               
+                    }
                     forceLayerRedraw = TRUE;
                     DoMethod ( WidgetLayers, MUIM_Draw );
                 }
             break;
-            
+
             default: break;
         }
-    }   
+    }
     return 0;
 }
 
@@ -310,7 +311,7 @@ IPTR _Layers_MUIM_NextFrame ( Class *CLASS, Object *self, Msg msg )
     {
         NextFrame ( globalActiveCanvas );
         set ( AnimationSlider, MUIA_Numeric_Value, ( globalActiveCanvas->currentFrame + 1 ) );
-        globalActiveWindow->layersChg = TRUE;            
+        globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
     }
     return 0;
@@ -335,7 +336,7 @@ IPTR _Layers_MUIM_CanvasAddLayer ( Class *CLASS, Object *self, Msg msg )
     if ( globalActiveCanvas )
     {
         addLayer ( globalActiveCanvas );
-        globalActiveWindow->layersChg = TRUE;            
+        globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
     }
     return 0;
@@ -348,7 +349,7 @@ IPTR _Layers_MUIM_CanvasSwapLayer ( Class *CLASS, Object *self, Msg msg )
         if ( globalActiveCanvas->currentLayer != globalActiveCanvas->previousLayer )
         {
             swapLayers ( globalActiveCanvas );
-            globalActiveWindow->layersChg = TRUE;            
+            globalActiveWindow->layersChg = TRUE;
             winHasChanged ( );
         }
     }
@@ -361,7 +362,7 @@ IPTR _Layers_MUIM_CanvasDeleteLayer ( Class *CLASS, Object *self, Msg msg )
     {
         deleteLayer ( globalActiveCanvas );
         setActiveBuffer ( globalActiveCanvas );
-        globalActiveWindow->layersChg = TRUE;            
+        globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
     }
     return 0;
@@ -373,7 +374,7 @@ IPTR _Layers_MUIM_CanvasMergeLayer ( Class *CLASS, Object *self, Msg msg )
     {
         mergeLayers ( globalActiveCanvas );
         setActiveBuffer ( globalActiveCanvas );
-        globalActiveWindow->layersChg = TRUE;            
+        globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
     }
     return 0;
@@ -397,7 +398,7 @@ IPTR _Layers_MUIM_ChangeOnionskin ( Class *CLASS, Object *self, Msg msg )
         int num = 0;
         get ( CycleOnionSkin, MUIA_Cycle_Active, &num );
         globalActiveCanvas->onion = ( char )num;
-        globalActiveWindow->layersChg = TRUE;            
+        globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
     }
     return 0;
@@ -442,7 +443,7 @@ void Init_LayersWindow ( )
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_LeftEdge, 0,
         MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
-        MUIA_Window_UseRightBorderScroller, TRUE,      
+        MUIA_Window_UseRightBorderScroller, TRUE,
         WindowContents, ( IPTR )VGroup,
             MUIA_Group_HorizSpacing, 0,
             Child, ( IPTR )GroupObject,
@@ -455,13 +456,13 @@ void Init_LayersWindow ( )
                         MUIA_Group_VertSpacing, 0,
                         MUIA_Group_HorizSpacing, 0,
                         Child, ( IPTR )( WidgetLayers = NewObject (
-                            lay->mcc_Class, NULL, 
-                            MUIA_FillArea, FALSE,                     
+                            lay->mcc_Class, NULL,
+                            MUIA_FillArea, FALSE,
                             MUIA_Frame, MUIV_Frame_None,
                             TAG_DONE
                         ) ),
                     End,
-                    Child, ( IPTR )( ScrollLayers = ScrollbarObject, 
+                    Child, ( IPTR )( ScrollLayers = ScrollbarObject,
                         MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_Right,
                     End ),
                 End,
@@ -473,7 +474,7 @@ void Init_LayersWindow ( )
                 End ),
                 Child, ( IPTR )HGroup,
                     Child, ( IPTR )( LayerOpacity = SliderObject,
-                        MUIA_Weight, 50,               
+                        MUIA_Weight, 50,
                         MUIA_Numeric_Min, 0,
                         MUIA_Numeric_Max, 100,
                         MUIA_Numeric_Value, 100,
@@ -493,7 +494,7 @@ void Init_LayersWindow ( )
                         MUIA_Weight, 25,
                         InnerSpacing ( 0, 0 ),
                         Child, ( IPTR )( LayerVisible = SimpleButton ( "Shown" ) ),
-                    End,               
+                    End,
                 End,
             End ),
             Child, ( IPTR )HGroup,
@@ -505,33 +506,33 @@ void Init_LayersWindow ( )
             End,
         End,
     End;
-    
+
     // Disable the keyboard when this window is activated
     DoMethod (
         WindowLayers, MUIM_Notify, MUIA_Window_Activate, TRUE,
         WindowLayers, 2, MUIM_CallHook, &DisableKeyboard_hook
     );
-    DoMethod ( WindowLayers, MUIM_Notify, MUIA_Window_Open, TRUE, 
+    DoMethod ( WindowLayers, MUIM_Notify, MUIA_Window_Open, TRUE,
         WindowLayers, 2, MUIM_CallHook, &DisableKeyboard_hook );
     // Enable the keyboard when this window is deactivated
     DoMethod (
         WindowLayers, MUIM_Notify, MUIA_Window_Activate, FALSE,
         WindowLayers, 2, MUIM_CallHook, &EnableKeyboard_hook
     );
-    DoMethod ( WindowLayers, MUIM_Notify, MUIA_Window_Open, FALSE, 
+    DoMethod ( WindowLayers, MUIM_Notify, MUIA_Window_Open, FALSE,
         WindowLayers, 2, MUIM_CallHook, &EnableKeyboard_hook );
-    
+
     /* Bubble help */
     DoMethod ( BtnAddLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Add layer" );
     DoMethod ( BtnDelLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Delete layer" );
     DoMethod ( BtnSwapLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Swap layer" );
     DoMethod ( BtnCopyLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Copy layer" );
     DoMethod ( BtnMergeLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Merge layer" );
-    
+
     /*
         Layers
     */
-    DoMethod ( 
+    DoMethod (
         BtnAddLayer, MUIM_Notify,
         MUIA_Pressed, FALSE,
         ( IPTR )WidgetLayers, 1, MUIM_CanvasAddLayer
@@ -556,18 +557,18 @@ void Init_LayersWindow ( )
         MUIA_Pressed, FALSE,
         ( IPTR )WidgetLayers, 1, MUIM_CanvasCopyLayer
     );
-    DoMethod ( 
+    DoMethod (
         ScrollLayers, MUIM_Notify, MUIA_Prop_First, MUIV_EveryTime,
         ( IPTR )WidgetLayers, 1, MUIM_Draw
     );
-    DoMethod ( 
+    DoMethod (
         WindowLayers, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
         ( IPTR )WindowLayers, 3, MUIM_Set, MUIA_Window_Open, FALSE
-    );   
-    
-    // Layer opacity   
+    );
+
+    // Layer opacity
     changeOpacityHook.h_Entry = ( HOOKFUNC )&changeOpacityFunc;
-    changeVisibilityHook.h_Entry = ( HOOKFUNC )&changeVisibilityFunc;  
+    changeVisibilityHook.h_Entry = ( HOOKFUNC )&changeVisibilityFunc;
     DoMethod (
         LayerOpacity, MUIM_Notify, MUIA_Numeric_Value, MUIV_EveryTime,
         ( IPTR )LayerOpacity, 2, MUIM_CallHook, &changeOpacityHook
@@ -586,7 +587,7 @@ void Init_LayersWindow ( )
         LayerVisible, MUIM_Notify, MUIA_Pressed, FALSE,
         ( IPTR )LayerVisible, 2, MUIM_CallHook, &changeVisibilityHook
     );
-    
+
 }
 
 void layerRenderBlank ( )
@@ -601,8 +602,8 @@ void layerRenderBlank ( )
         int size = areaWidth * areaHeight;
         unsigned int *buf = AllocVec ( size * 4, MEMF_ANY );
         int i = 0; for ( ; i < size; i++ ) buf[ i ] = 0x777777;
-        WritePixelArray ( 
-            buf, 0, 0, areaWidth * 4, 
+        WritePixelArray (
+            buf, 0, 0, areaWidth * 4,
             _rp ( WidgetLayers ), areaLeft, areaTop, areaWidth, areaHeight, RECTFMT_RGBA
         );
         FreeVec ( buf );
@@ -615,11 +616,11 @@ BOOL layerRender ( Class *CLASS, Object *self )
     get ( WindowLayers, MUIA_Window_Open, &opened );
     if ( !opened || globalActiveCanvas == NULL || globalActiveWindow == NULL )
         return FALSE;
-        
+
     unsigned int areaWidth = 0, areaHeight = 0;
     unsigned int topEdge = 0, leftEdge = 0;
     int propFirst = 0;
-    
+
     get ( WidgetLayers, MUIA_Width, &areaWidth );
     get ( WidgetLayers, MUIA_Height, &areaHeight );
     get ( WidgetLayers, MUIA_TopEdge, &topEdge );
@@ -628,22 +629,22 @@ BOOL layerRender ( Class *CLASS, Object *self )
 
     int diffy = propFirst - layersLastScrollPos;
     layersLastScrollPos = propFirst;
-    
+
     // Update rect
     int ux = 0, uy = 0, uw = areaWidth, uh = 0;
-    
+
     if ( diffy != 0 && abs (diffy ) < areaHeight )
     {
         // source / dest / moveheight
         int sy = 0, dy = 0, mh = 0;
-        
+
         if ( diffy > 0 )
         {
             sy = topEdge + diffy;
             dy = topEdge;
             mh = areaHeight - diffy;
             uy = areaHeight - diffy - 1;
-            uh = diffy + 1; 
+            uh = diffy + 1;
         }
         else
         {
@@ -653,16 +654,16 @@ BOOL layerRender ( Class *CLASS, Object *self )
             uy = 0;
             uh = 0 - diffy + 1;
         }
-        
+
         if ( uy < 0 ) uy = 0;
         if ( uh > areaHeight ) uh = areaHeight;
-        
+
         layersUpdateX = 0;
         layersUpdateY = uy;
         layersUpdateW = areaWidth;
         layersUpdateH = uh;
-        
-        MovePixelArray ( 
+
+        MovePixelArray (
             leftEdge,
             sy,
             _rp ( WidgetLayers ),
@@ -671,7 +672,7 @@ BOOL layerRender ( Class *CLASS, Object *self )
             areaWidth,
             mh
         );
-        
+
     }
     else
     {
@@ -681,9 +682,9 @@ BOOL layerRender ( Class *CLASS, Object *self )
         layersUpdateW = areaWidth;
         layersUpdateH = areaHeight;
     }
-    
+
     layersWidgetWidth = areaWidth; //<- remember width
-    
+
     int thumbHeight = LAYERTHUMBSIZE, thumbWidth = LAYERTHUMBSIZE; // <- frame
     int imageHeight = LAYERIMAGESIZE, imageWidth = LAYERIMAGESIZE; // <- cropped/centered image
     if ( globalActiveCanvas->width > globalActiveCanvas->height )
@@ -692,15 +693,15 @@ BOOL layerRender ( Class *CLASS, Object *self )
         imageWidth = ( double )globalActiveCanvas->width / globalActiveCanvas->height * LAYERIMAGESIZE;
     int HSpace = ( double )( thumbWidth - imageWidth ) / 2;
     int VSpace = ( double )( thumbHeight - imageHeight ) / 2;
-    
+
     if ( LayersWidgetTmpBuf != NULL ) FreeVec ( LayersWidgetTmpBuf );
     LayersWidgetTmpBuf = AllocVec ( areaWidth * areaHeight * 4, MEMF_ANY|MEMF_CLEAR );
-    
+
     gfxbuffer *buf = globalActiveCanvas->buffer;
-    
+
     int uxuw = ux + uw;
     int uyuh = uy + uh;
-    
+
     int f = 0; for ( ; f < globalActiveCanvas->totalFrames; f++ )
     {
         int l = 0; for ( ; l < globalActiveCanvas->totalLayers; l++ )
@@ -709,29 +710,29 @@ BOOL layerRender ( Class *CLASS, Object *self )
             {
                 // Get draw offset with highest layernumber shown on top (newest on top of stack)
                 int lOffsetY = ( LAYERTHUMBSIZE * ( globalActiveCanvas->totalLayers - l - 1 ) ) - propFirst;
-                
+
                 int y = 0; for ( ; y < LAYERTHUMBSIZE; y ++ )
                 {
                     int py = ( double )( y - VSpace ) / imageHeight * globalActiveCanvas->height;
                     int lOffsetYy = y + lOffsetY;
-                    
+
                     int x = ux; for ( ; x < uw; x++ )
                     {
                         int px = ( double )( x - HSpace ) / imageWidth * globalActiveCanvas->width;
-                        
+
                         // Draw only what's in view in the widget
                         if ( x >= ux && x < uxuw && lOffsetYy >= uy && lOffsetYy < uyuh )
                         {
-                            // offset to plot in tmpBuf                  
+                            // offset to plot in tmpBuf
                             int off = lOffsetYy * areaWidth + x;
-                            
-                            // within the frame                  
+
+                            // within the frame
                             if ( x >= HSpace && x < imageWidth + HSpace && y >= VSpace && y < imageHeight + VSpace )
-                            {            
-                                // Frame                     
-                                if ( 
-                                    x == HSpace || x == HSpace + imageWidth - 1 || 
-                                    y == VSpace || y == VSpace + imageHeight - 1 
+                            {
+                                // Frame
+                                if (
+                                    x == HSpace || x == HSpace + imageWidth - 1 ||
+                                    y == VSpace || y == VSpace + imageHeight - 1
                                 )
                                 {
                                     if ( l == globalActiveCanvas->currentLayer )
@@ -741,17 +742,17 @@ BOOL layerRender ( Class *CLASS, Object *self )
                                 // Image
                                 else
                                 {
-                                    rgbaData rgba = canvasColorToRGBA ( 
+                                    rgbaData rgba = canvasColorToRGBA (
                                         buf->buf[ py * globalActiveCanvas->width + px ]
                                     );
-                                    // Checks                        
+                                    // Checks
                                     unsigned int colr = *( unsigned int *)&( ( rgba32 ){ 128, 128, 128, 255 } );
                                     int checkCol = ( ( x % 16 ) + ( int )( y / 8 ) * 8 ) % 16;
-                                    if ( checkCol >= 8 ) 
+                                    if ( checkCol >= 8 )
                                         colr = *( unsigned int *)&( ( rgba32 ){ 90, 90, 90, 255 } );
                                     // Blend
                                     if ( rgba.a > 0 )
-                                    {       
+                                    {
                                         rgba32 blend = *( rgba32 *)&colr;
                                         double balph = ( double )rgba.a / 255;
                                         // Convert to safe mode
@@ -770,14 +771,14 @@ BOOL layerRender ( Class *CLASS, Object *self )
                             else
                             {
                                 // Switch background
-                                if ( l % 2 == 0 )                        
+                                if ( l % 2 == 0 )
                                     LayersWidgetTmpBuf[ off ] = 0x222222;
-                                else                           
+                                else
                                     LayersWidgetTmpBuf[ off ] = 0x444444;
-                            }                     
+                            }
                         }
                     }
-                }          
+                }
             }
             buf = buf->nextbuf;
         }
@@ -789,7 +790,7 @@ void RenderLayerNames ( int x, int y, int w, int h )
 {
     // illegal w/h
     if ( !w || !h ) return;
-    
+
     oCanvas *canv = globalActiveCanvas;
     gfxbuffer *buf = canv->buffer;
     int size = canv->totalLayers * canv->totalFrames;
@@ -798,34 +799,34 @@ void RenderLayerNames ( int x, int y, int w, int h )
     int areaWidth = ( int )XGET( WidgetLayers, MUIA_Width );
     int areaLeft =  ( int )XGET( WidgetLayers, MUIA_LeftEdge );
     int areaTop = ( int )XGET( WidgetLayers, MUIA_TopEdge );
-    
+
     // out of bounds
     if ( x >= areaWidth ) return;
     if ( y >= areaHeight ) return;
     if ( x + w < 0 ) return;
     if ( y + h < 0 ) return;
-    
+
     // snap to borders
     if ( x + w >= areaWidth ) w = ( areaWidth - 1 - x );
     if ( y + h >= areaHeight ) h = ( areaHeight - 1 - y );
-    
+
     // put into place
     x += areaLeft;
     y += areaTop;
-    
+
     // Add clipping rect (don't draw outside it)
-    APTR clip = MUI_AddClipping ( 
-        muiRenderInfo( obj ), 
+    APTR clip = MUI_AddClipping (
+        muiRenderInfo( obj ),
         x, y, w, h
     );
-    
+
     SetAPen( _rp( obj ), _pens( obj )[MPEN_SHINE] );
     int ioff = ( int )XGET ( ScrollLayers, MUIA_Prop_First );
     int yoffset = 20;
     int xoffset = 4;
     struct TextFont *fnt = _font ( LayerVisible );
     SetFont ( _rp ( obj ), fnt );
-    
+
     int i = 0; for ( ; i < size; i++ )
     {
         int l = i % canv->totalLayers;
@@ -839,10 +840,10 @@ void RenderLayerNames ( int x, int y, int w, int h )
             // Layer opacity
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset + fnt->tf_YSize + 4 );
             STRPTR percent = "%";
-            STRPTR str = AllocVec ( 16, MEMF_ANY|MEMF_CLEAR ); 
+            STRPTR str = AllocVec ( 16, MEMF_ANY|MEMF_CLEAR );
             sprintf ( str, "Opacity: %d%s", buf->opacity, percent );
             Text ( _rp ( obj ), str, strlen ( str ) );
-            FreeVec ( str ); 
+            FreeVec ( str );
             // Visibility
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset + ( ( fnt->tf_YSize + 4 ) * 2 ) );
             if ( buf->visible )
@@ -851,7 +852,7 @@ void RenderLayerNames ( int x, int y, int w, int h )
         }
         buf = buf->nextbuf;
     }
-    MUI_RemoveClipping( muiRenderInfo( obj ), clip );   
+    MUI_RemoveClipping( muiRenderInfo( obj ), clip );
 }
 
 void layersRepaintWindow ( Class *CLASS, Object *self )
@@ -859,27 +860,27 @@ void layersRepaintWindow ( Class *CLASS, Object *self )
     BOOL opened = FALSE;
     get ( WindowLayers, MUIA_Window_Open, &opened );
     if ( !opened ) return;
-    
+
     unsigned int areaWidth = 0, areaHeight = 0;
     unsigned int topEdge = 0, leftEdge = 0;
-    
+
     get ( WidgetLayers, MUIA_Width, &areaWidth );
     get ( WidgetLayers, MUIA_Height, &areaHeight );
     get ( WidgetLayers, MUIA_TopEdge, &topEdge );
     get ( WidgetLayers, MUIA_LeftEdge, &leftEdge );
 
     // Write the layer data
-    WritePixelArray ( 
-        LayersWidgetTmpBuf, 0, layersUpdateY, areaWidth * 4, 
-        _rp ( WidgetLayers ), leftEdge + layersUpdateX, topEdge + layersUpdateY, layersUpdateW, layersUpdateH, RECTFMT_RGBA 
+    WritePixelArray (
+        LayersWidgetTmpBuf, 0, layersUpdateY, areaWidth * 4,
+        _rp ( WidgetLayers ), leftEdge + layersUpdateX, topEdge + layersUpdateY, layersUpdateW, layersUpdateH, RECTFMT_RGBA
     );
     RenderLayerNames ( layersUpdateX, layersUpdateY, layersUpdateW, layersUpdateH );
     UpdateCanvasInfo ( globalActiveWindow );
 
     // Update layers scrollbar
-    if ( 
-    globalActiveCanvas->winHasChanged || globalActiveWindow->layersChg || 
-    areaWidth != layersWidgetWidth || areaHeight != layersWidgetHeight 
+    if (
+    globalActiveCanvas->winHasChanged || globalActiveWindow->layersChg ||
+    areaWidth != layersWidgetWidth || areaHeight != layersWidgetHeight
     )
     {
         globalActiveWindow->layersChg = FALSE;
@@ -887,7 +888,7 @@ void layersRepaintWindow ( Class *CLASS, Object *self )
         set ( ScrollLayers, MUIA_Prop_Entries, ( LAYERTHUMBSIZE * globalActiveCanvas->totalLayers ) );
         layersWidgetHeight = areaHeight;
         layersWidgetWidth = areaWidth;
-    }   
+    }
 }
 
 void Exit_LayersWindow ( )

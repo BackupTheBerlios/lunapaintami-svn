@@ -2,6 +2,7 @@
 *                                                                           *
 * export_import.c -- Lunapaint, http://www.sub-ether.org/lunapaint          *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -28,19 +29,19 @@ AROS_UFH3 ( void, exportanimation_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     int datatype = 0;
     unsigned char *filename = NULL;
     get ( exportCycDT, MUIA_Cycle_Active, &datatype );
     get ( exportPopFilename, MUIA_String_Contents, &filename );
-    
+
     if ( filename == NULL )
         return;
-        
+
     createImageFromAnimation ( globalActiveCanvas, datatype, filename );
-    
+
     AROS_USERFUNC_EXIT
-}	
+}
 
 AROS_UFH3 ( void, export_func,
     AROS_UFHA ( struct Hook*, h, A0 ),
@@ -49,18 +50,18 @@ AROS_UFH3 ( void, export_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     int mode = 0, datatype = 0;
     unsigned char *filename = NULL;
     get ( exportMode, MUIA_Cycle_Active, &mode );
     get ( exportCycDT, MUIA_Cycle_Active, &datatype );
     get ( exportPopFilename, MUIA_String_Contents, &filename );
-    
+
     if ( filename == NULL )
         return;
-    
+
     unsigned int *buffer = generateExportableBuffer ( globalActiveCanvas, mode, datatype );
-    
+
     // Export with the JPEG datatype
     if ( datatype == 0 )
     {
@@ -94,9 +95,9 @@ AROS_UFH3 ( void, export_func,
         }
         else printf ( "Failed to save image raw..\n" );
     }
-    
+
     FreeVec ( buffer );
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -107,12 +108,12 @@ AROS_UFH3 ( void, import_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     int datatype = 0;
     unsigned char *filename = NULL;
     get ( importCycDT, MUIA_Cycle_Active, &datatype );
     get ( importPopFilename, MUIA_String_Contents, &filename );
-    
+
     switch ( datatype )
     {
         case 0:
@@ -122,9 +123,9 @@ AROS_UFH3 ( void, import_func,
                 BPTR myfile;
                 if ( ( myfile = Open ( filename, MODE_OLDFILE ) ) != NULL )
                 {
-                    Read ( 
-                        myfile, globalActiveCanvas->activebuffer, 
-                        8 * globalActiveCanvas->width * globalActiveCanvas->height 
+                    Read (
+                        myfile, globalActiveCanvas->activebuffer,
+                        8 * globalActiveCanvas->width * globalActiveCanvas->height
                     );
                     Close ( myfile );
                     globalActiveCanvas->winHasChanged = TRUE;
@@ -136,50 +137,50 @@ AROS_UFH3 ( void, import_func,
             break;
         default: break;
     }
-    
+
     AROS_USERFUNC_EXIT
 }
 
 unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype )
 {
     unsigned int *buffer = NULL;
-    
+
     if ( mode == 0 )
     {
         if ( ( buffer = AllocVec ( 4 * canvas->width * canvas->height, MEMF_ANY|MEMF_CLEAR ) ) == NULL )
             return 0;
-        
+
         int size = canvas->width * canvas->height;
         int i = 0; for ( ; i < size; i++ )
         {
             rgba64 c64 = *( rgba64 *)&canvas->activebuffer[ i ];
-            
+
             // Align the colors reverse
             c64 = ( rgba64 ){ c64.a, c64.b, c64.g, c64.r };
-            
+
             // Set the colors in 32-but order
             // datatype 0 is JPEG
             if ( datatype == 0 )
             {
-                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){ 
-                    ( double )c64.a / 256, ( double )c64.r / 256, 
-                    ( double )c64.g / 256, ( double )c64.b / 256 
+                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){
+                    ( double )c64.a / 256, ( double )c64.r / 256,
+                    ( double )c64.g / 256, ( double )c64.b / 256
                 } );
             }
             // If datatype is png, include all channels
             else if ( datatype == 1 )
             {
                 buffer[ i ] = *( unsigned int *)&( ( rgba32 ){
-                    ( double )c64.r / 256, ( double )c64.g / 256, 
+                    ( double )c64.r / 256, ( double )c64.g / 256,
                     ( double )c64.b / 256, ( double )c64.a / 256
                 } );
             }
             // Others
             else
             {
-                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){ 
-                    ( double )c64.b / 256, ( double )c64.g / 256, 
-                    ( double )c64.r / 256, ( double )c64.a / 256 
+                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){
+                    ( double )c64.b / 256, ( double )c64.g / 256,
+                    ( double )c64.r / 256, ( double )c64.a / 256
                 } );
             }
         }
@@ -187,22 +188,22 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
     else if ( mode == 1 )
     {
         // Remove tool graphic that's overlayn
-        removePrevToolPreview ( );      
+        removePrevToolPreview ( );
         ULONG tool = globalCurrentTool;
         globalCurrentTool = -1;
-        
-        // Get flattened layers without tool preview      
+
+        // Get flattened layers without tool preview
         buffer = renderCanvas ( canvas, 0, 0, canvas->width, canvas->height, TRUE );
-        
+
         // Reset tool setting
         globalCurrentTool = tool;
-        
+
         // Fix color order for different storage formats
-        int size = canvas->width * canvas->height;      
+        int size = canvas->width * canvas->height;
         int i = 0; for ( ; i < size; i++ )
         {
             rgba32 c = *( rgba32 *)&buffer[ i ];
-            
+
             // Set the colors in 32-bit order
             // datatype 0 is JPEG
             if ( datatype == 0 )
@@ -211,7 +212,7 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
                 c = ( rgba32 ){ c.r, c.g, c.b, c.a };
             else
                 c = ( rgba32 ){ c.b, c.g, c.r, c.a };
-                
+
             buffer[ i ] = *( unsigned int *)&c;
         }
     }
@@ -224,10 +225,10 @@ void makeExportWindow ( )
     static const char *exp_mode[] = { "Current active layer", "Flatten layers", NULL };
     static const char *exp_titles[] = { "Export one frame", "Export frames", NULL };
     static const char *exp_anim_mode[] = { "Current active layer", "Flatten layers", NULL };
-    static const char *exp_anim_method[] = { 
-        "One file pr. frame", "One vertical strip", NULL 
+    static const char *exp_anim_method[] = {
+        "One file pr. frame", "One vertical strip", NULL
     };
-    
+
     exportWindow = WindowObject,
         MUIA_Window_ScreenTitle, ( IPTR )"Export project",
         MUIA_Window_Title, ( IPTR )"Export project",
@@ -242,8 +243,8 @@ void makeExportWindow ( )
                 Child, HGroup,
                     Child, PopaslObject,
                         ASLFR_DoSaveMode, TRUE,
-                        MUIA_Popstring_String, exportPopFilename = MUI_MakeObject ( 
-                            MUIO_String, NULL, 200 
+                        MUIA_Popstring_String, exportPopFilename = MUI_MakeObject (
+                            MUIO_String, NULL, 200
                         ),
                         MUIA_Popstring_Button, PopButton ( MUII_PopFile ),
                     End,
@@ -313,7 +314,7 @@ void makeExportWindow ( )
                                     MUIA_String_MaxLen, 10,
                                     MUIA_Frame, MUIV_Frame_String,
                                 End,
-                            End,	
+                            End,
                             Child, HGroup,
                                 Child, exportAnimBtnExport = SimpleButton ( ( IPTR )"Export Frames" ),
                                 Child, exportAnimBtnCancel = SimpleButton ( ( IPTR )"Cancel" ),
@@ -324,9 +325,9 @@ void makeExportWindow ( )
             End,
         End,
     End;
-    
-    DoMethod ( 
-        exportWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, 
+
+    DoMethod (
+        exportWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
         ( IPTR )exportWindow, 2, MUIM_Set, MUIA_Window_Open
     );
     DoMethod (
@@ -337,7 +338,7 @@ void makeExportWindow ( )
         exportAnimBtnCancel, MUIM_Notify, MUIA_Pressed, FALSE,
         ( IPTR )exportWindow, 2, MUIM_Set, MUIA_Window_Open
     );
-    
+
     // Setup hook
     export_hook.h_Entry = ( HOOKFUNC )&export_func;
     DoMethod (
@@ -354,7 +355,7 @@ void makeExportWindow ( )
 void makeImportWindow ( )
 {
     static const char *imp_datatypes[] = { "RAW64", NULL };
-    
+
     importWindow = WindowObject,
         MUIA_Window_ScreenTitle, ( IPTR )"Import image",
         MUIA_Window_Title, ( IPTR )"Import image",
@@ -390,20 +391,20 @@ void makeImportWindow ( )
                 Child, HGroup,
                     Child, importBtnImport = SimpleButton ( ( IPTR )"Import" ),
                     Child, importBtnCancel = SimpleButton ( ( IPTR )"Cancel" ),
-                End,	
+                End,
             End,
         End,
     End;
-    
-    DoMethod ( 
-        importWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, 
+
+    DoMethod (
+        importWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
         ( IPTR )importWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
     DoMethod (
         importBtnCancel, MUIM_Notify, MUIA_Pressed, FALSE,
         ( IPTR )importWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
-    
+
     // Setup hook
     import_hook.h_Entry = ( HOOKFUNC )&import_func;
     DoMethod (
@@ -420,7 +421,7 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
     get ( exportAnimMethod, MUIA_Cycle_Active, &AnimMethod );
     get ( exportAnimRangeStart, MUIA_String_Integer, &FrameStart );
     get ( exportAnimRangeEnd, MUIA_String_Integer, &FrameEnd );
-    
+
     // Restrict the export frame range
     if ( FrameStart < 1 ) FrameStart = 1;
     if ( FrameEnd < 1 ) FrameEnd = 1;
@@ -432,7 +433,7 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
     }
     if ( FrameEnd > canv->totalFrames )
         FrameEnd = canv->totalFrames;
-    
+
     // One vertical strip
     if ( AnimMethod == 1 )
     {
@@ -443,17 +444,17 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
         int bufsize = framesize * framecount;
         int tmpFrame = canv->currentFrame;
         int offset = 0;
-        
+
         unsigned int *animBuf = NULL;
         // not enough mem?
         if ( ( animBuf = AllocVec ( bufsize, MEMF_ANY|MEMF_CLEAR ) ) == NULL )
             return;
-            
+
         int f = FrameStart; for ( ; f <= FrameEnd; f++ )
         {
             canv->currentFrame = f - 1;
             setActiveBuffer ( canv );
-            
+
             unsigned int *buf = NULL;
             if ( ( buf = generateExportableBuffer ( canv, AnimMode, datatype ) ) == 0 )
             {
@@ -461,23 +462,23 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
                 FreeVec ( animBuf );
                 return;
             }
-            
+
             // Copy pixels from buf to animbuf
             int i = 0; for ( ; i < framelength; i++ )
             {
                 animBuf[ offset + i ] = buf[ i ];
             }
             FreeVec ( buf );
-            
+
             offset += framelength;
         }
-        
+
         // Export with the JPEG datatype
         if ( datatype == 0 )
         {
-            exportDT ( 
-                canv->width, 
-                canv->height * framecount, animBuf, filename, "jpeg" 
+            exportDT (
+                canv->width,
+                canv->height * framecount, animBuf, filename, "jpeg"
             );
         }
         // Export with png export code
@@ -502,10 +503,10 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
             }
             else printf ( "Failed to save image raw..\n" );
         }
-        
+
         // Free memory
         FreeVec ( animBuf );
-        
+
         // Reset the currentframe to where it was
         canv->currentFrame = tmpFrame;
         setActiveBuffer ( canv );
@@ -516,19 +517,19 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
         // Make room for buffer
         int framesize = canv->width * canv->height * 4;
         int tmpFrame = canv->currentFrame;
-        
+
         unsigned int *buf = NULL;
-        
+
         int f = FrameStart; for ( ; f <= FrameEnd; f++ )
         {
             char *tmpFilename = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
             sprintf ( tmpFilename, "%s%d", filename, ( f - FrameStart + 1 ) );
-        
+
             canv->currentFrame = f - 1;
             setActiveBuffer ( canv );
-            
+
             buf = generateExportableBuffer ( canv, AnimMode, datatype );
-            
+
             // Export with the JPEG datatype
             if ( datatype == 0 )
             {
@@ -555,11 +556,11 @@ void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
                 }
                 else printf ( "Failed to save image raw..\n" );
             }
-            
+
             FreeVec ( tmpFilename );
             FreeVec ( buf );
         }
-        
+
         // Reset the currentframe to where it was
         canv->currentFrame = tmpFrame;
         setActiveBuffer ( canv );
@@ -571,9 +572,9 @@ void exportDT ( int w, int h, unsigned int *buffer, unsigned char *filename, con
     if ( filename != NULL )
     {
         // Generate a datatype object
-        Object *DTImage = NewDTObject ( 
-            ( APTR )NULL, 
-            DTA_SourceType, DTST_RAM, 
+        Object *DTImage = NewDTObject (
+            ( APTR )NULL,
+            DTA_SourceType, DTST_RAM,
             DTA_BaseName, ( IPTR )format,
             PDTA_DestMode, PMODE_V43,
             TAG_DONE
@@ -581,35 +582,35 @@ void exportDT ( int w, int h, unsigned int *buffer, unsigned char *filename, con
         // Return if this doesn't work
         if ( !DTImage )
             return;
-        
-        // Make a header 
+
+        // Make a header
         struct BitMapHeader *bmhdr;
         if ( !( GetDTAttrs ( DTImage, PDTA_BitMapHeader, ( IPTR )&bmhdr, TAG_DONE ) ) )
             return;
-        
+
         // Write the data in memory
         struct pdtBlitPixelArray dtObj;
-        
+
         dtObj.MethodID = PDTM_WRITEPIXELARRAY;
         dtObj.pbpa_PixelFormat = PBPAFMT_ARGB;
         dtObj.pbpa_PixelArrayMod = w;
         dtObj.pbpa_Left = 0;
         dtObj.pbpa_Width = w;
         dtObj.pbpa_Height = 1;
-        
+
         bmhdr->bmh_Width = w;
         bmhdr->bmh_Height = h;
         bmhdr->bmh_Depth = 24;
         bmhdr->bmh_PageWidth = 320;
         bmhdr->bmh_PageHeight = 240;
-        
+
         int y = 0; for ( ; y < h; y++ )
         {
             dtObj.pbpa_Top = y;
             dtObj.pbpa_PixelData = ( APTR )( buffer + ( y * w ) );
             DoMethodA ( DTImage, ( Msg )&dtObj );
         }
-        
+
         // Write the data to disk
         BPTR filehandle;
         if ( ( filehandle = Open ( filename, MODE_NEWFILE ) ) )
@@ -623,7 +624,7 @@ void exportDT ( int w, int h, unsigned int *buffer, unsigned char *filename, con
             DoMethodA ( DTImage, ( Msg )&dtwObj );
             Close ( filehandle );
         }
-        
+
         // Clean up
         DisposeDTObject ( DTImage );
     }
@@ -643,11 +644,11 @@ void exportPNG ( int w, int h, unsigned int *buffer, unsigned char *filename )
     png_infop   info_ptr;
     BPTR    		file;
     int         i;
-    
+
     // Create a write struct.
-    if ( !(png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL ) ) )	
+    if ( !(png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL ) ) )
         return;
-    
+
     // Create an info struct.
     if ( !( info_ptr = png_create_info_struct( png_ptr ) ) )
     {
@@ -655,34 +656,34 @@ void exportPNG ( int w, int h, unsigned int *buffer, unsigned char *filename )
         png_destroy_write_struct ( &png_ptr, ( png_infopp )NULL );
         return;
     }
-    
+
     // Open file for writing
     if ( ( file = Open ( filename, MODE_NEWFILE ) ) == NULL )
         return;
 
     // Register the write function.
     png_set_write_fn ( png_ptr, file, png_user_write, png_user_flush );
-    
+
     // Create the info header.
     png_set_IHDR (
-        png_ptr, info_ptr, w, h, 8, 
+        png_ptr, info_ptr, w, h, 8,
         PNG_COLOR_TYPE_RGBA,
-        PNG_INTERLACE_NONE, 
+        PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_DEFAULT,
-        PNG_FILTER_TYPE_DEFAULT 
+        PNG_FILTER_TYPE_DEFAULT
     );
-    
+
     // Write the info header.
     png_write_info ( png_ptr, info_ptr );
-    
+
     // Write image rows
     for ( i = 0; i < h ; i++ )
         png_write_row( png_ptr, ( png_bytep )&buffer[ i * w ] );
-    
+
     // Write file end and clean up
     png_write_end( png_ptr, info_ptr );
-    png_destroy_write_struct( &png_ptr, &info_ptr ); 
-    
+    png_destroy_write_struct( &png_ptr, &info_ptr );
+
     // Close file and done!
     Close ( file );
 }

@@ -2,6 +2,7 @@
 *                                                                           *
 * toolbox.c -- Lunapaint, http://www.sub-ether.org/lunapaint                *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -42,22 +43,22 @@ AROS_UFH3 ( void, getOpacMode_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     brushTool.opacitymode = XGET( tbxCycColorCtrl, MUIA_Cycle_Active );
-    
+
     AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( void, getFill_func, 
+AROS_UFH3 ( void, getFill_func,
     AROS_UFHA ( struct Hook *, h, A0 ),
     AROS_UFHA ( APTR, obj, A2 ),
     AROS_UFHA ( APTR, param, A1 )
 )
 {
     AROS_USERFUNC_INIT
-    
+
     GetDrawFillState ( );
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -68,9 +69,9 @@ AROS_UFH3 ( void, brushOptions_func,
 )
 {
     AROS_USERFUNC_INIT
-    
+
     int val = *( int *)param;
-    
+
     switch ( val )
     {
         case SET_ANTIALIAS:
@@ -96,7 +97,7 @@ AROS_UFH3 ( void, brushOptions_func,
         default: break;
     }
     DoMethod ( tbxAreaPalette, MUIM_AlterBrushShape );
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -131,15 +132,15 @@ void nextPaletteColor ( )
 IPTR tbxPaintPreview ( )
 {
     if ( !XGET( toolbox, MUIA_Window_Open ) ) return 0;
-    
+
     unsigned int w = XGET ( tbxAreaPreview, MUIA_Width );
     unsigned int h = XGET ( tbxAreaPreview, MUIA_Height );
     unsigned int t = XGET ( tbxAreaPreview, MUIA_TopEdge );
     unsigned int l = XGET ( tbxAreaPreview, MUIA_LeftEdge );
     unsigned int rectsize = w * h;
-    
+
     unsigned int bpw = h;
-    
+
     if ( PreviewRectData != NULL )
         FreeVec ( PreviewRectData );
     PreviewRectData = AllocVec ( rectsize * 4, MEMF_ANY );
@@ -147,17 +148,17 @@ IPTR tbxPaintPreview ( )
     {
         int x = i % w;
         int y = i / w;
-        
+
         // Draw brush
         if ( x >= 0 && x < bpw && y >= 0 && y < h && brushTool.buffer != NULL )
         {
             int offx = ( ( double )x / bpw ) * brushTool.width;
             int offy = ( ( double )y / h ) * brushTool.height;
-            
-            rgbaData rgba = canvasColorToRGBA ( 
+
+            rgbaData rgba = canvasColorToRGBA (
                 brushTool.buffer[ offy * brushTool.width + offx ]
             );
-            
+
             if ( rgba.a == 0 )
             {
                 PreviewRectData[ i ] = 0x000000;
@@ -165,7 +166,7 @@ IPTR tbxPaintPreview ( )
             else
             {
                 // Blend towards gray
-                rgba.r -= ( int )( ( double )( rgba.r ) / rgba.a );			
+                rgba.r -= ( int )( ( double )( rgba.r ) / rgba.a );
                 rgba.g -= ( int )( ( double )( rgba.g ) / rgba.a );
                 rgba.b -= ( int )( ( double )( rgba.b ) / rgba.a );
                 PreviewRectData[ i ] = rgba.r | ( rgba.g << 8 ) | ( rgba.b << 16 ) | 0;
@@ -174,12 +175,12 @@ IPTR tbxPaintPreview ( )
         else
             PreviewRectData[ i ] = 0x707070;
     }
-    
+
     // UPDATE
-    WritePixelArray ( 
+    WritePixelArray (
         PreviewRectData, 0, 0, w * 4, _rp ( tbxAreaPreview ), l, t, w, h, RECTFMT_RGBA
     );
-    
+
     return ( IPTR )NULL;
 }
 
@@ -189,20 +190,20 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
     {
         case MUIM_Draw:
             return ( IPTR )tbxPaletteRedraw ();
-        
+
         case MUIM_HandleInput:
             return ( IPTR )tbxPaletteThink ( ( struct MUIP_HandleInput* )message );
-            
+
         case MUIM_Setup:
             MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
-            return DoSuperMethodA ( CLASS, self, message );	
-        
+            return DoSuperMethodA ( CLASS, self, message );
+
         case MUIM_OpenPaletteEditor:
             set ( paletteWindow, MUIA_Window_Open, TRUE );
             break;
-        
+
         case MUIM_ClearActiveCanvas:
-            
+
             // Clear active canvas and redraw...
             if ( globalActiveCanvas != NULL )
             {
@@ -213,9 +214,9 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 DoMethod ( WidgetLayers, MUIM_Draw ); // <- force redraw
             }
             break;
-        
+
         case MUIM_SetPaintMode:
-            
+
             if ( 1 )
             {
                 LONG num = 0; get ( tbxCycPaintMode, MUIA_Cycle_Active, &num );
@@ -254,7 +255,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                     makeToolBrush ( );
             }
             break;
-        
+
         case MUIM_AlterBrushShape:
             {
                 // Get brushsize from toolbox and set it
@@ -264,14 +265,14 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 get ( tbxSlider_Brushopacity, MUIA_Numeric_Value, &tempOpacity );
                 get ( tbxSlider_Brushincrement, MUIA_Numeric_Value, &tempPower );
                 brushTool.step = XGET ( tbxSlider_Brushstep, MUIA_Numeric_Value );
-                
+
                 // Opacity and power always change
-                brushTool.opacity = tempOpacity; 
+                brushTool.opacity = tempOpacity;
                 brushTool.power = tempPower;
-                
+
                 // Alter size and start making a brush
-                brushTool.width = tempWidth; 
-                brushTool.height = tempHeight; 
+                brushTool.width = tempWidth;
+                brushTool.height = tempHeight;
                 makeToolBrush ( );
                 return ( IPTR )NULL;
             }
@@ -282,18 +283,18 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 int tempOpacity = 0, tempPower = 0;
                 get ( tbxSlider_Brushopacity, MUIA_Numeric_Value, &tempOpacity );
                 get ( tbxSlider_Brushincrement, MUIA_Numeric_Value, &tempPower );
-                brushTool.opacity = tempOpacity; 
+                brushTool.opacity = tempOpacity;
                 brushTool.power = tempPower;
                 return ( IPTR )NULL;
             }
             break;
         case MUIM_AlterBrushStep:
-            brushTool.step = XGET( tbxSlider_Brushstep, MUIA_Numeric_Value );	
+            brushTool.step = XGET( tbxSlider_Brushstep, MUIA_Numeric_Value );
             break;
-        
+
         case MUIM_SetGlobalGrid:
             {
-                int num = 0; 
+                int num = 0;
                 get ( tbxCycGrid, MUIA_Cycle_Active, &num );
                 if ( num == 0 )
                     globalGrid = 0;
@@ -301,7 +302,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                     globalGrid = 1;
             }
             break;
-            
+
         case MUIM_SetGridSize:
             {
                 int num = 0;
@@ -309,19 +310,19 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 globalCurrentGrid = num + 2;
             }
             break;
-            
+
         case MUIM_NewProject:
             {
                 int width = 0, height = 0, frames = 0;
                 get ( nwStringWidth, MUIA_String_Integer, &width );
                 get ( nwStringHeight, MUIA_String_Integer, &height );
                 get ( nwStringFrames, MUIA_String_Integer, &frames );
-                
+
                 // TODO: Add memory checks!!!
                 if ( width > 0 && height > 0 && frames > 0 )
                 {
                     // TODO: Could projectName remain used?
-                    addCanvaswindow ( width, height, 1, frames, TRUE ); 
+                    addCanvaswindow ( width, height, 1, frames, TRUE );
                     STRPTR txtbuf = ( STRPTR )NULL;
                     get ( nwStringPrjName, MUIA_String_Contents, &txtbuf );
                     set ( globalActiveWindow->win, MUIA_Window_Title, ( IPTR )txtbuf );
@@ -330,9 +331,9 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 }
             }
             break;
-            
+
         case MUIM_EffectOffset:
-            
+
             if ( globalActiveCanvas != NULL )
             {
                 int x = 0, y = 0;
@@ -343,7 +344,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
-        
+
         case MUIM_SetColorMode:
             {
                 int num = 0; get ( tbxCyc_PaletteSnap, MUIA_Cycle_Active, &num );
@@ -353,7 +354,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                     globalColorMode = LUNA_COLORMODE_SNAP;
             }
             break;
-        
+
         default:
             return DoSuperMethodA ( CLASS, self, message );
     }
@@ -364,13 +365,13 @@ BOOPSI_DISPATCHER_END
 IPTR tbxPaletteRedraw ( )
 {
     if ( !XGET ( toolbox, MUIA_Window_Open ) ) return 0;
-    
+
     int topedge = 0, leftedge = 0, w = 0, h = 0;
     get ( tbxAreaPalette, MUIA_TopEdge, &topedge );
     get ( tbxAreaPalette, MUIA_LeftEdge, &leftedge );
     get ( tbxAreaPalette, MUIA_Width, &w );
     get ( tbxAreaPalette, MUIA_Height, &h );
-    
+
     unsigned int *tmpRect = AllocVec ( 4 * ( w * h ), MEMF_ANY );
 
     // Set how broad each color rect is
@@ -386,8 +387,8 @@ IPTR tbxPaletteRedraw ( )
         int x = 0; for ( ; x < w; x++ )
         {
             int offset = ( ( y / segH ) * ( w / segW ) ) + ( x / segW );
-            if ( 
-                ( x >= x1 && x < x1 + segW && ( y == y1 || y == y1 + segH - 1 ) ) || 
+            if (
+                ( x >= x1 && x < x1 + segW && ( y == y1 || y == y1 + segH - 1 ) ) ||
                 ( y >= y1 && y < y1 + segH && ( x == x1 || x == x1 + ( int )segW ) )
             )
             {
@@ -401,24 +402,24 @@ IPTR tbxPaletteRedraw ( )
         }
     }
 
-    WritePixelArray ( 
-        tmpRect, 0, 0, w * 4, 
-        _rp ( tbxAreaPalette ), leftedge, topedge, w, h, 
-        RECTFMT_RGBA 
+    WritePixelArray (
+        tmpRect, 0, 0, w * 4,
+        _rp ( tbxAreaPalette ), leftedge, topedge, w, h,
+        RECTFMT_RGBA
     );
-    
+
     FreeVec ( tmpRect );
-    
+
     // Set color
     globalColor = globalPalette[ currColor ];
-    
+
     return ( IPTR )NULL;
 }
 
 IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
 {
     if ( !XGET ( toolbox, MUIA_Window_Open ) ) return 0;
-    
+
     int topedge = 0, leftedge = 0, w = 0, h = 0;
     get ( tbxAreaPalette, MUIA_TopEdge, &topedge );
     get ( tbxAreaPalette, MUIA_LeftEdge, &leftedge );
@@ -434,7 +435,7 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
         switch ( msg->imsg->Class )
         {
             case IDCMP_MOUSEBUTTONS:
-                if ( 
+                if (
                     ( int )msg->imsg->MouseX - leftedge >= 0 &&
                     ( int )msg->imsg->MouseX - leftedge < w &&
                     ( int )msg->imsg->MouseY - topedge >= 0 &&
@@ -447,15 +448,15 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
                     int x = msg->imsg->MouseX - leftedge;
                     float wu = w / 16;
                     int segh = h / 16;
-                    
+
                     currColor = ( 16 * ( y / segh ) ) + ( x / wu );
-                    tbxPaletteRedraw ( ); 
+                    tbxPaletteRedraw ( );
                     DoMethod ( paletteRect, MUIM_Draw );
-                    
-                    // If we are using normal brushes, make a new 
+
+                    // If we are using normal brushes, make a new
                     // brush with the new color
                     if ( globalBrushMode == 0 ) makeToolBrush ( );
-                        
+
                     if ( msg->imsg->Code == SELECTDOWN )
                     {
                         // On singleclick, make double click possible
@@ -470,11 +471,11 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
                             tbxPaletteClickMode = 0;
                             mouseClickCount = 0;
                             set ( paletteWindow, MUIA_Window_Open, TRUE );
-                        }	
+                        }
                     }
                 }
                 break;
-            
+
             default: break;
         }
     }
@@ -483,26 +484,26 @@ IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
 
 
 void Init_ToolboxWindow ( )
-{	
+{
     // Palette widget
-    struct MUI_CustomClass *mcc = MUI_CreateCustomClass ( 
+    struct MUI_CustomClass *mcc = MUI_CreateCustomClass (
         NULL, MUIC_Rectangle, NULL, 0, &tbxPalette
     );
-    
+
     // Brush preview widget
     struct MUI_CustomClass *mcc_preview = MUI_CreateCustomClass (
         NULL, MUIC_Rectangle, NULL, 0, &tbxPreview
     );
-    
+
     static const char *arr_fillmode[] = { "Draw", "Fill", "Both", NULL };
     static const char *arr_colorctrl[] = { "Add", "Lock", NULL };
     static const char *arr_grid[] = { "Grid off", "Grid on", NULL };
     static const char *arr_grdz[] = { "2", "3", "4", "5", "6", "7", "8", "9", "10", NULL };
-    static const char *arr_drawmodes[] = { 
-        "Normal", "Color", "Blur", "Smudge", "Lighten", "Darken", "Colorize", "Erase", "Unerase", NULL 
+    static const char *arr_drawmodes[] = {
+        "Normal", "Color", "Blur", "Smudge", "Lighten", "Darken", "Colorize", "Erase", "Unerase", NULL
     };
     static const char *arr_pltsnap[] = { "64-bit", "Palette", NULL };
-    
+
     offsetWindow = WindowObject,
         MUIA_Window_Title, ( IPTR )"Set layer offset",
         MUIA_Window_ScreenTitle, ( IPTR )"Set layer offset",
@@ -546,7 +547,7 @@ void Init_ToolboxWindow ( )
             End,
         End,
     End;
-    
+
     // The toolbox
     toolbox = WindowObject,
         MUIA_Window_Title, ( IPTR )"Toolbox",
@@ -577,7 +578,7 @@ void Init_ToolboxWindow ( )
                                 MUIA_Group_VertSpacing, 0,
                                 Child, ( IPTR )HGroup,
                                     MUIA_Group_HorizSpacing, 0,
-                                    Child, ( IPTR )( tbxBtn_draw = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_draw = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -585,7 +586,7 @@ void Init_ToolboxWindow ( )
                                             MUIA_Frame, MUIV_Frame_None,
                                         End,
                                     End ),
-                                    Child, ( IPTR )( tbxBtn_line = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_line = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -593,7 +594,7 @@ void Init_ToolboxWindow ( )
                                             MUIA_Frame, MUIV_Frame_None,
                                         End,
                                     End ),
-                                    Child, ( IPTR )( tbxBtn_rectangle = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_rectangle = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -601,7 +602,7 @@ void Init_ToolboxWindow ( )
                                             MUIA_Frame, MUIV_Frame_None,
                                         End,
                                     End ),
-                                    Child, ( IPTR )( tbxBtn_circle = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_circle = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -612,7 +613,7 @@ void Init_ToolboxWindow ( )
                                 End,
                                 Child, ( IPTR )HGroup,
                                     MUIA_Group_HorizSpacing, 0,
-                                    Child, ( IPTR )( tbxBtn_polygon = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_polygon = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -620,7 +621,7 @@ void Init_ToolboxWindow ( )
                                             MUIA_Frame, MUIV_Frame_None,
                                         End,
                                     End ),
-                                    Child, ( IPTR )( tbxBtn_fill = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_fill = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -628,7 +629,7 @@ void Init_ToolboxWindow ( )
                                             MUIA_Frame, MUIV_Frame_None,
                                         End,
                                     End ),
-                                    Child, ( IPTR )( tbxBtn_getbrush = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_getbrush = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -636,7 +637,7 @@ void Init_ToolboxWindow ( )
                                             MUIA_Frame, MUIV_Frame_None,
                                         End,
                                     End ),
-                                    Child, ( IPTR )( tbxBtn_pickcolor = HGroup,    
+                                    Child, ( IPTR )( tbxBtn_pickcolor = HGroup,
                                         MUIA_Frame, MUIV_Frame_Button,
                                         MUIA_InputMode, MUIV_InputMode_RelVerify,
                                         Child, ImageObject,
@@ -658,7 +659,7 @@ void Init_ToolboxWindow ( )
                                 MUIA_Weight, 64,
                                 Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Brushsize:", End,
                                 Child, ( IPTR )( tbxSlider_Brushdiameter = SliderObject,
-                                    MUIA_Numeric_Min, 1, 
+                                    MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 100,
                                     MUIA_Numeric_Value, 1,
                                 End ),
@@ -666,7 +667,7 @@ void Init_ToolboxWindow ( )
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 32,
                                 Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Step:", End,
-                                Child, ( IPTR )( tbxSlider_Brushstep = SliderObject, 
+                                Child, ( IPTR )( tbxSlider_Brushstep = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 50,
                                     MUIA_Numeric_Value, 1,
@@ -677,7 +678,7 @@ void Init_ToolboxWindow ( )
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 64,
                                 Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Opacity:", End,
-                                Child, ( IPTR )( tbxSlider_Brushopacity = SliderObject, 
+                                Child, ( IPTR )( tbxSlider_Brushopacity = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 255,
                                     MUIA_Numeric_Value, 255,
@@ -686,7 +687,7 @@ void Init_ToolboxWindow ( )
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 32,
                                 Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Power:", End,
-                                Child, ( IPTR )( tbxSlider_Brushincrement = SliderObject, 
+                                Child, ( IPTR )( tbxSlider_Brushincrement = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 100,
                                     MUIA_Numeric_Value, 100,
@@ -747,8 +748,8 @@ void Init_ToolboxWindow ( )
                                 End,
                                 Child, ( IPTR )HGroup,
                                     MUIA_Weight, 25,
-                                    Child, ( IPTR )( 
-                                        antiImage = HGroup,    
+                                    Child, ( IPTR )(
+                                        antiImage = HGroup,
                                             MUIA_Frame, MUIV_Frame_Button,
                                             MUIA_InputMode, MUIV_InputMode_RelVerify,
                                             Child, ImageObject,
@@ -757,8 +758,8 @@ void Init_ToolboxWindow ( )
                                             End,
                                         End
                                     ),
-                                    Child, ( IPTR )( 
-                                        antiOffImage = HGroup,    
+                                    Child, ( IPTR )(
+                                        antiOffImage = HGroup,
                                             MUIA_Frame, MUIV_Frame_Button,
                                             MUIA_InputMode, MUIV_InputMode_RelVerify,
                                             Child, ImageObject,
@@ -770,8 +771,8 @@ void Init_ToolboxWindow ( )
                                 End,
                                 Child, ( IPTR )HGroup,
                                     MUIA_Weight, 25,
-                                    Child, ( IPTR )( 
-                                        featherImage = HGroup,    
+                                    Child, ( IPTR )(
+                                        featherImage = HGroup,
                                             MUIA_Frame, MUIV_Frame_Button,
                                             MUIA_InputMode, MUIV_InputMode_RelVerify,
                                             Child, ImageObject,
@@ -780,15 +781,15 @@ void Init_ToolboxWindow ( )
                                             End,
                                         End
                                     ),
-                                    Child, ( IPTR )( 
-                                        solidImage  = HGroup,    
+                                    Child, ( IPTR )(
+                                        solidImage  = HGroup,
                                             MUIA_Frame, MUIV_Frame_Button,
                                             MUIA_InputMode, MUIV_InputMode_RelVerify,
                                             Child, ImageObject,
                                                 MUIA_Image_Spec, ( IPTR )"3:Lunapaint:data/solid.png",
                                                 MUIA_Frame, MUIV_Frame_None,
                                             End,
-                                        End 
+                                        End
                                     ),
                                 End,
                             End,
@@ -833,11 +834,11 @@ void Init_ToolboxWindow ( )
     // Move to left edge of screen (todo: improve this!)
     int toolboxWidth = 0; get ( toolbox, MUIA_Window_Width, &toolboxWidth );
     set ( toolbox, MUIA_Window_LeftEdge, ( lunaPubScreen->Width - toolboxWidth ) );
-    
+
     // set buttons
     set ( antiImage, MUIA_Background, MUII_FILL );
     set ( featherImage, MUIA_Background, MUII_FILL );
-    
+
     // Set initial gridsize
     set ( tbxCyc_GridSize, MUIA_Cycle_Active, 8 );
     globalCurrentGrid = 10;
@@ -856,9 +857,9 @@ void Init_ToolboxMethods ( )
     brushOptions_hook.h_Entry = ( HOOKFUNC )&brushOptions_func;
     getFill_hook.h_Entry = ( HOOKFUNC )&getFill_func;
     getOpacMode_hook.h_Entry = ( HOOKFUNC )&getOpacMode_func;
-    
+
     // Methods
-    DoMethod ( 
+    DoMethod (
         antiImage, MUIM_Notify, MUIA_Pressed, TRUE,
         antiImage, 3, MUIM_CallHook, &brushOptions_hook, SET_ANTIALIAS
     );
@@ -866,117 +867,117 @@ void Init_ToolboxMethods ( )
         antiOffImage, MUIM_Notify, MUIA_Pressed, TRUE,
         antiOffImage, 3, MUIM_CallHook, &brushOptions_hook, SET_ANTIALIASOFF
     );
-    DoMethod ( 
+    DoMethod (
         featherImage, MUIM_Notify, MUIA_Pressed, FALSE,
         featherImage, 3, MUIM_CallHook, &brushOptions_hook, SET_FEATHERED
     );
-    DoMethod ( 
+    DoMethod (
         solidImage, MUIM_Notify, MUIA_Pressed, FALSE,
         solidImage, 3, MUIM_CallHook, &brushOptions_hook, SET_FEATHEREDOFF
     );
-    DoMethod ( 
+    DoMethod (
         tbxCycColorCtrl, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         tbxCycColorCtrl, 2, MUIM_CallHook, &getOpacMode_hook
-    );	
-    
+    );
+
     /*
         Draw tools and bubble help
     */
-    DoMethod ( 
-        tbxBtn_draw, MUIM_Notify, 
+    DoMethod (
+        tbxBtn_draw, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_Draw
     );
     DoMethod ( tbxBtn_draw, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Draw" );
-    
-    DoMethod ( 
-        tbxBtn_fill, MUIM_Notify, 
+
+    DoMethod (
+        tbxBtn_fill, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_Fill
     );
     DoMethod ( tbxBtn_fill, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Flood fill" );
-    
+
     DoMethod (
         tbxBtn_line, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_Line
     );
     DoMethod ( tbxBtn_line, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Line" );
-    
-    DoMethod ( 
-        tbxBtn_rectangle, MUIM_Notify, 
+
+    DoMethod (
+        tbxBtn_rectangle, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_Rectangle
     );
     DoMethod ( tbxBtn_rectangle, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Rectangle" );
-    
-    DoMethod ( 
-        tbxBtn_circle, MUIM_Notify, 
+
+    DoMethod (
+        tbxBtn_circle, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_Circle
     );
     DoMethod ( tbxBtn_circle, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Circle" );
-    
-    DoMethod ( 
-        tbxBtn_getbrush, MUIM_Notify, 
+
+    DoMethod (
+        tbxBtn_getbrush, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_ClipBrush
     );
     DoMethod ( tbxBtn_getbrush, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Cut out brush" );
-    
+
     DoMethod (
         tbxBtn_pickcolor, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_SetTool_Colorpicker
     );
     DoMethod ( tbxBtn_pickcolor, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Pick color" );
-    
+
     /*
         Other
     */
-    DoMethod ( 
+    DoMethod (
         tbxSlider_Brushdiameter, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_AlterBrushShape
     );
-    DoMethod ( 
+    DoMethod (
         tbxSlider_Brushopacity, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_AlterBrushStrength
     );
-    DoMethod ( 
+    DoMethod (
         tbxSlider_Brushincrement, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_AlterBrushStrength
     );
-    DoMethod ( 
+    DoMethod (
         tbxSlider_Brushstep, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_AlterBrushStep
     );
-    
+
     DoMethod (
         offsetWindowOk, MUIM_Notify, MUIA_Pressed, FALSE,
         tbxAreaPalette, 1, MUIM_EffectOffset
     );
-    
+
     DoMethod (
         tbxCyc_PaletteSnap, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_SetColorMode
     );
-    
+
     // When you access the menu
     DoMethod (
         PaintApp, MUIM_Notify, MUIA_Application_MenuAction, MUIV_EveryTime,
         ( IPTR )toolbox, 3, MUIM_CallHook, ( IPTR )&getMenu_hook, MUIV_EveryTime
     );
-    
+
     DoMethod (
         tbxCycPaintMode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_SetPaintMode
     );
     DoMethod (
-        tbxCycGrid, MUIM_Notify, 
+        tbxCycGrid, MUIM_Notify,
         MUIA_Cycle_Active, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_SetGlobalGrid
     );
@@ -984,24 +985,24 @@ void Init_ToolboxMethods ( )
         tbxCyc_GridSize, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         tbxAreaPalette, 1, MUIM_SetGridSize
     );
-    
+
     // Offset window
     DoMethod (
         offsetWindowCancel, MUIM_Notify, MUIA_Pressed, FALSE,
         offsetWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
-    DoMethod ( 
+    DoMethod (
         offsetWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
         offsetWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
-    
+
     // Fill state
-    DoMethod ( 
+    DoMethod (
         tbxCycFillmode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         tbxCycFillmode, 2, MUIM_CallHook, &getFill_hook
     );
-    
-    
+
+
     // Set default brush options and update the brush
     brushTool.antialias = 1;
     brushTool.feather = 1;
@@ -1021,12 +1022,12 @@ void checkMenuEvents ( int udata )
             if ( 1 )
             {
                 char *filename = getFilename ( );
-                if ( filename != NULL ) 
+                if ( filename != NULL )
                     LoadProject ( filename, FALSE );
                 if ( filename != NULL ) FreeVec ( filename );
             }
             break;
-    
+
         case 594:
             // Load datatype image
             if ( loadDatatypeImage ( ) )
@@ -1037,35 +1038,35 @@ void checkMenuEvents ( int udata )
                 DoMethod ( globalActiveWindow->area, MUIM_Redraw, NULL );
             }
             break;
-    
+
         case 595:
             // Revert
             if ( globalActiveCanvas != NULL && globalActiveWindow != NULL )
             {
                 int currentFrame = globalActiveCanvas->currentFrame;
                 int currentLayer = globalActiveCanvas->currentLayer;
-                
+
                 if ( globalActiveWindow->filename == NULL )
                     globalActiveWindow->filename = getFilename ( );
                 if ( globalActiveWindow->filename != NULL )
                     LoadProject ( globalActiveWindow->filename, TRUE );
-                else 
+                else
                     return;
-                    
-                if ( globalActiveCanvas->totalFrames <= currentFrame ) 
+
+                if ( globalActiveCanvas->totalFrames <= currentFrame )
                     currentFrame = globalActiveCanvas->totalFrames - 1;
                 globalActiveCanvas->currentFrame = currentFrame;
-                if ( globalActiveCanvas->totalLayers <= currentLayer ) 
+                if ( globalActiveCanvas->totalLayers <= currentLayer )
                     currentLayer = globalActiveCanvas->totalLayers - 1;
                 globalActiveCanvas->currentLayer = currentLayer;
-                
+
                 setActiveBuffer ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                
+
                 DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
-            
+
         case 598:
             // Save
             if ( globalActiveWindow != NULL )
@@ -1076,7 +1077,7 @@ void checkMenuEvents ( int udata )
                     SaveProject ( globalActiveWindow );
             }
             break;
-    
+
         case 596:
             // Save AS
             if ( globalActiveWindow != NULL )
@@ -1091,17 +1092,17 @@ void checkMenuEvents ( int udata )
                 checkMenuEvents ( 598 );
             }
             break;
-            
+
         case 599:
             set ( nwWindow, MUIA_Window_Open, TRUE );
             keyboardEnabled = FALSE;
             break;
-            
+
         case 600:
             if ( globalActiveCanvas != NULL )
                 set ( importWindow, MUIA_Window_Open, TRUE );
             break;
-        
+
         /* Export */
         case 601:
             if ( globalActiveCanvas != NULL )
@@ -1109,43 +1110,43 @@ void checkMenuEvents ( int udata )
                 set ( exportWindow, MUIA_Window_Open, TRUE );
             }
             break;
-            
+
         case 602:
             set ( aboutWindow, MUIA_Window_Open, TRUE );
             break;
-            
+
         case 604:
             if ( globalActiveWindow != NULL )
             {
                 set ( globalActiveWindow->projectWin, MUIA_Window_Open, TRUE );
             }
             break;
-            
+
         case 700:
             DoMethod (
                 PaintApp, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
             );
             break;
-            
+
         case 730:
             DoMethod ( globalActiveWindow->area, MUIM_ZoomIn );
             break;
-            
+
         case 731:
             DoMethod ( globalActiveWindow->area, MUIM_ZoomOut );
             break;
-        
+
         case 732:
             DoMethod ( globalActiveWindow->area, MUIM_ShowAll );
             break;
-        
+
         case 740:
             if ( globalActiveCanvas != NULL )
             {
                 copyToSwap ( globalActiveCanvas );
             }
             break;
-            
+
         case 741:
             if ( globalActiveCanvas != NULL )
             {
@@ -1158,14 +1159,14 @@ void checkMenuEvents ( int udata )
                 DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
-            
+
         case 742:
             if ( globalActiveWindow != NULL )
             {
                 set ( offsetWindow, MUIA_Window_Open, TRUE );
             }
             break;
-            
+
         case 743:
             if ( globalActiveCanvas != NULL )
             {
@@ -1174,7 +1175,7 @@ void checkMenuEvents ( int udata )
                 DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
-            
+
         case 744:
             if ( globalActiveCanvas != NULL )
             {
@@ -1183,127 +1184,127 @@ void checkMenuEvents ( int udata )
                 DoMethod ( globalActiveWindow->area, MUIM_Redraw );
             }
             break;
-        
+
         case 745:
             if ( globalActiveCanvas != NULL )
             {
                 DoMethod ( tbxAreaPalette, MUIM_ClearActiveCanvas );
             }
             break;
-    
+
         // next palette color
         case 746:
             nextPaletteColor ( );
             break;
-        
+
         // prev palette color
         case 747:
             prevPaletteColor ( );
             break;
-            
+
         // Flip brush vert
         case 748:
             flipBrushVert ( );
             break;
-            
+
         // Flip brush vert
         case 749:
             flipBrushHoriz ( );
             break;
-        
+
         // Rotate brush 90 degrees
         case 751:
             rotateBrush90 ( );
             break;
-    
+
         // Palette editor
         case 750:
             set ( paletteWindow, MUIA_Window_Open, TRUE );
             break;
-    
-        // The text to brush window 
+
+        // The text to brush window
         case 755:
             set ( textToBrushWindow, MUIA_Window_Open, TRUE );
             break;
-    
-        // Paint modes 
-    
+
+        // Paint modes
+
         case 800:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 0 );
             break;
-        
+
         case 801:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 6 );
             break;
-        
+
         case 802:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 7 );
             break;
-        
+
         case 807:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 8 );
             break;
-            
+
         case 803:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 3 );
             break;
-            
+
         case 804:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 4 );
             break;
-        
+
         case 805:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 5 );
             break;
-            
+
         case 806:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 2 );
             break;
-        
+
         case 808:
             set ( tbxCycPaintMode, MUIA_Cycle_Active, 1 );
             break;
-            
+
         /* Paint tools */
-            
+
         case 850:
             DoMethod ( paletteRect, MUIM_SetTool_Draw );
             break;
-        
+
         case 851:
             DoMethod ( paletteRect, MUIM_SetTool_Line );
             break;
-            
+
         case 852:
             DoMethod ( paletteRect, MUIM_SetTool_Fill );
             break;
-        
+
         case 853:
             DoMethod ( paletteRect, MUIM_SetTool_Rectangle );
             break;
-        
+
         case 855:
             DoMethod ( paletteRect, MUIM_SetTool_Circle );
             break;
-        
+
         case 854:
             DoMethod ( paletteRect, MUIM_SetTool_ClipBrush );
             break;
-        
+
         case 856:
             DoMethod ( paletteRect, MUIM_SetTool_Colorpicker );
             break;
-        
+
         /* Animation */
-            
+
         case 820:
             DoMethod ( WidgetLayers, MUIM_NextFrame );
             break;
-        
+
         case 821:
             DoMethod ( WidgetLayers, MUIM_PrevFrame );
             break;
-            
+
         case 825:
             {
                 int num = 0;
@@ -1311,9 +1312,9 @@ void checkMenuEvents ( int udata )
                 set (	CycleOnionSkin, MUIA_Cycle_Active, ( num == 0 ) ? 1 : 0 );
             }
             break;
-            
+
         /* Windows */
-        
+
         case 400:
             {
                 BOOL opened = FALSE;
@@ -1324,7 +1325,7 @@ void checkMenuEvents ( int udata )
                     set ( WindowAnimation, MUIA_Window_Open, TRUE );
             }
             break;
-            
+
         case 401:
             {
                 BOOL opened = FALSE;
@@ -1335,7 +1336,7 @@ void checkMenuEvents ( int udata )
                     set ( WindowLayers, MUIA_Window_Open, TRUE );
             }
             break;
-            
+
         case 402:
             {
                 if ( !fullscreenEditing )
@@ -1348,13 +1349,13 @@ void checkMenuEvents ( int udata )
                     hideFullscreenWindow ( );
                 }
             }
-            break;  
-          
+            break;
+
         // Program preferences
         case 900:
             set ( PrefsWindow, MUIA_Window_Open, TRUE );
             break;
-        
+
         default:
             break;
     }
@@ -1364,39 +1365,39 @@ void setToolbarActive ( )
 {
     // Draw:
     if ( globalCurrentTool == LUNA_TOOL_BRUSH )
-        set ( tbxBtn_draw, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_draw, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_draw, MUIA_Background, MUII_ButtonBack ); 
-    
+        set ( tbxBtn_draw, MUIA_Background, MUII_ButtonBack );
+
     if ( globalCurrentTool == LUNA_TOOL_FILL )
-        set ( tbxBtn_fill, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_fill, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_fill, MUIA_Background, MUII_ButtonBack ); 
-    
+        set ( tbxBtn_fill, MUIA_Background, MUII_ButtonBack );
+
     if ( globalCurrentTool == LUNA_TOOL_LINE )
-        set ( tbxBtn_line, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_line, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_line, MUIA_Background, MUII_ButtonBack ); 
-        
+        set ( tbxBtn_line, MUIA_Background, MUII_ButtonBack );
+
     if ( globalCurrentTool == LUNA_TOOL_RECTANGLE )
-        set ( tbxBtn_rectangle, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_rectangle, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_rectangle, MUIA_Background, MUII_ButtonBack ); 
-        
+        set ( tbxBtn_rectangle, MUIA_Background, MUII_ButtonBack );
+
     if ( globalCurrentTool == LUNA_TOOL_CIRCLE )
-        set ( tbxBtn_circle, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_circle, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_circle, MUIA_Background, MUII_ButtonBack ); 
-        
+        set ( tbxBtn_circle, MUIA_Background, MUII_ButtonBack );
+
     if ( globalCurrentTool == LUNA_TOOL_CLIPBRUSH )
-        set ( tbxBtn_getbrush, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_getbrush, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_getbrush, MUIA_Background, MUII_ButtonBack ); 
-    
+        set ( tbxBtn_getbrush, MUIA_Background, MUII_ButtonBack );
+
     if ( globalCurrentTool == LUNA_TOOL_COLORPICKER )
-        set ( tbxBtn_pickcolor, MUIA_Background, MUII_FILL ); 
+        set ( tbxBtn_pickcolor, MUIA_Background, MUII_FILL );
     else
-        set ( tbxBtn_pickcolor, MUIA_Background, MUII_ButtonBack ); 
+        set ( tbxBtn_pickcolor, MUIA_Background, MUII_ButtonBack );
 }
 
 void GetDrawFillState ( )

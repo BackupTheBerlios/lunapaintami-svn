@@ -2,6 +2,7 @@
 *                                                                           *
 * main.c -- Lunapaint, http://www.sub-ether.org/lunapaint                   *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -43,7 +44,7 @@
 char *Version = VERSIONSTRING;
 
 void doEvents ( )
-{       
+{
     // Go through events
     if ( globalActiveWindow->isActive )
     {
@@ -54,33 +55,33 @@ void doEvents ( )
             BOOL response = FALSE;
             switch ( globalCurrentTool )
             {
-                case LUNA_TOOL_BRUSH:		
+                case LUNA_TOOL_BRUSH:
                     response = toolBrush ( );
-                    break;	
-                case LUNA_TOOL_FILL:		
-                    response = toolFill ( );				
                     break;
-                case LUNA_TOOL_LINE:		
-                    response = toolLine ( );				
+                case LUNA_TOOL_FILL:
+                    response = toolFill ( );
                     break;
-                case LUNA_TOOL_RECTANGLE:		
-                    response = toolRectangle ( );				
+                case LUNA_TOOL_LINE:
+                    response = toolLine ( );
                     break;
-                case LUNA_TOOL_CIRCLE:		
-                    response = toolCircle ( );				
+                case LUNA_TOOL_RECTANGLE:
+                    response = toolRectangle ( );
                     break;
-                case LUNA_TOOL_CLIPBRUSH:		
-                    response = toolClipBrush ( );				
+                case LUNA_TOOL_CIRCLE:
+                    response = toolCircle ( );
                     break;
-                case LUNA_TOOL_COLORPICKER:		
-                    response = toolColorPicker ( );				
+                case LUNA_TOOL_CLIPBRUSH:
+                    response = toolClipBrush ( );
+                    break;
+                case LUNA_TOOL_COLORPICKER:
+                    response = toolColorPicker ( );
                     break;
                 default:
                     break;
             }
             if ( response )
                 MouseHasMoved = FALSE;
-        }		
+        }
         // Show outline of tool
         callToolPreview ( );
     }
@@ -92,21 +93,21 @@ int main ( int argc, char *argv[] )
     ULONG sigs;
     globalEvents = -1;
     globalCurrentTool = LUNA_TOOL_BRUSH;
-    
+
     // Init brush
     brushTool.antialias = TRUE; // TODO: load from config set toolbox cycle!
     brushTool.width = 1;
     brushTool.height = 1;
     brushTool.feather = TRUE; // TODO: load from config and set toolbox cycle!
-    
+
     // Set the colors
     prevColor = 0;
     currColor = 0;
     globalColor = 0;
-    
+
     BOOL keyIsDown = FALSE;
     keyboardEnabled = TRUE;
-    
+
     // Starts up the application
     Init_Application ( );
 
@@ -115,8 +116,8 @@ int main ( int argc, char *argv[] )
     {
         // Check for signals from GUI
         if ( checkSignalBreak ( &sigs ) )
-            break;	
-            
+            break;
+
         if ( keyboardEnabled )
         {
             // Execute keyboard events on key press
@@ -132,23 +133,23 @@ int main ( int argc, char *argv[] )
         // We always register keyup strokes
         if ( evalRawKey & IECODE_UP_PREFIX )
             keyIsDown = FALSE;
-            
+
         // Execute pending events
         if ( globalActiveWindow && globalActiveCanvas )
             doEvents ( );
-        
+
         // Reset events
         globalEvents = -1;
-        
+
         // Mouse clicks
         if ( mouseClickCount > 0 ) mouseClickCount--;
-            
+
         // Delayed canvas redraw
         if ( redrawTimes == 1 )
         {
             if ( globalActiveWindow )
                 DoMethod ( globalActiveWindow->area, MUIM_Draw );
-            redrawTimes--;       
+            redrawTimes--;
         }
         if ( redrawTimes > 0 ) redrawTimes--;
     }

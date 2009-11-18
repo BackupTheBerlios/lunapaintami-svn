@@ -2,6 +2,7 @@
 *                                                                           *
 * effects.c -- Lunapaint, http://www.sub-ether.org/lunapaint                *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -24,40 +25,40 @@
 void effectOffset ( int x, int y, oCanvas *canvas )
 {
     unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
-    
+
     unsigned long long int *buf = canvas->activebuffer;
-    
-    int cy, cx, offy, offx; 
-    
+
+    int cy, cx, offy, offx;
+
     // Y pass
-    
+
     for ( cy = 0; cy < canvas->height; cy++ )
     {
         offy = ( cy + y ) % canvas->height;
         memcpy ( &buffer[ offy * canvas->width ], &buf[ cy * canvas->width ], canvas->width * 8 );
     }
-    
+
     // Copy back
-    
+
     memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-    
+
     // X pass
-    
+
     for ( cy = 0; cy < canvas->height; cy++ )
     {
         int dataoffy = cy * canvas->width;
-        
+
         for ( cx = 0; cx < canvas->width; cx++ )
         {
             offx = ( cx + x ) % canvas->width;
             buffer[ dataoffy + offx ] = buf[ dataoffy + cx ];
         }
     }
-    
+
     // Copy back
-    
+
     memcpy ( buf, buffer, canvas->width * canvas->height * 8 );
-    
+
     FreeVec ( buffer );
 }
 

@@ -2,6 +2,7 @@
 *                                                                           *
 * preferences.c -- Lunapaint, http://www.sub-ether.org/lunapaint            *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -33,7 +34,7 @@ AROS_UFH3 ( void, PrefsHandler_func,
     set ( PrefsWindow, MUIA_Window_Open, FALSE );
 
     BOOL save = *( BOOL *)param;
-    
+
     int screenchoice = XGET ( PrefsCycScrType, MUIA_Cycle_Active );
     if ( screenchoice != GlobalPrefs.ScreenmodeType )
     {
@@ -51,13 +52,13 @@ AROS_UFH3 ( void, PrefsHandler_func,
         InitLunaScreen ( );
         ReopenWindows ( );
     }
-    
+
     // View
     GlobalPrefs.LayerBackgroundMode = XGET ( PrefsLayBackMode, MUIA_Cycle_Active );
-    
+
     if ( save == 1 )
         savePreferences ( );
-    
+
     AROS_USERFUNC_EXIT
 }
 
@@ -94,21 +95,21 @@ void Init_PrefsWindow ( )
                     End ),
                 End,
             End,
-            Child, ( IPTR )HGroup,	
+            Child, ( IPTR )HGroup,
                 Child, ( IPTR )( PrefsBtnSave = SimpleButton ( "Save" ) ),
                 Child, ( IPTR )( PrefsBtnUse = SimpleButton ( "Use" ) ),
                 Child, ( IPTR )( PrefsBtnCancel = SimpleButton ( "Cancel" ) ),
             End,
         End,
     End;
-    
+
     PrefsHandler_hook.h_Entry = ( HOOKFUNC )&PrefsHandler_func;
-    
+
     // Setting the prefs visible in the gui
     set ( PrefsCycScrType, MUIA_Cycle_Active, ( IPTR )GlobalPrefs.ScreenmodeType );
     set ( PrefsLayBackMode, MUIA_Cycle_Active, ( IPTR )GlobalPrefs.LayerBackgroundMode );
-    
-    DoMethod ( 
+
+    DoMethod (
         PrefsWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
         PrefsWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
@@ -117,45 +118,45 @@ void Init_PrefsWindow ( )
         PrefsWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
     DoMethod (
-        PrefsBtnUse, MUIM_Notify, MUIA_Pressed, FALSE, 
+        PrefsBtnUse, MUIM_Notify, MUIA_Pressed, FALSE,
         PrefsBtnUse, 3, MUIM_CallHook, &PrefsHandler_hook, FALSE
     );
     DoMethod (
-        PrefsBtnSave, MUIM_Notify, MUIA_Pressed, FALSE, 
-        PrefsBtnSave, 3, MUIM_CallHook, &PrefsHandler_hook, TRUE 
+        PrefsBtnSave, MUIM_Notify, MUIA_Pressed, FALSE,
+        PrefsBtnSave, 3, MUIM_CallHook, &PrefsHandler_hook, TRUE
     );
-    
+
 }
 
 BOOL savePreferences ( )
 {
-    struct PrefHeader head = { 0 }; 
+    struct PrefHeader head = { 0 };
     struct IFFHandle *handle;
     BOOL result = FALSE;
-    BPTR filehandle = NULL;	
-    
+    BPTR filehandle = NULL;
+
     if ( ( filehandle = Open ( "Lunapaint:lunapaint.prefs", MODE_NEWFILE ) ) == NULL )
         return FALSE;
-        
+
     if ( !( handle = AllocIFF() ) )
     {
         goto prefs_save_ending;
     }
-        
+
     handle->iff_Stream = ( IPTR )filehandle;
-    
+
     InitIFFasDOS( handle );
-    
+
     if ( OpenIFF( handle, IFFF_WRITE ) )
     {
         goto prefs_save_ending;
     }
-    
+
     if ( PushChunk( handle, ID_PREF, ID_FORM, IFFSIZE_UNKNOWN ) )
     {
         goto prefs_save_ending;
     }
-    
+
     head.ph_Version = ( IPTR )"0.1";
     head.ph_Type = 0;
 
@@ -163,22 +164,22 @@ BOOL savePreferences ( )
     {
         goto prefs_save_ending;
     }
-        
+
     if ( !WriteChunkBytes( handle, &head, sizeof( struct PrefHeader ) ) )
     {
         goto prefs_save_ending;
     }
-        
-    if ( PopChunk( handle ) ) 
+
+    if ( PopChunk( handle ) )
     {
         goto prefs_save_ending;
     }
-    
+
     if ( PushChunk( handle, ID_PREF, ID_LUNAPAINT, sizeof( LunapaintPrefs ) ) )
     {
         goto prefs_save_ending;
     }
-    
+
     // Save prefs struct
     if ( !WriteChunkBytes( handle, &GlobalPrefs, sizeof( LunapaintPrefs ) ) )
     {
@@ -188,21 +189,21 @@ BOOL savePreferences ( )
     {
         goto prefs_save_ending;
     }
-    
+
     // End saving
     if ( PopChunk(handle) )
     {
         goto prefs_save_ending;
     }
-        
+
     result = TRUE;
-    
+
     prefs_save_ending:
-    
+
     if ( handle != NULL ) CloseIFF( handle );
     if ( filehandle != NULL ) Close ( filehandle );
     if ( handle != NULL ) FreeIFF( handle );
-    
+
     return result;
 }
 
@@ -216,10 +217,10 @@ BOOL loadPreferences ( )
 
     if ( !( handle = AllocIFF( ) ) )
         return FALSE;
-    
+
     if ( ( filehandle = Open ( "Lunapaint:lunapaint.prefs", MODE_OLDFILE ) ) == NULL )
         goto prefs_load_ending;
-    
+
     handle->iff_Stream = ( IPTR )filehandle;
     InitIFFasDOS( handle );
 
@@ -228,22 +229,22 @@ BOOL loadPreferences ( )
 
     if ( StopChunk( handle, ID_PREF, ID_LUNAPAINT ) )
         goto prefs_load_ending;
-    
+
     if ( ParseIFF( handle, IFFPARSE_SCAN ) )
         goto prefs_load_ending;
-    
+
     context = CurrentChunk( handle );
-            
+
     if ( ReadChunkBytes ( handle, &GlobalPrefs, sizeof( LunapaintPrefs ) ) )
         goto prefs_load_ending;
-    
+
     result = TRUE;
-        
+
     prefs_load_ending:
-    
+
     if ( handle != NULL ) CloseIFF(handle);
     if ( filehandle != NULL ) Close (filehandle);
     if ( handle != NULL ) FreeIFF(handle);
-    
+
     return result;
 }

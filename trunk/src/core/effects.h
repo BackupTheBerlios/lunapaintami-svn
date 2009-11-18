@@ -2,6 +2,7 @@
 *                                                                           *
 * effects.h -- Lunapaint, http://www.sub-ether.org/lunapaint                *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -30,7 +31,7 @@
 #include "definitions.h"
 
 /*
-    Move the active layer on a canvas with x and y and wrap 
+    Move the active layer on a canvas with x and y and wrap
     around.
 */
 void effectOffset ( int x, int y, oCanvas *canvas );
@@ -43,6 +44,6 @@ void effectFlipVert ( oCanvas *canvas );
 /*
     Flip a buffer horizontally
 */
-void effectFlipHoriz ( oCanvas *canvas ); 
+void effectFlipHoriz ( oCanvas *canvas );
 
 #endif

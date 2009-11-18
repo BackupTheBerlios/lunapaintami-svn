@@ -2,6 +2,7 @@
 *                                                                           *
 * new_image.c -- Lunapaint, http://www.sub-ether.org/lunapaint              *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
+* Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
@@ -30,24 +31,24 @@ AROS_UFH3 ( void, template_func,
     AROS_USERFUNC_INIT
 
     int selection = XGET ( nwTemplates, MUIA_Cycle_Active );
-    
+
     int templates[ 9 ][ 2 ] = {
         { 32, 32 }, { 48, 48 }, { 64, 64 }, { 160, 120 },
         { 320, 240 }, { 640, 480 }, { 800, 600 },
         { 1024, 768 }, { 1280, 1024 }
     };
-    
+
     set ( nwStringWidth, MUIA_String_Integer, ( IPTR )templates[ selection ][ 0 ] );
     set ( nwStringHeight, MUIA_String_Integer, ( IPTR )templates[ selection ][ 1 ] );
-    
+
     AROS_USERFUNC_EXIT
 }
 
 void nwNewWindow ( )
 {
     static const char *templates[] = {
-        "32x32", "48x48", "64x64", "160x120", 
-        "320x240", "640x480", "800x600", 
+        "32x32", "48x48", "64x64", "160x120",
+        "320x240", "640x480", "800x600",
         "1024x768", "1280x1024", NULL
     };
 
@@ -133,22 +134,22 @@ void nwNewWindow ( )
 void Init_NewProjectMethods ( )
 {
     // Do Methods...
-    DoMethod ( 
+    DoMethod (
         nwBtnOk, MUIM_Notify, MUIA_Pressed, FALSE,
         tbxAreaPalette, 1, MUIM_NewProject
     );
-    DoMethod ( 
+    DoMethod (
         nwBtnCancel, MUIM_Notify, MUIA_Pressed, FALSE,
-        nwWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE 
+        nwWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
-    
+
     template_hook.h_Entry = ( HOOKFUNC )&template_func;
-    
+
     DoMethod (
         nwTemplates, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
         nwTemplates, 2, MUIM_CallHook, &template_hook
     );
-    
+
     // Disable the keyboard when this window is activated
     DoMethod (
         nwWindow, MUIM_Notify, MUIA_Window_Activate, TRUE,
