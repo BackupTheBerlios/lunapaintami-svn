@@ -61,7 +61,7 @@ clean:
 deps: $(CFILES)
 		$(CC) -MM $(CFLAGS) $^
 
-
+main.o: main.c math/math.h common.h core/definitions.h app/parts.h \
   config.h core/definitions.h core/canvas.h aros/debug.h \
   core/definitions.h core/color.h common.h math/math.h core/drawtools.h \
   app/toolbox.h app/canvas.h app/parts.h app/toolbox.h app/layers.h \

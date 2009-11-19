@@ -175,14 +175,15 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
         struct LunapaintHeader *header = AllocVec ( sizeof ( struct LunapaintHeader ), MEMF_CLEAR );
         Read ( inputFile, header, sizeof ( struct LunapaintHeader ) );
         // test if the header is correct
-        char verTpl[ 16 ] = "Lunapaint_v1";
-        int p = 0; for ( p = 0; p < 12; p++ )
+        char verTpl[ ] = "Lunapaint_v1";
+        int p = 0; for ( p = 0; p < sizeof(verTpl) - 1; p++ )
         {
             if ( verTpl[ p ] != header->version[ p ] )
             {
                 FreeVec ( tmpFilename );
                 FreeVec ( header );
                 Close ( inputFile );
+                ShowAlert("File isn't a Lunapaint file");
                 return;
             }
         }

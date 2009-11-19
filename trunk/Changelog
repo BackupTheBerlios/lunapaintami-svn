@@ -1,3 +1,9 @@
+Lunapaint v0.4
+
+ * Fixed: Use AddPart for correct combination of drawer and file
+ * Fixed: Print error message when project file doesn' start with
+          magic word during loading a project
+          
 Lunapaint v0.3.3b
  
  * Fixed: Loosing keyboard shortcuts

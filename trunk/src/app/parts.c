@@ -48,29 +48,14 @@ char *getFilename ( )
             goto end;
 
         file = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
+        if ( ! file )
+        {
+            goto end;
+        }
 
-        // See if we have a trailing slash or a colon
-        // This control is important to get right
-        char lastChar = 0;
-        BOOL hasColon = FALSE;
-        int a = 0; for ( ; aslfileReq->fr_Drawer[ a ] != 0; a++ )
-        {
-            lastChar = aslfileReq->fr_Drawer[ a ];
-            if ( lastChar == ':' ) hasColon = TRUE;
-        }
-        if ( !hasColon && lastChar != '/' )
-        {
-            sprintf ( file, "Lunapaint:%s/%s", aslfileReq->fr_Drawer, aslfileReq->fr_File );
-        }
-        else if ( hasColon && ( lastChar == '/' || lastChar == ':' ) )
-        {
-            sprintf ( file, "%s%s", aslfileReq->fr_Drawer, aslfileReq->fr_File );
-        }
-        else if ( hasColon && lastChar != '/' && lastChar != ':' )
-        {
-            sprintf ( file, "%s/%s", aslfileReq->fr_Drawer, aslfileReq->fr_File );
-        }
-        else
+        strcpy ( file, aslfileReq->fr_Drawer );
+
+        if ( ! AddPart ( file, aslfileReq->fr_File, 255 ) )
         {
             FreeVec ( file );
             file = NULL;
