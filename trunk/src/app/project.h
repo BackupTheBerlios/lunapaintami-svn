@@ -1,6 +1,7 @@
 /****************************************************************************
 *                                                                           *
-* project.h -- Lunapaint, http://www.sub-ether.org/lunapaint                *
+* project.h -- Lunapaint,                                                   *
+*    http://developer.berlios.de/projects/lunapaintami/                     *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
 * Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *

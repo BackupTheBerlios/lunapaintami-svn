@@ -1,6 +1,7 @@
 /****************************************************************************
 *                                                                           *
-* canvas.c -- Lunapaint, http://www.sub-ether.org/lunapaint                 *
+* canvas.c -- Lunapaint,                                                    *
+*    http://developer.berlios.de/projects/lunapaintami/                     *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
 * Copyright (C) 2009 LunaPaint Development Team                             *
 *                                                                           *
@@ -100,6 +101,7 @@ IPTR MUIM_RGB_Redraw ( )
     }
     return ( IPTR )NULL;
 }
+
 // Called from outside the object
 IPTR MUIM_RGB_RedrawArea ( )
 {
@@ -111,6 +113,7 @@ IPTR MUIM_RGB_RedrawArea ( )
     }
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_HandleInput ( Class *CLASS, Object *self, Msg message )
 {
     if ( CLASS == NULL || isZooming || globalActiveCanvas == NULL )
@@ -223,6 +226,7 @@ IPTR MUIM_RGB_HandleInput ( Class *CLASS, Object *self, Msg message )
     }
     return 0;
 }
+
 IPTR MUIM_RGB_Setup ( Class *CLASS, Object *self, Msg message )
 {
     AskMinMaxTimes = 0;
@@ -231,16 +235,19 @@ IPTR MUIM_RGB_Setup ( Class *CLASS, Object *self, Msg message )
     MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
     return DoSuperMethodA ( CLASS, self, message );
 }
+
 IPTR MUIM_RGB_Cleanup ( Class *CLASS, Object *self, Msg message )
 {
     MUI_RejectIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
     return DoSuperMethodA ( CLASS, self, message );
 }
+
 IPTR MUIM_RGB_ScrollingNotify ( )
 {
     isScrolling = TRUE;
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_CanvasActivate ( Class *CLASS, Object *self, Msg message )
 {
     struct RGBitmapData *data = INST_DATA ( CLASS, self );
@@ -266,6 +273,7 @@ IPTR MUIM_RGB_CanvasActivate ( Class *CLASS, Object *self, Msg message )
 
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_CanvasDeactivate ( Class *CLASS, Object *self, Msg message )
 {
     if ( globalActiveWindow != NULL && !fullscreenEditing )
@@ -275,6 +283,7 @@ IPTR MUIM_RGB_CanvasDeactivate ( Class *CLASS, Object *self, Msg message )
     }
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_ZoomIn ( )
 {
     if ( globalActiveCanvas->zoom + 1 <= 32 && !isZooming )
@@ -303,6 +312,7 @@ IPTR MUIM_RGB_ZoomIn ( )
     }
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_ZoomOut ( )
 {
     if ( globalActiveCanvas->zoom - 1 >= 1 && !isZooming )
@@ -327,6 +337,7 @@ IPTR MUIM_RGB_ZoomOut ( )
     }
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_ShowAll ( )
 {
     // Remove any previous tool preview
@@ -340,6 +351,7 @@ IPTR MUIM_RGB_ShowAll ( )
     isZooming = FALSE;
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_AskMinMax ( Class *CLASS, Object *self, Msg message )
 {
     DoSuperMethodA ( CLASS, self, message );
@@ -381,6 +393,7 @@ IPTR MUIM_RGB_AskMinMax ( Class *CLASS, Object *self, Msg message )
 
     return ( IPTR )NULL;
 }
+
 IPTR MUIM_RGB_CloseCanvasWin ( Class *CLASS, Object *self, Msg message )
 {
     if ( !fullscreenEditing )
@@ -550,6 +563,7 @@ void moveScrollbarUp ( )
     int dist = globalActiveCanvas->zoom * 10;
     set ( globalActiveWindow->scrollV, MUIA_Prop_First, pos - dist );
 }
+
 void moveScrollbarDown ( )
 {
     if ( globalActiveWindow == NULL ) return;
@@ -557,6 +571,7 @@ void moveScrollbarDown ( )
     int dist = globalActiveCanvas->zoom * 10;
     set ( globalActiveWindow->scrollV, MUIA_Prop_First, pos + dist );
 }
+
 void moveScrollbarLeft ( )
 {
     if ( globalActiveWindow == NULL ) return;
@@ -564,6 +579,7 @@ void moveScrollbarLeft ( )
     int dist = globalActiveCanvas->zoom * 10;
     set ( globalActiveWindow->scrollH, MUIA_Prop_First, pos - dist );
 }
+
 void moveScrollbarRight ( )
 {
     if ( globalActiveWindow == NULL ) return;
@@ -1640,6 +1656,7 @@ ULONG _getAreaWidth ( )
     return view;
 
 }
+
 ULONG _getAreaHeight ( )
 {
     ULONG ideal = globalActiveCanvas->height * globalActiveCanvas->zoom;
@@ -1648,14 +1665,17 @@ ULONG _getAreaHeight ( )
         return ideal;
     return view;
 }
+
 ULONG _getAreaTop ( )
 {
     return XGET ( globalActiveWindow->area, MUIA_TopEdge );
 }
+
 ULONG _getAreaLeft ( )
 {
     return XGET ( globalActiveWindow->area, MUIA_LeftEdge );
 }
+
 ULONG _getAreaOffsetX ( )
 {
     ULONG screenOffX = XGET ( globalActiveWindow->area, MUIA_Width );
@@ -1665,6 +1685,7 @@ ULONG _getAreaOffsetX ( )
     else screenOffX = 0;
     return screenOffX;
 }
+
 ULONG _getAreaOffsetY ( )
 {
     ULONG screenOffY = XGET ( globalActiveWindow->area, MUIA_Height );
