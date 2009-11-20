@@ -1413,8 +1413,6 @@ BOOL loadDatatypeImage ( )
         if ( size > 0 )
         {
 
-            struct Library *DatatypeLib = OpenLibrary ( "datatypes.library", 0 );
-
             Object *myDtObj = NewDTObject (
                 ( APTR )filename,
                 DTA_GroupID, GID_PICTURE,
@@ -1494,7 +1492,6 @@ BOOL loadDatatypeImage ( )
                 else printf ( "Not enough memory.\n" );
             }
 
-            CloseLibrary ( DatatypeLib );
         }
         FreeVec ( filename );
     }

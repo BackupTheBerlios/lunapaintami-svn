@@ -204,16 +204,8 @@ void Exit_Application ( )
 
     UnlockPubScreen ( ( STRPTR )"Lunapaint", lunaPubScreen );
 
-    DOSBase = ( struct DosLibrary *)OpenLibrary ( "dos.library", 36 );
-    IntuitionBase = ( struct IntuitionBase *)OpenLibrary ( "intuition.library", 36 );
-
     if ( lunaPubScreen != NULL )
         CloseScreen ( lunaPubScreen );
-
-    if ( IntuitionBase != NULL )
-        CloseLibrary ( ( struct Library *)IntuitionBase );
-    if ( DOSBase != NULL )
-        CloseLibrary ( ( struct Library *)DOSBase );
 
     // Shutdown events
     ShutdownEvents ( );
@@ -268,10 +260,6 @@ int getSignals ( ULONG *sigs )
 
 void InitLunaScreen ( )
 {
-    // Open some libraries for our pubscreen
-    DOSBase = ( struct DosLibrary *)OpenLibrary ( "dos.library", 36 );
-    IntuitionBase = ( struct IntuitionBase *)OpenLibrary ( "intuition.library", 36 );
-
     if ( lunaPubScreen != NULL )
     {
         UnlockPubScreen ( ( STRPTR )"Lunapaint", lunaPubScreen );
@@ -327,9 +315,6 @@ void InitLunaScreen ( )
         lunaPubScreen = LockPubScreen ( ( UBYTE *)"Workbench" );
     }
 
-    // Close intuition for now
-    CloseLibrary ( ( struct Library *)IntuitionBase );
-    CloseLibrary ( ( struct Library *)DOSBase );
 }
 
 void HideOpenWindows ( )

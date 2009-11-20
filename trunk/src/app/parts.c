@@ -27,18 +27,14 @@ char *getFilename ( )
     keyboardEnabled = FALSE;
 
     // Get filename
-    struct Library *IntuitionBase, *AslBase;
     BOOL result;
 
     // Create the asl file requestor and get a filename
-    IntuitionBase = OpenLibrary ( "intuition.library", 0 );
-    AslBase = OpenLibrary ( "asl.library", 0 );
     aslfileReq = AllocAslRequestTags ( ASL_FileRequest,
         ASLFR_Screen, lunaPubScreen,
         TAG_DONE
     );
     result = RequestFile ( aslfileReq );
-    CloseLibrary ( IntuitionBase ); CloseLibrary ( AslBase );
 
     char *file = NULL;
     if ( result != FALSE )
@@ -71,8 +67,6 @@ char *getFilename ( )
 
 unsigned int getFilesize ( char *filename )
 {
-    struct Library *DosBase;
-    DosBase = OpenLibrary ( "dos.library", 0 );
 
     if ( filename != NULL )
     {
@@ -84,12 +78,9 @@ unsigned int getFilesize ( char *filename )
             Seek ( fp, 0, OFFSET_END );
             size = Seek ( fp, 0, OFFSET_BEGINNING ) + 2;
             Close ( fp );
-            CloseLibrary ( DosBase );
             return size;
         }
     }
-
-    CloseLibrary ( DosBase );
 
     return 0;
 }

@@ -1,6 +1,6 @@
 CC=i386-aros-gcc
-CFLAGS=-fno-strict-aliasing -funroll-loops -Wall -Wno-pointer-sign -I.
-LDFLAGS=-lmui -lpng -lz -lfreetype2
+CFLAGS=-g -fno-strict-aliasing -funroll-loops -Wall -Wno-pointer-sign -I.
+LDFLAGS=-g -lmui -lpng -lz -lfreetype2
 
 EXE=../Lunapaint
 

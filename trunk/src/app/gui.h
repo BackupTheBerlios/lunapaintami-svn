@@ -93,12 +93,6 @@ Object *LunaBackdrop;
 Object *GetWindowById ( int id );
 
 /*
-    DOSBase and IntutitionBase for opening and closing libraries
-*/
-struct DosLibrary *DOSBase;
-struct IntuitionBase *IntuitionBase;
-
-/*
     This function starts the application object
 */
 void Init_Application ( );
