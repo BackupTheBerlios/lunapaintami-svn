@@ -42,6 +42,14 @@
 #define DEBUG 1
 #endif
 
+#define ARG_TEMPLATE "FILE/M"
+
+enum
+{
+    ARG_FILE,
+    ARG_CNT
+};
+
 char *Version = VERSIONSTRING;
 
 void doEvents ( )
@@ -91,6 +99,7 @@ void doEvents ( )
 
 int main ( int argc, char *argv[] )
 {
+    struct RDArgs *rda = NULL;
     ULONG sigs;
     globalEvents = -1;
     globalCurrentTool = LUNA_TOOL_BRUSH;
@@ -111,6 +120,28 @@ int main ( int argc, char *argv[] )
 
     // Starts up the application
     Init_Application ( );
+
+    if (argc)
+    {
+        IPTR args[ ARG_CNT ] = {0};
+
+        rda = ReadArgs ( ARG_TEMPLATE, args, NULL );
+        if ( ! rda )
+        {
+            PrintFault( IoErr ( ), argv[0] );
+            goto exit;
+        }
+
+        if ( args[ARG_FILE] )
+        {
+            STRPTR *file = (STRPTR *)args[ARG_FILE];
+            while ( *file )
+            {
+                LoadProject ( *file, FALSE );
+                file++;
+            }
+        }
+    }
 
     // Main loop
     while ( getSignals ( &sigs ) )
@@ -156,7 +187,9 @@ int main ( int argc, char *argv[] )
     }
 
     // Exists the application and cleans up reserved resources
+exit:
     Exit_Application ( );
+    if (rda) FreeArgs(rda);
 
     return 0;
 }
