@@ -24,61 +24,63 @@
 #ifndef _aros_canvas_h_
 #define _aros_canvas_h_
 
-#define MUIM_ClearActiveCanvas 		    7001
-#define MUIM_SetPaintMode				7004
-#define MUIM_AlterBrushShape			7005
-#define MUIM_AlterBrushStep			    7006
-#define MUIM_AlterBrushStrength		    7007
-#define MUIM_CanvasAddLayer			    7020
-#define MUIM_CanvasSwapLayer			7021
-#define MUIM_CanvasDeleteLayer		    7022
-#define MUIM_CanvasMergeLayer			7023
-#define MUIM_CanvasCopyLayer			7024
-#define MUIM_ChangeOnionskin			7025
-#define MUIM_ChangeScrollOffset		    7026
-#define MUIM_SetGlobalGrid				7050
-#define MUIM_SetGridSize				7051
-#define MUIM_SetColorMode				7070
-#define MUIM_NextFrame					7060
-#define MUIM_PrevFrame					7061
-#define MUIM_GotoFrame					7062
-#define MUIM_EffectOffset				8000
-#define MUIM_OpenPaletteEditor		    7600
-#define MUIM_ScrollingNotify			7777
-#define MUIM_RedrawArea                 43587
-#define MUIM_Redraw                     43588
+#define LNCATAGBASE (TAG_USER+300)
+
+#define MUIM_Luna_Canvas_ClearActiveCanvas  (LNCATAGBASE+0)
+#define MUIM_Luna_Canvas_SetPaintMode       (LNCATAGBASE+1)
+#define MUIM_Luna_Canvas_AlterBrushShape    (LNCATAGBASE+2)
+#define MUIM_Luna_Canvas_AlterBrushStep     (LNCATAGBASE+3)
+#define MUIM_Luna_Canvas_AlterBrushStrength (LNCATAGBASE+4)
+#define MUIM_Luna_Canvas_CanvasAddLayer     (LNCATAGBASE+5)
+#define MUIM_Luna_Canvas_CanvasSwapLayer    (LNCATAGBASE+6)
+#define MUIM_Luna_Canvas_CanvasDeleteLayer  (LNCATAGBASE+7)
+#define MUIM_Luna_Canvas_CanvasMergeLayer   (LNCATAGBASE+8)
+#define MUIM_Luna_Canvas_CanvasCopyLayer    (LNCATAGBASE+9)
+#define MUIM_Luna_Canvas_ChangeOnionskin    (LNCATAGBASE+10)
+#define MUIM_Luna_Canvas_ChangeScrollOffset (LNCATAGBASE+11)
+#define MUIM_Luna_Canvas_SetGlobalGrid      (LNCATAGBASE+12)
+#define MUIM_Luna_Canvas_SetGridSize        (LNCATAGBASE+13)
+#define MUIM_Luna_Canvas_SetColorMode       (LNCATAGBASE+14)
+#define MUIM_Luna_Canvas_NextFrame          (LNCATAGBASE+15)
+#define MUIM_Luna_Canvas_PrevFrame          (LNCATAGBASE+16)
+#define MUIM_Luna_Canvas_GotoFrame          (LNCATAGBASE+17)
+#define MUIM_Luna_Canvas_EffectOffset       (LNCATAGBASE+18)
+#define MUIM_Luna_Canvas_OpenPaletteEditor  (LNCATAGBASE+19)
+#define MUIM_Luna_Canvas_ScrollingNotify    (LNCATAGBASE+20)
+#define MUIM_Luna_Canvas_RedrawArea         (LNCATAGBASE+21)
+#define MUIM_Luna_Canvas_Redraw             (LNCATAGBASE+22)
 
 // Paint tool keys
-#define MUIA_Key_F						1001
-#define MUIA_Key_D						1002
-#define MUIA_Key_V						1003
-#define MUIA_Key_L						1004
-#define MUIA_Key_E						1005
-#define MUIA_Key_R						1006
-#define MUIA_Key_O						1007
-#define MUIA_Key_B						1008
+#define MUIA_Key_F          1001
+#define MUIA_Key_D          1002
+#define MUIA_Key_V          1003
+#define MUIA_Key_L          1004
+#define MUIA_Key_E          1005
+#define MUIA_Key_R          1006
+#define MUIA_Key_O          1007
+#define MUIA_Key_B          1008
 // Buffer keys
-#define MUIA_Key_J						1050
-#define MUIA_Key_Shift_J				1051
-#define MUIA_Key_X						1052
-#define MUIA_Key_Y						1053
-#define MUIA_Key_Up						1054
-#define MUIA_Key_Left					1055
-#define MUIA_Key_Right					1056
-#define MUIA_Key_Down					1057
+#define MUIA_Key_J          1050
+#define MUIA_Key_Shift_J    1051
+#define MUIA_Key_X          1052
+#define MUIA_Key_Y          1053
+#define MUIA_Key_Up         1054
+#define MUIA_Key_Left       1055
+#define MUIA_Key_Right      1056
+#define MUIA_Key_Down       1057
 // Effect keys
-#define MUIA_Key_F1						1100
-#define MUIA_Key_F2						1101
-#define MUIA_Key_F3						1102
-#define MUIA_Key_F4						1103
-#define MUIA_Key_F5						1104
-#define MUIA_Key_F6						1105
-#define MUIA_Key_F7						1106
-#define MUIA_Key_F8						1107
-#define MUIA_Key_F9						1108
+#define MUIA_Key_F1         1100
+#define MUIA_Key_F2         1101
+#define MUIA_Key_F3         1102
+#define MUIA_Key_F4         1103
+#define MUIA_Key_F5         1104
+#define MUIA_Key_F6         1105
+#define MUIA_Key_F7         1106
+#define MUIA_Key_F8         1107
+#define MUIA_Key_F9         1108
 // Color keys
-#define MUIA_Key_Shift_Comma			1200
-#define MUIA_Key_Comma					1201
+#define MUIA_Key_Shift_Comma    1200
+#define MUIA_Key_Comma          1201
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,16 +124,16 @@
 #include "math/math.h"
 #include "common.h"
 
-BOOL isZooming;
-BOOL isScrolling;
-BOOL fullscreenEditing;
-int AskMinMaxTimes;
+extern BOOL isZooming;
+extern BOOL isScrolling;
+extern BOOL fullscreenEditing;
+extern int AskMinMaxTimes;
 
 /*
     For editing in fullscreen mode
 */
-Object *windowFullscreen;
-Object *fullscreenGroup;
+extern Object *windowFullscreen;
+extern Object *fullscreenGroup;
 
 /*
     For our dispatcher:

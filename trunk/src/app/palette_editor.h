@@ -55,41 +55,42 @@
 #include "config.h"
 
 // Some defines for palette actions
-#ifndef MUIM_Palette_Copy
-#define MUIM_Palette_Copy 1001
-#define MUIM_Palette_Paste 1002
-#define MUIM_Palette_Swap 1003
-#define MUIM_Palette_Reverse 1004
-#define MUIM_Palette_Spread 1005
-#define MUIM_Palette_Clear 1006
-#endif
+#define LNPATAGBASE (TAG_USER+200)
 
-Object *paletteWindow;
-Object *paletteRect;
-Object *palSlideR;
-Object *palSlideG;
-Object *palSlideB;
-Object *palColRect;
-Object *palBtnUse;
-Object *palBtnSave;
-Object *palBtnLoad;
-Object *palStrFileSave;
+#define MUIM_Luna_Palette_Copy      (LNPATAGBASE+0)
+#define MUIM_Luna_Palette_Paste     (LNPATAGBASE+1)
+#define MUIM_Luna_Palette_Swap      (LNPATAGBASE+2)
+#define MUIM_Luna_Palette_Reverse   (LNPATAGBASE+3)
+#define MUIM_Luna_Palette_Spread    (LNPATAGBASE+4)
+#define MUIM_Luna_Palette_Clear     (LNPATAGBASE+5)
+
+
+extern Object *paletteWindow;
+extern Object *paletteRect;
+extern Object *palSlideR;
+extern Object *palSlideG;
+extern Object *palSlideB;
+extern Object *palColRect;
+extern Object *palBtnUse;
+extern Object *palBtnSave;
+extern Object *palBtnLoad;
+extern Object *palStrFileSave;
 
 // Action buttons
-Object *palBtnCopy;
-Object *palBtnSwap;
-Object *palBtnSpread;
-Object *palBtnReverse;
-Object *palBtnClear;
-Object *palBtnPaste;
+extern Object *palBtnCopy;
+extern Object *palBtnSwap;
+extern Object *palBtnSpread;
+extern Object *palBtnReverse;
+extern Object *palBtnClear;
+extern Object *palBtnPaste;
 
-unsigned int tempCopiedColor;
-BOOL tempCopiedColorExists;
+extern unsigned int tempCopiedColor;
+extern BOOL tempCopiedColorExists;
 
-struct Hook rgbslider_hook;
-struct Hook paletteSave_hook;
-struct Hook paletteLoad_hook;
-struct Hook paletteClose_hook;
+extern struct Hook rgbslider_hook;
+extern struct Hook paletteSave_hook;
+extern struct Hook paletteLoad_hook;
+extern struct Hook paletteClose_hook;
 
 /*
     Function to redraw the palette area

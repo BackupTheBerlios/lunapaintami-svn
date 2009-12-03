@@ -60,15 +60,15 @@
 #define SCREENMODE_TYPE_CLONE 1
 #define SCREENMODE_TYPE_OWN 2
 
-struct Hook PrefsHandler_hook;
+extern struct Hook PrefsHandler_hook;
 
-Object *PrefsWindow;			// The prefs window
-Object *PrefsScrnMdType; 	// Screen mode type
-Object *PrefsLayBackMode; 	// Layer background mode
-Object *PrefsBtnUse; 		// Use button
-Object *PrefsBtnSave; 		// Save button
-Object *PrefsBtnCancel; 	// Cancel button
-Object *PrefsCycScrType;	// Screen type cycle
+extern Object *PrefsWindow;         // The prefs window
+extern Object *PrefsScrnMdType;     // Screen mode type
+extern Object *PrefsLayBackMode;    // Layer background mode
+extern Object *PrefsBtnUse;         // Use button
+extern Object *PrefsBtnSave;        // Save button
+extern Object *PrefsBtnCancel;      // Cancel button
+extern Object *PrefsCycScrType;     // Screen type cycle
 
 
 void Init_PrefsWindow ( );
@@ -82,7 +82,5 @@ BOOL savePreferences ( );
     Load program preferences
 */
 BOOL loadPreferences ( );
-
-
 
 #endif

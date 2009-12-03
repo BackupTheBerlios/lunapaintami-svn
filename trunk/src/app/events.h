@@ -40,19 +40,19 @@
 #define eventMouseX                 0x00000010
 #define eventMouseY                 0x00000011
 
-struct IOStdReq *gameInput;
-struct MsgPort *gameInputPort;
-struct Interrupt *gameInputInterrupt;
+extern struct IOStdReq *gameInput;
+extern struct MsgPort *gameInputPort;
+extern struct Interrupt *gameInputInterrupt;
 
-struct Hook DisableKeyboard_hook;
-struct Hook EnableKeyboard_hook;
+extern struct Hook DisableKeyboard_hook;
+extern struct Hook EnableKeyboard_hook;
 
-BOOL evalMouseButtonL;
-BOOL evalMouseButtonR;
-LONG evalMouseX;
-LONG evalMouseY;
-ULONG evalRawKey;
-ULONG releaseKey;
+extern BOOL evalMouseButtonL;
+extern BOOL evalMouseButtonR;
+extern LONG evalMouseX;
+extern LONG evalMouseY;
+extern ULONG evalRawKey;
+extern ULONG releaseKey;
 
 BOOL InitEvents ( );
 void ShutdownEvents ( );

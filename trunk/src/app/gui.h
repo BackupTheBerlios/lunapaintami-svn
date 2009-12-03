@@ -72,20 +72,20 @@ typedef struct ObjectBOOL
 /*
     Program menu
 */
-IPTR ProgramMenu;
-Object *mainPulldownMenu;
+extern IPTR ProgramMenu;
+extern Object *mainPulldownMenu;
 
 /*
     - The MUI "Application" runs on *PaintApp
     - The canvases is managed in the canvases list
 */
-Object *PaintApp;
-WindowList *canvases;
-Object *testWindow;
-Object *AlertWindow;
-Object *AlertText;
-Object *AlertOk;
-Object *LunaBackdrop;
+extern Object *PaintApp;
+extern WindowList *canvases;
+extern Object *testWindow;
+extern Object *AlertWindow;
+extern Object *AlertText;
+extern Object *AlertOk;
+extern Object *LunaBackdrop;
 
 /*
     This function returns a pointer to a window by id

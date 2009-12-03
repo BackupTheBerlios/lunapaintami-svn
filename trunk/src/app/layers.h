@@ -52,32 +52,32 @@
 
 #include "config.h"
 
-Object *WindowLayers;
-Object *WidgetLayers;
-Object *ScrollLayers;
-Object *BtnAddLayer;
-Object *BtnDelLayer;
-Object *BtnSwapLayer;
-Object *BtnMergeLayer;
-Object *BtnCopyLayer;
-Object *LayerOpacity;
-Object *LayerName;
-Object *LayerVisible;
-Object *LayerControlGroup;
-Object *LayerOpacityValue;
+extern Object *WindowLayers;
+extern Object *WidgetLayers;
+extern Object *ScrollLayers;
+extern Object *BtnAddLayer;
+extern Object *BtnDelLayer;
+extern Object *BtnSwapLayer;
+extern Object *BtnMergeLayer;
+extern Object *BtnCopyLayer;
+extern Object *LayerOpacity;
+extern Object *LayerName;
+extern Object *LayerVisible;
+extern Object *LayerControlGroup;
+extern Object *LayerOpacityValue;
 
-unsigned int *LayersWidgetTmpBuf;
-unsigned int layersWidgetWidth;
-unsigned int layersWidgetHeight;
-int layersLastScrollPos;
-int layersUpdateX, layersUpdateY, layersUpdateW, layersUpdateH;
+extern unsigned int *LayersWidgetTmpBuf;
+extern unsigned int layersWidgetWidth;
+extern unsigned int layersWidgetHeight;
+extern int layersLastScrollPos;
+extern int layersUpdateX, layersUpdateY, layersUpdateW, layersUpdateH;
 
-struct Hook changeOpacityHook;
-struct Hook acknowledgeOpacity;
-struct Hook acknowledgeLayName;
-struct Hook changeVisibilityHook;
-oCanvas* lastDrawnCanvas;
-BOOL forceLayerRedraw;
+extern struct Hook changeOpacityHook;
+extern struct Hook acknowledgeOpacity;
+extern struct Hook acknowledgeLayName;
+extern struct Hook changeVisibilityHook;
+extern oCanvas* lastDrawnCanvas;
+extern BOOL forceLayerRedraw;
 
 /*
     This function initializes the layer window and the widget

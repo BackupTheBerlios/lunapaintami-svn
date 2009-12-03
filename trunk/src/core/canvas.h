@@ -43,8 +43,8 @@
 #include "math/math.h"
 
 // Use this to interrupt redrawing
-BOOL abortRedraw;
-int redrawTimes; // how many redrawtimes
+extern BOOL abortRedraw;
+extern int redrawTimes; // how many redrawtimes
 
 // Linked value list
 typedef struct valuelist
@@ -57,94 +57,100 @@ typedef struct valuelist
 // Tool Line
 typedef struct tool_LineData
 {
-    int mode;									// The mode
-    double x;									// Draw from
-    double y;									// -||-
-    double dx, dy;								// Destination x, y (draw to)
-    double ox;									// start offset x
-    double oy;									// start offset y
-    double w;									// Width of buffer rect
-    double h;									// Height of buffer rect
-    BOOL initialized;							// Are we initialized or not?
-    unsigned long long int *buffer;		// pixelbuffer
+    int                     mode;           // The mode
+    double                  x;              // Draw from
+    double                  y;              // -||-
+    double                  dx, dy;         // Destination x, y (draw to)
+    double                  ox;             // start offset x
+    double                  oy;             // start offset y
+    double                  w;              // Width of buffer rect
+    double                  h;              // Height of buffer rect
+    BOOL                    initialized;    // Are we initialized or not?
+    unsigned long long int  *buffer;        // pixelbuffer
 } toolLineData;
-toolLineData lineTool;
+
+extern toolLineData lineTool;
 
 // Tool Brush
 typedef struct tool_BrushData
 {
-    int width;									// Brush width
-    int height;									// Brush height
-    int opacity;								// Brush opacity
-    int power;									// Brush draw power
-    int step;									// Brush steps in between draw
-    int paintmode;								// The current paintmode
-    char opacitymode;							// How to use opacity
-    ValueList *ContourBuffer; 				// For filled freehand drawing
-    BOOL RecordContour;						// Record pixels for contour or not?
-    double ContourMinX, ContourMinY;		// Smallest x,y
-    double ContourMaxX, ContourMaxY;		// Largest x,y
-    BOOL feather;								// Using feather or not?
-    BOOL antialias;							// Using antialiasing or not?
-    BOOL initialized;							// Are we initialized?
-    unsigned long long int *buffer;		// Buffer for storing the brush
-    unsigned long long int *tmpbuf;   	// Generic buffer for different things
+    int                     width;      // Brush width
+    int                     height;     // Brush height
+    int                     opacity;    // Brush opacity
+    int                     power;      // Brush draw power
+    int                     step;       // Brush steps in between draw
+    int                     paintmode;  // The current paintmode
+    char                    opacitymode;// How to use opacity
+    ValueList               *ContourBuffer; // For filled freehand drawing
+    BOOL                    RecordContour;  // Record pixels for contour or not?
+    double                  ContourMinX, ContourMinY;   // Smallest x,y
+    double                  ContourMaxX, ContourMaxY;   // Largest x,y
+    BOOL                    feather;    // Using feather or not?
+    BOOL                    antialias;  // Using antialiasing or not?
+    BOOL                    initialized;// Are we initialized?
+    unsigned long long int  *buffer;    // Buffer for storing the brush
+    unsigned long long int  *tmpbuf;    // Generic buffer for different things
 } toolBrushData;
-toolBrushData brushTool;
+
+extern toolBrushData brushTool;
 
 // Tool Circle
 typedef struct tool_CircleData
 {
-    int mode;								// The mode
-    int x, y;								// Draw from
-    int ox;									// start offset x
-    int oy;									// start offset y
-    int w;									// Width of buffer rect
-    int h;									// Height of buffer rect
-    int bufwidth;							// Buffer width
-    int bufheight;							// buffer height
-    BOOL initialized;				// Are we initialized or not?
-    unsigned long long int *buffer;		// pixelbuffer
+    int                     mode;       // The mode
+    int                     x, y;       // Draw from
+    int                     ox;         // start offset x
+    int                     oy;         // start offset y
+    int                     w;          // Width of buffer rect
+    int                     h;          // Height of buffer rect
+    int                     bufwidth;   // Buffer width
+    int                     bufheight;  // buffer height
+    BOOL                    initialized;// Are we initialized or not?
+    unsigned long long int  *buffer;    // pixelbuffer
 } toolCircleData;
-toolCircleData circleTool;
+
+extern toolCircleData circleTool;
 
 // Tool Rectangle
 typedef struct tool_RectangleData
 {
-    int mode;								// The mode
-    double x;									// Draw from
-    double y;									// -||-
-    double dx, dy;							// Destination x, y (draw to)
-    double ox;									// start offset x
-    double oy;									// start offset y
-    double w;									// Width of buffer rect
-    double h;									// Height of buffer rect
-    BOOL initialized;				// Are we initialized or not?
-    unsigned long long int *buffer;		// pixelbuffer
+    int                     mode;           // The mode
+    double                  x;              // Draw from
+    double                  y;              // -||-
+    double                  dx, dy;         // Destination x, y (draw to)
+    double                  ox;             // start offset x
+    double                  oy;             // start offset y
+    double                  w;              // Width of buffer rect
+    double                  h;              // Height of buffer rect
+    BOOL                    initialized;    // Are we initialized or not?
+    unsigned long long int  *buffer;        // pixelbuffer
 } toolRectData;
-toolRectData rectangleTool;
+
+extern toolRectData rectangleTool;
 
 // Tool Clipbrush
 typedef struct tool_ClipBrush
 {
-    int mode;								// The mode
-    double x;									// Draw from
-    double y;									// -||-
-    double dx, dy;							// Destination x, y (draw to)
-    double ox;									// start offset x
-    double oy;									// start offset y
-    double w;									// Width of buffer rect
-    double h;									// Height of buffer rect
-    BOOL initialized;				// Are we initialized or not?
-    unsigned long long int *buffer;		// pixelbuffer
+    int                     mode;       // The mode
+    double                  x;          // Draw from
+    double                  y;          // -||-
+    double                  dx, dy;     // Destination x, y (draw to)
+    double                  ox;         // start offset x
+    double                  oy;         // start offset y
+    double                  w;          // Width of buffer rect
+    double                  h;          // Height of buffer rect
+    BOOL                    initialized;// Are we initialized or not?
+    unsigned long long int  *buffer;    // pixelbuffer
 } toolClipBrushData;
-toolClipBrushData clipbrushTool;
+
+extern toolClipBrushData clipbrushTool;
 
 /*
     Initialize a canvas and return a struct with a canvas in it
 */
 oCanvas* Init_Canvas (
-    unsigned int w, unsigned int h, unsigned int layers, unsigned int frames, BOOL generateBuffers
+    unsigned int w, unsigned int h, unsigned int layers,
+    unsigned int frames, BOOL generateBuffers
 );
 
 /*
@@ -222,8 +228,8 @@ void scrollScreenStorage ( oCanvas *canvas, int x, int y );
     Draw all layers onto the screenbuffer constrained by rect
 */
 BOOL redrawScreenbufferRect (
-    oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw, unsigned int rh,
-    BOOL updateStorage
+    oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw,
+    unsigned int rh, BOOL updateStorage
 );
 
 /*

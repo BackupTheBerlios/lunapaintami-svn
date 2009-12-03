@@ -45,12 +45,12 @@
 #include "config.h"
 #include "canvas.h"
 
-Object *WindowAnimation;
-Object *CycleOnionSkin;
-Object *ButtonAnimNext;
-Object *ButtonAnimPrev;
-Object *AnimationSlider;
-BOOL    IgnoreFramechange; // Wether or not to ignore changing frames..
+extern Object *WindowAnimation;
+extern Object *CycleOnionSkin;
+extern Object *ButtonAnimNext;
+extern Object *ButtonAnimPrev;
+extern Object *AnimationSlider;
+extern BOOL    IgnoreFramechange; // Wether or not to ignore changing frames..
 
 void Init_AnimationWindow ( );
 void Update_AnimValues ( );

@@ -23,6 +23,13 @@
 
 #include "animation.h"
 
+Object *WindowAnimation;
+Object *CycleOnionSkin;
+Object *ButtonAnimNext;
+Object *ButtonAnimPrev;
+Object *AnimationSlider;
+BOOL    IgnoreFramechange;
+
 void Init_AnimationWindow ( )
 {
     static const char *arr_onion[] = { "No onion skin", "Simple onion skin", NULL };
@@ -65,21 +72,21 @@ void Init_AnimationWindow ( )
     // Animation
     DoMethod (
         ButtonAnimNext, MUIM_Notify, MUIA_Pressed, FALSE,
-        ( IPTR )WidgetLayers, 1, MUIM_NextFrame
+        ( IPTR )WidgetLayers, 1, MUIM_Luna_Canvas_NextFrame
     );
     DoMethod (
         ButtonAnimPrev, MUIM_Notify, MUIA_Pressed, FALSE,
-        ( IPTR )WidgetLayers, 1, MUIM_PrevFrame
+        ( IPTR )WidgetLayers, 1, MUIM_Luna_Canvas_PrevFrame
     );
     DoMethod (
         AnimationSlider, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
-        ( IPTR )WidgetLayers, 1, MUIM_GotoFrame
+        ( IPTR )WidgetLayers, 1, MUIM_Luna_Canvas_GotoFrame
     );
     DoMethod (
         CycleOnionSkin, MUIM_Notify,
         MUIA_Cycle_Active, MUIV_EveryTime,
-        ( IPTR )WidgetLayers, 1, MUIM_ChangeOnionskin
+        ( IPTR )WidgetLayers, 1, MUIM_Luna_Canvas_ChangeOnionskin
     );
 }
 

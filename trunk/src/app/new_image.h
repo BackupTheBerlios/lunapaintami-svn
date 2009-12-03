@@ -53,15 +53,15 @@
 
 #include "config.h"
 
-Object *nwWindow;
-Object *nwBtnOk;
-Object *nwBtnCancel;
-Object *nwStringWidth;
-Object *nwStringHeight;
-Object *nwStringFrames;
-Object *nwStringPrjName;
-Object *nwTemplates;
-struct Hook template_hook;
+extern Object *nwWindow;
+extern Object *nwBtnOk;
+extern Object *nwBtnCancel;
+extern Object *nwStringWidth;
+extern Object *nwStringHeight;
+extern Object *nwStringFrames;
+extern Object *nwStringPrjName;
+extern Object *nwTemplates;
+extern struct Hook template_hook;
 
 void nwNewWindow ( );
 void Init_NewProjectMethods ( );

@@ -24,6 +24,8 @@
 
 #include "about_window.h"
 
+Object *aboutWindow, *aboutWindowOk;
+
 void Init_AboutWindow ( )
 {
     aboutWindow = WindowObject,

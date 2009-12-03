@@ -24,8 +24,8 @@
 #ifndef _text_to_brush_h
 #define _text_to_brush_h
 
-#define MAX_FONTNUM 			1024
-#define FONTREAD_BUFSIZE 	4096
+#define MAX_FONTNUM         1024
+#define FONTREAD_BUFSIZE    4096
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,17 +62,17 @@
 #include "project.h"
 #include "events.h"
 
-Object *textToBrushWindow;
-Object *ttbw_TextString;
-Object *ttbw_RenderButton;
-Object *ttbw_FontListview;
-Object *ttbw_FontList;
-Object *ttbw_FontSizeListview;
-Object *ttbw_FontSizeList;
+extern Object *textToBrushWindow;
+extern Object *ttbw_TextString;
+extern Object *ttbw_RenderButton;
+extern Object *ttbw_FontListview;
+extern Object *ttbw_FontList;
+extern Object *ttbw_FontSizeListview;
+extern Object *ttbw_FontSizeList;
 
-STRPTR FontList[ MAX_FONTNUM ];
+extern STRPTR FontList[ MAX_FONTNUM ];
 
-struct Hook RenderTextToBrush_hook;
+extern struct Hook RenderTextToBrush_hook;
 
 void Init_TextToBrushWindow ( );
 void Init_TextToBrushMethods ( );

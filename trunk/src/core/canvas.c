@@ -23,6 +23,15 @@
 
 #include "canvas.h"
 
+BOOL abortRedraw;
+int redrawTimes;
+toolLineData lineTool;
+toolBrushData brushTool;
+toolCircleData circleTool;
+toolRectData rectangleTool;
+toolClipBrushData clipbrushTool;
+
+
 oCanvas* Init_Canvas (
     unsigned int w, unsigned int h,
     unsigned int layers, unsigned int frames,

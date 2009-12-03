@@ -902,7 +902,7 @@ BOOL toolClipBrush ( )
             clipbrushTool.mode = 0;
 
             // Set draw tool now
-            DoMethod ( paletteRect, MUIM_SetTool_Draw, FALSE );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Draw, FALSE );
             DoMethod ( tbxAreaPreview, MUIM_Draw );
 
             return TRUE;

@@ -60,30 +60,30 @@
 
 #define DEBUG 1
 
-Object *exportCycDT;
-Object *exportBtnCancel;
-Object *exportBtnExport;
-Object *exportPopFilename;
-Object *exportMode;
+extern Object *exportCycDT;
+extern Object *exportBtnCancel;
+extern Object *exportBtnExport;
+extern Object *exportPopFilename;
+extern Object *exportMode;
 
-Object *exportAnimMethod;
-Object *exportAnimMode;
-Object *exportAnimRangeStart;
-Object *exportAnimRangeEnd;
-Object *exportAnimBtnExport;
-Object *exportAnimBtnCancel;
+extern Object *exportAnimMethod;
+extern Object *exportAnimMode;
+extern Object *exportAnimRangeStart;
+extern Object *exportAnimRangeEnd;
+extern Object *exportAnimBtnExport;
+extern Object *exportAnimBtnCancel;
 
-Object *importCycDT;
-Object *importBtnCancel;
-Object *importBtnImport;
-Object *importPopFilename;
+extern Object *importCycDT;
+extern Object *importBtnCancel;
+extern Object *importBtnImport;
+extern Object *importPopFilename;
 
-Object *exportWindow;
-Object *importWindow;
+extern Object *exportWindow;
+extern Object *importWindow;
 
-struct Hook export_hook;
-struct Hook import_hook;
-struct Hook exportanimation_hook;
+extern struct Hook export_hook;
+extern struct Hook import_hook;
+extern struct Hook exportanimation_hook;
 
 /*
     Generate an exportable buffer

@@ -62,47 +62,47 @@
 /*
 	Toolbox object elements
 */
-struct Hook getMenu_hook;
-struct Hook brushOptions_hook;
-struct Hook getFill_hook;
-struct Hook getOpacMode_hook;
+extern struct Hook getMenu_hook;
+extern struct Hook brushOptions_hook;
+extern struct Hook getFill_hook;
+extern struct Hook getOpacMode_hook;
 
-int ToolboxRunning;
-Object *toolbox;
-Object *toolboxTopGroup;
-Object *tbxAreaPalette;
-Object *tbxAreaPreview;
-Object *tbxBtn_draw;
-Object *tbxBtn_line;
-Object *tbxBtn_rectangle;
-Object *tbxBtn_polygon;
-Object *tbxBtn_circle;
-Object *tbxBtn_fill;
-Object *tbxBtn_getbrush;
-Object *tbxBtn_pickcolor;
+extern int ToolboxRunning;
+extern Object *toolbox;
+extern Object *toolboxTopGroup;
+extern Object *tbxAreaPalette;
+extern Object *tbxAreaPreview;
+extern Object *tbxBtn_draw;
+extern Object *tbxBtn_line;
+extern Object *tbxBtn_rectangle;
+extern Object *tbxBtn_polygon;
+extern Object *tbxBtn_circle;
+extern Object *tbxBtn_fill;
+extern Object *tbxBtn_getbrush;
+extern Object *tbxBtn_pickcolor;
 
-char tbxPaletteClickMode;
+extern char tbxPaletteClickMode;
 
-Object *antiImage, *antiOffImage, *solidImage, *featherImage;
-Object *brushOpGroup;
+extern Object *antiImage, *antiOffImage, *solidImage, *featherImage;
+extern Object *brushOpGroup;
 
-Object *tbxCyc_GridSize;
-Object *tbxCycColorCtrl;
+extern Object *tbxCyc_GridSize;
+extern Object *tbxCycColorCtrl;
 
-Object *tbxSlider_Brushdiameter;
-Object *tbxSlider_Brushopacity;
-Object *tbxSlider_Brushincrement;
-Object *tbxSlider_Brushstep;
-Object *tbxCycGrid;
-Object *tbxCycFillmode;
+extern Object *tbxSlider_Brushdiameter;
+extern Object *tbxSlider_Brushopacity;
+extern Object *tbxSlider_Brushincrement;
+extern Object *tbxSlider_Brushstep;
+extern Object *tbxCycGrid;
+extern Object *tbxCycFillmode;
 
-Object *tbxCyc_PaletteSnap;
+extern Object *tbxCyc_PaletteSnap;
 
-Object *tbxCycPaintMode;
+extern Object *tbxCycPaintMode;
 
-Object *offsetWindow, *offsetWindowOk, *offsetWindowCancel, *offsetWindowX, *offsetWindowY;
+extern Object *offsetWindow, *offsetWindowOk, *offsetWindowCancel, *offsetWindowX, *offsetWindowY;
 
-unsigned int *PreviewRectData;
+extern unsigned int *PreviewRectData;
 
 /*
 	Color things

@@ -24,6 +24,19 @@
 #include "text_to_brush.h"
 #define TTLOAD_DEFAULT  (TTLOAD_SCALE_GLYPH | TTLOAD_HINT_GLYPH )
 
+Object *textToBrushWindow;
+Object *ttbw_TextString;
+Object *ttbw_RenderButton;
+Object *ttbw_FontListview;
+Object *ttbw_FontList;
+Object *ttbw_FontSizeListview;
+Object *ttbw_FontSizeList;
+
+STRPTR FontList[ MAX_FONTNUM ];
+
+struct Hook RenderTextToBrush_hook;
+
+
 AROS_UFH3 ( void, RenderTextToBrush_func,
     AROS_UFHA ( struct Hook*, h, A0 ),
     AROS_UFHA ( APTR, obj, A2 ),

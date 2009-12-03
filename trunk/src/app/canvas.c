@@ -23,6 +23,13 @@
 
 #include "canvas.h"
 
+BOOL isZooming;
+BOOL isScrolling;
+BOOL fullscreenEditing;
+int AskMinMaxTimes;
+Object *windowFullscreen;
+Object *fullscreenGroup;
+
 //---------------------------------------------------------------------
 
 /*
@@ -57,21 +64,21 @@ BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
 {
     switch ( message->MethodID )
     {
-        case MUIM_Draw:             return MUIM_RGB_Draw ( CLASS, self, message );
-        case MUIM_Redraw:           return MUIM_RGB_Redraw ( );
-        case MUIM_RedrawArea:       return MUIM_RGB_RedrawArea ( );
-        case MUIM_HandleInput:      return MUIM_RGB_HandleInput ( CLASS, self, message );
-        case MUIM_Setup:            return MUIM_RGB_Setup ( CLASS, self, message );
-        case MUIM_Cleanup:          return MUIM_RGB_Cleanup ( CLASS, self, message );
-        case MUIM_ScrollingNotify:  return MUIM_RGB_ScrollingNotify ( );
-        case MUIM_CanvasActivate:   return MUIM_RGB_CanvasActivate ( CLASS, self, message );
-        case MUIM_CanvasDeactivate: return MUIM_RGB_CanvasDeactivate ( CLASS, self, message );
-        case MUIM_ZoomIn:           return MUIM_RGB_ZoomIn ( );
-        case MUIM_ZoomOut:          return MUIM_RGB_ZoomOut ( );
-        case MUIM_ShowAll:          return MUIM_RGB_ShowAll ( );
-        case MUIM_AskMinMax:        return MUIM_RGB_AskMinMax ( CLASS, self, message );
-        case MUIM_CloseCanvasWin:   return MUIM_RGB_CloseCanvasWin ( CLASS, self, message );
-        default:                    return DoSuperMethodA ( CLASS, self, message );
+        case MUIM_Draw:                         return MUIM_RGB_Draw ( CLASS, self, message );
+        case MUIM_Luna_Canvas_Redraw:           return MUIM_RGB_Redraw ( );
+        case MUIM_Luna_Canvas_RedrawArea:       return MUIM_RGB_RedrawArea ( );
+        case MUIM_HandleInput:                  return MUIM_RGB_HandleInput ( CLASS, self, message );
+        case MUIM_Setup:                        return MUIM_RGB_Setup ( CLASS, self, message );
+        case MUIM_Cleanup:                      return MUIM_RGB_Cleanup ( CLASS, self, message );
+        case MUIM_Luna_Canvas_ScrollingNotify:  return MUIM_RGB_ScrollingNotify ( );
+        case MUIM_Luna_CanvasActivate:          return MUIM_RGB_CanvasActivate ( CLASS, self, message );
+        case MUIM_Luna_CanvasDeactivate:        return MUIM_RGB_CanvasDeactivate ( CLASS, self, message );
+        case MUIM_Luna_ZoomIn:                  return MUIM_RGB_ZoomIn ( );
+        case MUIM_Luna_ZoomOut:                 return MUIM_RGB_ZoomOut ( );
+        case MUIM_Luna_ShowAll:                 return MUIM_RGB_ShowAll ( );
+        case MUIM_AskMinMax:                    return MUIM_RGB_AskMinMax ( CLASS, self, message );
+        case MUIM_Luna_CloseCanvasWin:          return MUIM_RGB_CloseCanvasWin ( CLASS, self, message );
+        default:                                return DoSuperMethodA ( CLASS, self, message );
     }
     return ( IPTR )NULL;
 }
@@ -433,22 +440,22 @@ void checkKeyboardShortcuts ( UWORD valu )
             setToolbarActive ( );
             break;
         case RAWKEY_D:
-            DoMethod ( paletteRect, MUIM_SetTool_Draw );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Draw );
             break;
         case RAWKEY_L:
-            DoMethod ( paletteRect, MUIM_SetTool_Line );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Line );
             break;
         case RAWKEY_E:
-            DoMethod ( paletteRect, MUIM_SetTool_Circle );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Circle );
             break;
         case RAWKEY_R:
-            DoMethod ( paletteRect, MUIM_SetTool_Rectangle );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Rectangle );
             break;
         case RAWKEY_O:
-            DoMethod ( paletteRect, MUIM_SetTool_Colorpicker );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Colorpicker );
             break;
         case RAWKEY_B:
-            DoMethod ( paletteRect, MUIM_SetTool_ClipBrush );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_ClipBrush );
             break;
         case RAWKEY_G:
             {
@@ -1051,19 +1058,19 @@ void addCanvaswindow (
     TAG_END );
 
     // Some values in the area object
-    struct RGBitmapData *areaData = INST_DATA ( mcc->mcc_Class, canvases->area );
-    areaData->window				= canvases;
-    areaData->mousepressed 	    	= FALSE;
-    canvases->id 				   	= globalWindowIncrement;
-    canvases->layersChg 		   	= TRUE; // initially, say yes layers changed
-    canvases->prevBlit 				= ( RectStruct ){ 0, 0, 0, 0 };
-    canvases->filename 				= NULL; // set the filename to null *obviously*
-    canvases->rRectX 				= 0;
-    canvases->rRectY 				= 0;
-    canvases->rRectW 				= 0;
-    canvases->rRectH 				= 0;
-    canvases->contWidth				= 0;
-    canvases->contHeight			= 0;
+    struct RGBitmapData *areaData   = INST_DATA ( mcc->mcc_Class, canvases->area );
+    areaData->window                = canvases;
+    areaData->mousepressed          = FALSE;
+    canvases->id                    = globalWindowIncrement;
+    canvases->layersChg             = TRUE; // initially, say yes layers changed
+    canvases->prevBlit              = ( RectStruct ){ 0, 0, 0, 0 };
+    canvases->filename              = NULL; // set the filename to null *obviously*
+    canvases->rRectX                = 0;
+    canvases->rRectY                = 0;
+    canvases->rRectW                = 0;
+    canvases->rRectH                = 0;
+    canvases->contWidth             = 0;
+    canvases->contHeight            = 0;
 
     // Add project func to hook
     canvases->projHook.h_Entry = ( HOOKFUNC )projFunc;
@@ -1085,39 +1092,39 @@ void addCanvaswindow (
     // Add some methods
     DoMethod (
         canvases->btnZoom, MUIM_Notify, MUIA_Pressed, FALSE,
-        ( IPTR )canvases->area, 1, MUIM_ZoomIn
+        ( IPTR )canvases->area, 1, MUIM_Luna_ZoomIn
     );
     DoMethod (
         canvases->btnUnZoom, MUIM_Notify, MUIA_Pressed, FALSE,
-        ( IPTR )canvases->area, 1, MUIM_ZoomOut
+        ( IPTR )canvases->area, 1, MUIM_Luna_ZoomOut
     );
     DoMethod (
         canvases->btnShowAll, MUIM_Notify, MUIA_Pressed, FALSE,
-        ( IPTR )canvases->area, 1, MUIM_ShowAll
+        ( IPTR )canvases->area, 1, MUIM_Luna_ShowAll
     );
     DoMethod (
         canvases->win, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
-        ( IPTR )canvases->area, 1, MUIM_CloseCanvasWin
+        ( IPTR )canvases->area, 1, MUIM_Luna_CloseCanvasWin
     );
 
     DoMethod (
         canvases->win, MUIM_Notify, MUIA_Window_Activate, TRUE,
-        ( IPTR )canvases->area, 1, MUIM_CanvasActivate
+        ( IPTR )canvases->area, 1, MUIM_Luna_CanvasActivate
     );
 
     DoMethod (
         canvases->win, MUIM_Notify, MUIA_Window_Activate, FALSE,
-        ( IPTR )canvases->area, 1, MUIM_CanvasDeactivate
+        ( IPTR )canvases->area, 1, MUIM_Luna_CanvasDeactivate
     );
 
     DoMethod (
         canvases->scrollV, MUIM_Notify, MUIA_Prop_First, MUIV_EveryTime,
-        ( IPTR )canvases->area, 1, MUIM_ScrollingNotify
+        ( IPTR )canvases->area, 1, MUIM_Luna_Canvas_ScrollingNotify
     );
 
     DoMethod (
         canvases->scrollH, MUIM_Notify, MUIA_Prop_First, MUIV_EveryTime,
-        ( IPTR )canvases->area, 1, MUIM_ScrollingNotify
+        ( IPTR )canvases->area, 1, MUIM_Luna_Canvas_ScrollingNotify
     );
 
     DoMethod ( canvases->win, MUIM_Notify, MUIA_Window_Open, TRUE,

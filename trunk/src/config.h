@@ -38,6 +38,6 @@ typedef struct LunapaintPrefs
     char LayerBackgroundMode;
 } LunapaintPrefs;
 
-LunapaintPrefs GlobalPrefs;
+extern LunapaintPrefs GlobalPrefs;
 
 #endif

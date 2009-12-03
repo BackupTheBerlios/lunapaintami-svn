@@ -23,6 +23,32 @@
 
 #include "export_import.h"
 
+Object *exportCycDT;
+Object *exportBtnCancel;
+Object *exportBtnExport;
+Object *exportPopFilename;
+Object *exportMode;
+
+Object *exportAnimMethod;
+Object *exportAnimMode;
+Object *exportAnimRangeStart;
+Object *exportAnimRangeEnd;
+Object *exportAnimBtnExport;
+Object *exportAnimBtnCancel;
+
+Object *importCycDT;
+Object *importBtnCancel;
+Object *importBtnImport;
+Object *importPopFilename;
+
+Object *exportWindow;
+Object *importWindow;
+
+struct Hook export_hook;
+struct Hook import_hook;
+struct Hook exportanimation_hook;
+
+
 AROS_UFH3 ( void, exportanimation_func,
     AROS_UFHA ( struct Hook*, h, A0 ),
     AROS_UFHA ( APTR, obj, A2 ),

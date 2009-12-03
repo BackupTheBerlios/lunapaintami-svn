@@ -24,24 +24,26 @@
 #ifndef _parts_h_
 #define _parts_h_
 
-#define MUIM_ZoomIn 			    9998
-#define MUIM_ZoomOut 		        9997
-#define MUIM_ShowAll			    9996
-#define MUIM_SetTool_Draw		    18001
-#define MUIM_SetTool_Fill		    18002
-#define MUIM_SetTool_Line		    18003
-#define MUIM_SetTool_Rectangle	    18004
-#define MUIM_SetTool_ClipBrush	    18005
-#define MUIM_SetTool_Circle		    18006
-#define MUIM_SetTool_Colorpicker    18007
-#define MUIM_ExecuteRevert			18020
-#define MUIM_CanvasDeactivate 	    18030
-#define MUIM_CanvasActivate 		18032
-#define MUIM_NewProject				20000
-#define MUIM_CloseCanvasWin	 	    18031
+#define LNTAGBASE (TAG_USER+100)
+
+#define MUIM_Luna_ZoomIn                        (LNTAGBASE+0)
+#define MUIM_Luna_ZoomOut                       (LNTAGBASE+1)
+#define MUIM_Luna_ShowAll                       (LNTAGBASE+2)
+#define MUIM_Luna_SetTool_Draw                  (LNTAGBASE+3)
+#define MUIM_Luna_SetTool_Fill                  (LNTAGBASE+4)
+#define MUIM_Luna_SetTool_Line                  (LNTAGBASE+5)
+#define MUIM_Luna_SetTool_Rectangle             (LNTAGBASE+6)
+#define MUIM_Luna_SetTool_ClipBrush             (LNTAGBASE+7)
+#define MUIM_Luna_SetTool_Circle                (LNTAGBASE+8)
+#define MUIM_Luna_SetTool_Colorpicker           (LNTAGBASE+9)
+#define MUIM_Luna_ExecuteRevert                 (LNTAGBASE+10)
+#define MUIM_Luna_CanvasDeactivate              (LNTAGBASE+11)
+#define MUIM_Luna_CanvasActivate                (LNTAGBASE+12)
+#define MUIM_Luna_NewProject                    (LNTAGBASE+13)
+#define MUIM_Luna_CloseCanvasWin                (LNTAGBASE+14)
 
 // how much time defines a click within a doubleclick
-#define MOUSE_DoubleClickTime		5
+#define MOUSE_DoubleClickTime   5
 
 #include <stdio.h>
 
@@ -68,13 +70,13 @@
 #include "config.h"
 #include "core/definitions.h"
 
-BOOL keyboardEnabled;
+extern BOOL keyboardEnabled;
 
 /*
     For the pubscreen
 */
-struct NewScreen *lunaScreen;
-struct Screen *lunaPubScreen;
+extern struct NewScreen *lunaScreen;
+extern struct Screen *lunaPubScreen;
 
 typedef struct rect__struct
 {
@@ -89,48 +91,46 @@ typedef struct rect__struct
 */
 typedef struct sWinList
 {
-    Object 									*win;					// The MUI window
+    Object          *win;           // The MUI window
 
-    Object									*projectWin;	// Project window
-    Object									*projBtnOk;		// Project ok button
-    Object									*projName;		// Project name
-    Object									*projAuthor;	// Project author
-    Object									*projDesc;		// Project description
-    struct 		Hook					 	projHook;		// Function hook to change the proj info
-    char									*filename;		// The filename
+    Object          *projectWin;    // Project window
+    Object          *projBtnOk;     // Project ok button
+    Object          *projName;      // Project name
+    Object          *projAuthor;    // Project author
+    Object          *projDesc;      // Project description
+    struct Hook     projHook;       // Function hook to change the proj info
+    char            *filename;      // The filename
 
-    int										rRectX;			// RedrawRect X
-    int										rRectY;			// RedrawRect Y
-    int										rRectW;			// RedrawRect W
-    int										rRectH;			// RedrawRect H
-    unsigned int							contWidth;		// Known container width
-    unsigned int							contHeight;		// Known container height
+    int             rRectX;         // RedrawRect X
+    int             rRectY;         // RedrawRect Y
+    int             rRectW;         // RedrawRect W
+    int             rRectH;         // RedrawRect H
+    unsigned int    contWidth;      // Known container width
+    unsigned int    contHeight;     // Known container height
 
-    Object                                  *infocontainer; // Containing frame info etc
-    Object									*container; 	// Containing the area
-    Object									*area;			// MUI area data
-    Object									*scrollgrp;		// Scrollgroup
-    Object									*scrollH;		// Horizontal scrollbar
-    Object									*scrollV;		// Vertical scrollbar
-    Object									*mouse;			// Contains the mouse object
-    Object									*btnZoom;		// The zoom button
-    Object									*btnShowAll;	// The whole image
-    Object									*btnUnZoom;		// The zoom out button
-    Object									*txtFrameInf;   // Info of which frame you're on
-    Object									*txtLayerInf;   // Info on which layer you're on
-    Object                                  *txtCoordX;     // X coordinates
-    Object                                  *txtCoordY;     // Y coordinates
-    Object                                  *txtZoomLevel;  // How much zoom
-    oCanvas									*canvas;		// Pixel buffer
-    unsigned	int 					 	id;				// Window ID
-    BOOL								    isActive;		// is the window active or not?
-    BOOL								    isVisible;		// If it is supposed to be visible
-    BOOL								    layersChg;		// Has the layercount changed?
-    RectStruct							 	prevBlit;		// previous blitted area
-    struct 		Hook						CanvasKey_hook; // Hook for input keys
-    struct 		sWinList 			        *nextwin;		// Next window in list
-
-
+    Object          *infocontainer; // Containing frame info etc
+    Object          *container;     // Containing the area
+    Object          *area;          // MUI area data
+    Object          *scrollgrp;     // Scrollgroup
+    Object          *scrollH;       // Horizontal scrollbar
+    Object          *scrollV;       // Vertical scrollbar
+    Object          *mouse;         // Contains the mouse object
+    Object          *btnZoom;       // The zoom button
+    Object          *btnShowAll;    // The whole image
+    Object          *btnUnZoom;     // The zoom out button
+    Object          *txtFrameInf;   // Info of which frame you're on
+    Object          *txtLayerInf;   // Info on which layer you're on
+    Object          *txtCoordX;     // X coordinates
+    Object          *txtCoordY;     // Y coordinates
+    Object          *txtZoomLevel;  // How much zoom
+    oCanvas         *canvas;        // Pixel buffer
+    unsigned int    id;             // Window ID
+    BOOL            isActive;       // is the window active or not?
+    BOOL            isVisible;      // If it is supposed to be visible
+    BOOL            layersChg;      // Has the layercount changed?
+    RectStruct      prevBlit;       // previous blitted area
+    struct Hook     CanvasKey_hook; // Hook for input keys
+    struct sWinList *nextwin;       // Next window in list
 } WindowList;
 
 /*
@@ -138,28 +138,28 @@ typedef struct sWinList
 */
 struct RGBitmapData
 {
-    int								zuneAreaLeft;   		// Offset relative to window
-    int								zuneAreaTop;			// --||--
-    int                             rgbAreaLeft;            // Offset relative to draw rect
-    int                             rgbAreaTop;             //
-    int								currentzoom;			// Current zoom level
-    int                             zuneAreaWidth;          // Zune area width
-    int                             zuneAreaHeight;         // Zune area height
-    int								rgbAreaWidth; 	        // current width of paint area
-    int								rgbAreaHeight;	        // current height of paint area
-    unsigned int                    scrollPosH;             // Remembered scroll pos
-    unsigned int                    scrollPosV;             // Remembered scroll pos
-    unsigned int                    scrollEntriesH;         // Remembered scroll pos
-    unsigned int                    scrollEntriesV;         // Remembered scroll pos
-    BOOL 				 			mousepressed;		    // If the mouse is pressed
-    BOOL							isBusy;				    // If the canvas is heavily busy on something
-    WindowList*						window;					// A pointer to the window
-    struct RastPort* 				rp;						// Rastport to draw on
+    int             zuneAreaLeft;   // Offset relative to window
+    int             zuneAreaTop;    // --||--
+    int             rgbAreaLeft;    // Offset relative to draw rect
+    int             rgbAreaTop;     //
+    int             currentzoom;    // Current zoom level
+    int             zuneAreaWidth;  // Zune area width
+    int             zuneAreaHeight; // Zune area height
+    int             rgbAreaWidth;   // current width of paint area
+    int             rgbAreaHeight;  // current height of paint area
+    unsigned int    scrollPosH;     // Remembered scroll pos
+    unsigned int    scrollPosV;     // Remembered scroll pos
+    unsigned int    scrollEntriesH; // Remembered scroll pos
+    unsigned int    scrollEntriesV; // Remembered scroll pos
+    BOOL            mousepressed;   // If the mouse is pressed
+    BOOL            isBusy;         // If the canvas is heavily busy on something
+    WindowList      *window;        // A pointer to the window
+    struct RastPort *rp;            // Rastport to draw on
 };
 
-struct FileRequester *aslfileReq;
+extern struct FileRequester *aslfileReq;
 
-int mouseClickCount; // registers clicks and doubleclicks etc
+extern int mouseClickCount; // registers clicks and doubleclicks etc
 
 
 /*

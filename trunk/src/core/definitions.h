@@ -24,12 +24,12 @@
 #ifndef _ldefinitions_h_
 #define _ldefinitions_h_
 
-#define DRAW_DRAW 			        0
-#define DRAW_FILLED 			    1
-#define DRAW_DRAWFILLED 	        2
+#define DRAW_DRAW       0
+#define DRAW_FILLED     1
+#define DRAW_DRAWFILLED 2
 
-#define LUNA_OPACITYMODE_ADD		0
-#define LUNA_OPACITYMODE_KEEP		1
+#define LUNA_OPACITYMODE_ADD    0
+#define LUNA_OPACITYMODE_KEEP   1
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -68,6 +68,7 @@ struct LunapaintObject
 #define LunaObj_LayerOpacity        1
 #define LunaObj_LayerVisibility     2
 #define LunaObj_LayerName           3
+
 struct LunaObjDesc
 {
     unsigned int type;
@@ -122,33 +123,33 @@ unsigned int prevColor; // previous color index
 */
 typedef struct typeCanvas
 {
-    unsigned int 							width;
-    unsigned int 							height;
-    int										offsetx;
-    int										offsety;
-    unsigned int 							currentFrame;
-    unsigned int                            totalFrames;
-    unsigned int                            currentLayer;
-    unsigned int                            previousLayer; 	    // Previously selected layer
-    unsigned int 							totalLayers;
-    unsigned char							onion;				// Modes of onion skin
+    unsigned int            width;
+    unsigned int            height;
+    int                     offsetx;
+    int                     offsety;
+    unsigned int            currentFrame;
+    unsigned int            totalFrames;
+    unsigned int            currentLayer;
+    unsigned int            previousLayer;      // Previously selected layer
+    unsigned int            totalLayers;
+    unsigned char           onion;              // Modes of onion skin
 
-    unsigned int*							screenbuffer;		// Holds temp data for displaying
-    unsigned int*							screenstorage;		// Stores the screenbuffer
-    BOOL										winHasChanged;		// If the window has changed
-    unsigned int							scrStorageWidth;	// Width of storage window
-    unsigned int							scrStorageHeight;	// Height of storage window
-    unsigned int							layerScrollPosV;	// Vertical scroll position in layers window
+    unsigned int            *screenbuffer;       // Holds temp data for displaying
+    unsigned int            *screenstorage;      // Stores the screenbuffer
+    BOOL                    winHasChanged;      // If the window has changed
+    unsigned int            scrStorageWidth;    // Width of storage window
+    unsigned int            scrStorageHeight;   // Height of storage window
+    unsigned int            layerScrollPosV;    // Vertical scroll position in layers window
 
-    unsigned int							winEdgeWidth;		// Edge from canvas to window edge
-    unsigned int							winEdgeHeight;		// --||--
-    unsigned int							visibleWidth;		// Visible part of image
-    unsigned int							visibleHeight;		// Visible part of image
-    double									zoom;				// Amout of zoom on canvas
-    gfxbuffer* 								buffer;				// Linked list
-    unsigned long long int* 			    activebuffer;		// Points to the current layer/frame
-    unsigned long long int*				    swapbuffer;			// A swap buffer :-)
-    unsigned int*							tmpBuf;				// Stores temp info if needed
+    unsigned int            winEdgeWidth;       // Edge from canvas to window edge
+    unsigned int            winEdgeHeight;      // --||--
+    unsigned int            visibleWidth;       // Visible part of image
+    unsigned int            visibleHeight;      // Visible part of image
+    double                  zoom;               // Amout of zoom on canvas
+    gfxbuffer               *buffer;            // Linked list
+    unsigned long long int  *activebuffer;      // Points to the current layer/frame
+    unsigned long long int  *swapbuffer;        // A swap buffer :-)
+    unsigned int            *tmpBuf;            // Stores temp info if needed
 } oCanvas;
 
 #endif

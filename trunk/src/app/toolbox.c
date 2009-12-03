@@ -23,6 +23,49 @@
 
 #include "toolbox.h"
 
+struct Hook getMenu_hook;
+struct Hook brushOptions_hook;
+struct Hook getFill_hook;
+struct Hook getOpacMode_hook;
+
+int ToolboxRunning;
+Object *toolbox;
+Object *toolboxTopGroup;
+Object *tbxAreaPalette;
+Object *tbxAreaPreview;
+Object *tbxBtn_draw;
+Object *tbxBtn_line;
+Object *tbxBtn_rectangle;
+Object *tbxBtn_polygon;
+Object *tbxBtn_circle;
+Object *tbxBtn_fill;
+Object *tbxBtn_getbrush;
+Object *tbxBtn_pickcolor;
+
+char tbxPaletteClickMode;
+
+Object *antiImage, *antiOffImage, *solidImage, *featherImage;
+Object *brushOpGroup;
+
+Object *tbxCyc_GridSize;
+Object *tbxCycColorCtrl;
+
+Object *tbxSlider_Brushdiameter;
+Object *tbxSlider_Brushopacity;
+Object *tbxSlider_Brushincrement;
+Object *tbxSlider_Brushstep;
+Object *tbxCycGrid;
+Object *tbxCycFillmode;
+
+Object *tbxCyc_PaletteSnap;
+
+Object *tbxCycPaintMode;
+
+Object *offsetWindow, *offsetWindowOk, *offsetWindowCancel, *offsetWindowX, *offsetWindowY;
+
+unsigned int *PreviewRectData;
+
+
 AROS_UFH3 ( void, getMenu_func,
     AROS_UFHA ( struct Hook*, h, A0 ),
     AROS_UFHA ( APTR, obj, A2 ),
@@ -97,7 +140,7 @@ AROS_UFH3 ( void, brushOptions_func,
             break;
         default: break;
     }
-    DoMethod ( tbxAreaPalette, MUIM_AlterBrushShape );
+    DoMethod ( tbxAreaPalette, MUIM_Luna_Canvas_AlterBrushShape );
 
     AROS_USERFUNC_EXIT
 }
@@ -199,11 +242,11 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
             MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
             return DoSuperMethodA ( CLASS, self, message );
 
-        case MUIM_OpenPaletteEditor:
+        case MUIM_Luna_Canvas_OpenPaletteEditor:
             set ( paletteWindow, MUIA_Window_Open, TRUE );
             break;
 
-        case MUIM_ClearActiveCanvas:
+        case MUIM_Luna_Canvas_ClearActiveCanvas:
 
             // Clear active canvas and redraw...
             if ( globalActiveCanvas != NULL )
@@ -211,12 +254,12 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 int i; for ( i = 0; i < globalActiveCanvas->height * globalActiveCanvas->width; i++ )
                     globalActiveCanvas->activebuffer[ i ] = TRANSCOLOR;
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw );
                 DoMethod ( WidgetLayers, MUIM_Draw ); // <- force redraw
             }
             break;
 
-        case MUIM_SetPaintMode:
+        case MUIM_Luna_Canvas_SetPaintMode:
 
             if ( 1 )
             {
@@ -257,7 +300,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
             }
             break;
 
-        case MUIM_AlterBrushShape:
+        case MUIM_Luna_Canvas_AlterBrushShape:
             {
                 // Get brushsize from toolbox and set it
                 int tempWidth = 0, tempHeight = 0, tempOpacity = 0, tempPower = 0;
@@ -278,7 +321,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 return ( IPTR )NULL;
             }
             break;
-        case MUIM_AlterBrushStrength:
+        case MUIM_Luna_Canvas_AlterBrushStrength:
             {
                 // Get brushsize from toolbox and set it
                 int tempOpacity = 0, tempPower = 0;
@@ -289,11 +332,11 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 return ( IPTR )NULL;
             }
             break;
-        case MUIM_AlterBrushStep:
+        case MUIM_Luna_Canvas_AlterBrushStep:
             brushTool.step = XGET( tbxSlider_Brushstep, MUIA_Numeric_Value );
             break;
 
-        case MUIM_SetGlobalGrid:
+        case MUIM_Luna_Canvas_SetGlobalGrid:
             {
                 int num = 0;
                 get ( tbxCycGrid, MUIA_Cycle_Active, &num );
@@ -304,7 +347,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
             }
             break;
 
-        case MUIM_SetGridSize:
+        case MUIM_Luna_Canvas_SetGridSize:
             {
                 int num = 0;
                 get ( tbxCyc_GridSize, MUIA_Cycle_Active, &num );
@@ -312,7 +355,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
             }
             break;
 
-        case MUIM_NewProject:
+        case MUIM_Luna_NewProject:
             {
                 int width = 0, height = 0, frames = 0;
                 get ( nwStringWidth, MUIA_String_Integer, &width );
@@ -333,7 +376,7 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
             }
             break;
 
-        case MUIM_EffectOffset:
+        case MUIM_Luna_Canvas_EffectOffset:
 
             if ( globalActiveCanvas != NULL )
             {
@@ -342,11 +385,11 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
                 get ( offsetWindowY, MUIA_String_Integer, &y );
                 effectOffset ( x, y, globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw );
             }
             break;
 
-        case MUIM_SetColorMode:
+        case MUIM_Luna_Canvas_SetColorMode:
             {
                 int num = 0; get ( tbxCyc_PaletteSnap, MUIA_Cycle_Active, &num );
                 if ( num == 0 )
@@ -887,49 +930,49 @@ void Init_ToolboxMethods ( )
     DoMethod (
         tbxBtn_draw, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_Draw
+        paletteRect, 1, MUIM_Luna_SetTool_Draw
     );
     DoMethod ( tbxBtn_draw, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Draw" );
 
     DoMethod (
         tbxBtn_fill, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_Fill
+        paletteRect, 1, MUIM_Luna_SetTool_Fill
     );
     DoMethod ( tbxBtn_fill, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Flood fill" );
 
     DoMethod (
         tbxBtn_line, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_Line
+        paletteRect, 1, MUIM_Luna_SetTool_Line
     );
     DoMethod ( tbxBtn_line, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Line" );
 
     DoMethod (
         tbxBtn_rectangle, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_Rectangle
+        paletteRect, 1, MUIM_Luna_SetTool_Rectangle
     );
     DoMethod ( tbxBtn_rectangle, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Rectangle" );
 
     DoMethod (
         tbxBtn_circle, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_Circle
+        paletteRect, 1, MUIM_Luna_SetTool_Circle
     );
     DoMethod ( tbxBtn_circle, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Circle" );
 
     DoMethod (
         tbxBtn_getbrush, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_ClipBrush
+        paletteRect, 1, MUIM_Luna_SetTool_ClipBrush
     );
     DoMethod ( tbxBtn_getbrush, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Cut out brush" );
 
     DoMethod (
         tbxBtn_pickcolor, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_SetTool_Colorpicker
+        paletteRect, 1, MUIM_Luna_SetTool_Colorpicker
     );
     DoMethod ( tbxBtn_pickcolor, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Pick color" );
 
@@ -939,32 +982,32 @@ void Init_ToolboxMethods ( )
     DoMethod (
         tbxSlider_Brushdiameter, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_AlterBrushShape
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_AlterBrushShape
     );
     DoMethod (
         tbxSlider_Brushopacity, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_AlterBrushStrength
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_AlterBrushStrength
     );
     DoMethod (
         tbxSlider_Brushincrement, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_AlterBrushStrength
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_AlterBrushStrength
     );
     DoMethod (
         tbxSlider_Brushstep, MUIM_Notify,
         MUIA_Numeric_Value, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_AlterBrushStep
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_AlterBrushStep
     );
 
     DoMethod (
         offsetWindowOk, MUIM_Notify, MUIA_Pressed, FALSE,
-        tbxAreaPalette, 1, MUIM_EffectOffset
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_EffectOffset
     );
 
     DoMethod (
         tbxCyc_PaletteSnap, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_SetColorMode
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_SetColorMode
     );
 
     // When you access the menu
@@ -975,16 +1018,16 @@ void Init_ToolboxMethods ( )
 
     DoMethod (
         tbxCycPaintMode, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_SetPaintMode
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_SetPaintMode
     );
     DoMethod (
         tbxCycGrid, MUIM_Notify,
         MUIA_Cycle_Active, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_SetGlobalGrid
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_SetGlobalGrid
     );
     DoMethod (
         tbxCyc_GridSize, MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime,
-        tbxAreaPalette, 1, MUIM_SetGridSize
+        tbxAreaPalette, 1, MUIM_Luna_Canvas_SetGridSize
     );
 
     // Offset window
@@ -1036,7 +1079,7 @@ void checkMenuEvents ( int udata )
                 setActiveBuffer ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
                 set ( globalActiveWindow->win, MUIA_Window_Open, TRUE );
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw, NULL );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw, NULL );
             }
             break;
 
@@ -1064,7 +1107,7 @@ void checkMenuEvents ( int udata )
                 setActiveBuffer ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
 
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw );
             }
             break;
 
@@ -1130,15 +1173,15 @@ void checkMenuEvents ( int udata )
             break;
 
         case 730:
-            DoMethod ( globalActiveWindow->area, MUIM_ZoomIn );
+            DoMethod ( globalActiveWindow->area, MUIM_Luna_ZoomIn );
             break;
 
         case 731:
-            DoMethod ( globalActiveWindow->area, MUIM_ZoomOut );
+            DoMethod ( globalActiveWindow->area, MUIM_Luna_ZoomOut );
             break;
 
         case 732:
-            DoMethod ( globalActiveWindow->area, MUIM_ShowAll );
+            DoMethod ( globalActiveWindow->area, MUIM_Luna_ShowAll );
             break;
 
         case 740:
@@ -1157,7 +1200,7 @@ void checkMenuEvents ( int udata )
                 globalActiveWindow->rRectH = 0;
                 globalActiveWindow->rRectY = 0;
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw );
             }
             break;
 
@@ -1173,7 +1216,7 @@ void checkMenuEvents ( int udata )
             {
                 effectFlipVert ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw );
             }
             break;
 
@@ -1182,14 +1225,14 @@ void checkMenuEvents ( int udata )
             {
                 effectFlipHoriz ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
-                DoMethod ( globalActiveWindow->area, MUIM_Redraw );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw );
             }
             break;
 
         case 745:
             if ( globalActiveCanvas != NULL )
             {
-                DoMethod ( tbxAreaPalette, MUIM_ClearActiveCanvas );
+                DoMethod ( tbxAreaPalette, MUIM_Luna_Canvas_ClearActiveCanvas );
             }
             break;
 
@@ -1269,41 +1312,41 @@ void checkMenuEvents ( int udata )
         /* Paint tools */
 
         case 850:
-            DoMethod ( paletteRect, MUIM_SetTool_Draw );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Draw );
             break;
 
         case 851:
-            DoMethod ( paletteRect, MUIM_SetTool_Line );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Line );
             break;
 
         case 852:
-            DoMethod ( paletteRect, MUIM_SetTool_Fill );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Fill );
             break;
 
         case 853:
-            DoMethod ( paletteRect, MUIM_SetTool_Rectangle );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Rectangle );
             break;
 
         case 855:
-            DoMethod ( paletteRect, MUIM_SetTool_Circle );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Circle );
             break;
 
         case 854:
-            DoMethod ( paletteRect, MUIM_SetTool_ClipBrush );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_ClipBrush );
             break;
 
         case 856:
-            DoMethod ( paletteRect, MUIM_SetTool_Colorpicker );
+            DoMethod ( paletteRect, MUIM_Luna_SetTool_Colorpicker );
             break;
 
         /* Animation */
 
         case 820:
-            DoMethod ( WidgetLayers, MUIM_NextFrame );
+            DoMethod ( WidgetLayers, MUIM_Luna_Canvas_NextFrame );
             break;
 
         case 821:
-            DoMethod ( WidgetLayers, MUIM_PrevFrame );
+            DoMethod ( WidgetLayers, MUIM_Luna_Canvas_PrevFrame );
             break;
 
         case 825:

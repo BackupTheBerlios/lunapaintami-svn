@@ -61,8 +61,6 @@
 #include "core/canvas.h"
 #include "core/definitions.h"
 
-Object *projectWindow;
-
 /*
     Creates a project window object and adds it to the PaintApp object
 */

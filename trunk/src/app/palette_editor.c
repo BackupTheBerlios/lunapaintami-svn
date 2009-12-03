@@ -23,6 +23,34 @@
 
 #include "palette_editor.h"
 
+Object *paletteWindow;
+Object *paletteRect;
+Object *palSlideR;
+Object *palSlideG;
+Object *palSlideB;
+Object *palColRect;
+Object *palBtnUse;
+Object *palBtnSave;
+Object *palBtnLoad;
+Object *palStrFileSave;
+
+// Action buttons
+Object *palBtnCopy;
+Object *palBtnSwap;
+Object *palBtnSpread;
+Object *palBtnReverse;
+Object *palBtnClear;
+Object *palBtnPaste;
+
+unsigned int tempCopiedColor;
+BOOL tempCopiedColorExists;
+
+struct Hook rgbslider_hook;
+struct Hook paletteSave_hook;
+struct Hook paletteLoad_hook;
+struct Hook paletteClose_hook;
+
+
 /*
     Call the function that opens a palette file requestor and
     save on the resulting file...
@@ -134,70 +162,70 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
             MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
             return DoSuperMethodA ( CLASS, self, message );
 
-        case MUIM_Palette_Copy:
-            return ( IPTR )PaletteActions ( MUIM_Palette_Copy );
+        case MUIM_Luna_Palette_Copy:
+            return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Copy );
 
-        case MUIM_Palette_Paste:
-            return ( IPTR )PaletteActions ( MUIM_Palette_Paste );
+        case MUIM_Luna_Palette_Paste:
+            return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Paste );
 
-        case MUIM_Palette_Swap:
-            return ( IPTR )PaletteActions ( MUIM_Palette_Swap );
+        case MUIM_Luna_Palette_Swap:
+            return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Swap );
 
-        case MUIM_Palette_Reverse:
-            return ( IPTR )PaletteActions ( MUIM_Palette_Reverse );
+        case MUIM_Luna_Palette_Reverse:
+            return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Reverse );
 
-        case MUIM_Palette_Spread:
-            return ( IPTR )PaletteActions ( MUIM_Palette_Spread );
+        case MUIM_Luna_Palette_Spread:
+            return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Spread );
 
-        case MUIM_Palette_Clear:
-            return ( IPTR )PaletteActions ( MUIM_Palette_Clear );
+        case MUIM_Luna_Palette_Clear:
+            return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Clear );
 
         /* Tool stuff (should be in a dispatcher in the toolbox! */
 
-        case MUIM_SetTool_Draw:
+        case MUIM_Luna_SetTool_Draw:
             if ( globalCurrentTool != LUNA_TOOL_CLIPBRUSH )
             {
                 globalBrushMode = 0; // normal drawing mode
-                DoMethod ( tbxAreaPalette, MUIM_AlterBrushShape );
+                DoMethod ( tbxAreaPalette, MUIM_Luna_Canvas_AlterBrushShape );
             }
             globalCurrentTool = LUNA_TOOL_BRUSH;
             setToolbarActive ( );
             return 0;
 
-        case MUIM_SetTool_Fill:
+        case MUIM_Luna_SetTool_Fill:
 
             // Make a small brush now
             globalCurrentTool = LUNA_TOOL_FILL;
             setToolbarActive ( );
             return 0;
 
-        case MUIM_SetTool_Line:
+        case MUIM_Luna_SetTool_Line:
             globalCurrentTool = LUNA_TOOL_LINE;
             setToolbarActive ( );
             return 0;
 
-        case MUIM_SetTool_Rectangle:
+        case MUIM_Luna_SetTool_Rectangle:
             globalCurrentTool = LUNA_TOOL_RECTANGLE;
             setToolbarActive ( );
             return 0;
 
-        case MUIM_SetTool_Circle:
+        case MUIM_Luna_SetTool_Circle:
             globalCurrentTool = LUNA_TOOL_CIRCLE;
             setToolbarActive ( );
             return 0;
 
-        case MUIM_SetTool_ClipBrush:
+        case MUIM_Luna_SetTool_ClipBrush:
             globalCurrentTool = LUNA_TOOL_CLIPBRUSH;
             globalBrushMode = 1; // clipbrush mode
             setToolbarActive ( );
             return 0;
 
-        case MUIM_SetTool_Colorpicker:
+        case MUIM_Luna_SetTool_Colorpicker:
             globalCurrentTool = LUNA_TOOL_COLORPICKER;
             setToolbarActive ( );
             return 0;
 
-        case MUIM_ExecuteRevert:
+        case MUIM_Luna_ExecuteRevert:
             checkMenuEvents ( 595 );
             return 0;
 
@@ -346,12 +374,12 @@ IPTR PaletteActions ( ULONG action )
 {
     switch ( action )
     {
-        case MUIM_Palette_Copy:
+        case MUIM_Luna_Palette_Copy:
             tempCopiedColor = *( globalPalette + currColor );
             tempCopiedColorExists = TRUE;
             break;
 
-        case MUIM_Palette_Paste:
+        case MUIM_Luna_Palette_Paste:
 
             if ( tempCopiedColorExists )
             {
@@ -366,7 +394,7 @@ IPTR PaletteActions ( ULONG action )
 
             break;
 
-        case MUIM_Palette_Swap:
+        case MUIM_Luna_Palette_Swap:
 
             // Swap two colors
             if ( prevColor != currColor )
@@ -385,7 +413,7 @@ IPTR PaletteActions ( ULONG action )
 
             break;
 
-        case MUIM_Palette_Reverse:
+        case MUIM_Luna_Palette_Reverse:
 
             if ( currColor != prevColor )
             {
@@ -417,7 +445,7 @@ IPTR PaletteActions ( ULONG action )
 
             break;
 
-        case MUIM_Palette_Spread:
+        case MUIM_Luna_Palette_Spread:
             if ( currColor != prevColor )
             {
                 unsigned int firstCol = ( currColor > prevColor ) ? prevColor : currColor;
@@ -444,7 +472,7 @@ IPTR PaletteActions ( ULONG action )
             }
             break;
 
-        case MUIM_Palette_Clear:
+        case MUIM_Luna_Palette_Clear:
             if ( 1 )
             {
                 // Clear all colors in palette with current color
@@ -645,32 +673,32 @@ void Init_PaletteMethods ( )
     DoMethod (
         palBtnCopy, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_Palette_Copy
+        paletteRect, 1, MUIM_Luna_Palette_Copy
     );
     DoMethod (
         palBtnPaste, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_Palette_Paste
+        paletteRect, 1, MUIM_Luna_Palette_Paste
     );
     DoMethod (
         palBtnSpread, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_Palette_Spread
+        paletteRect, 1, MUIM_Luna_Palette_Spread
     );
     DoMethod (
         palBtnSwap, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_Palette_Swap
+        paletteRect, 1, MUIM_Luna_Palette_Swap
     );
     DoMethod (
         palBtnReverse, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_Palette_Reverse
+        paletteRect, 1, MUIM_Luna_Palette_Reverse
     );
     DoMethod (
         palBtnClear, MUIM_Notify,
         MUIA_Pressed, FALSE,
-        paletteRect, 1, MUIM_Palette_Clear
+        paletteRect, 1, MUIM_Luna_Palette_Clear
     );
 
     // Load/Save

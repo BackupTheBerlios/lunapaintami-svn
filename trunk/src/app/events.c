@@ -23,6 +23,20 @@
 
 #include "events.h"
 
+struct IOStdReq *gameInput;
+struct MsgPort *gameInputPort;
+struct Interrupt *gameInputInterrupt;
+
+struct Hook DisableKeyboard_hook;
+struct Hook EnableKeyboard_hook;
+
+BOOL evalMouseButtonL;
+BOOL evalMouseButtonR;
+LONG evalMouseX;
+LONG evalMouseY;
+ULONG evalRawKey;
+ULONG releaseKey;
+
 AROS_UFH3 ( void, DisableKeyboard_func,
     AROS_UFHA ( struct Hook*, h, A0 ),
     AROS_UFHA ( APTR, obj, A2 ),

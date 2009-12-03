@@ -22,6 +22,13 @@
 ****************************************************************************/
 #include "parts.h"
 
+BOOL keyboardEnabled;
+
+struct NewScreen *lunaScreen;
+struct Screen *lunaPubScreen;
+struct FileRequester *aslfileReq;
+int mouseClickCount;
+
 char *getFilename ( )
 {
     keyboardEnabled = FALSE;

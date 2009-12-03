@@ -23,6 +23,17 @@
 
 #include "preferences.h"
 
+struct Hook PrefsHandler_hook;
+LunapaintPrefs GlobalPrefs;
+
+Object *PrefsWindow;
+Object *PrefsScrnMdType;
+Object *PrefsLayBackMode;
+Object *PrefsBtnUse;
+Object *PrefsBtnSave;
+Object *PrefsBtnCancel;
+Object *PrefsCycScrType;
+
 
 AROS_UFH3 ( void, PrefsHandler_func,
     AROS_UFHA ( struct Hook*, h, A0 ),

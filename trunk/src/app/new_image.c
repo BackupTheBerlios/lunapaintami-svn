@@ -23,6 +23,17 @@
 
 #include "new_image.h"
 
+Object *nwWindow;
+Object *nwBtnOk;
+Object *nwBtnCancel;
+Object *nwStringWidth;
+Object *nwStringHeight;
+Object *nwStringFrames;
+Object *nwStringPrjName;
+Object *nwTemplates;
+struct Hook template_hook;
+
+
 AROS_UFH3 ( void, template_func,
     AROS_UFHA ( struct Hook*, h, A0 ),
     AROS_UFHA ( APTR, obj, A2 ),
@@ -137,7 +148,7 @@ void Init_NewProjectMethods ( )
     // Do Methods...
     DoMethod (
         nwBtnOk, MUIM_Notify, MUIA_Pressed, FALSE,
-        tbxAreaPalette, 1, MUIM_NewProject
+        tbxAreaPalette, 1, MUIM_Luna_NewProject
     );
     DoMethod (
         nwBtnCancel, MUIM_Notify, MUIA_Pressed, FALSE,

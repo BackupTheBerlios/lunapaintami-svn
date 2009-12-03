@@ -51,7 +51,7 @@
 #include "config.h"
 #include "parts.h"
 
-Object *aboutWindow, *aboutWindowOk;
+extern Object *aboutWindow, *aboutWindowOk;
 
 void Init_AboutWindow ( );
 
