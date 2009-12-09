@@ -168,7 +168,7 @@ AROS_UFH3 ( void, import_func,
     AROS_USERFUNC_EXIT
 }
 
-unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype )
+unsigned int *generateExportableBuffer ( struct oCanvas *canvas, int mode, int datatype )
 {
     unsigned int *buffer = NULL;
 
@@ -180,16 +180,16 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
         int size = canvas->width * canvas->height;
         int i = 0; for ( ; i < size; i++ )
         {
-            rgba64 c64 = *( rgba64 *)&canvas->activebuffer[ i ];
+            struct rgba64 c64 = *( struct rgba64 *)&canvas->activebuffer[ i ];
 
             // Align the colors reverse
-            c64 = ( rgba64 ){ c64.a, c64.b, c64.g, c64.r };
+            c64 = ( struct rgba64 ){ c64.a, c64.b, c64.g, c64.r };
 
             // Set the colors in 32-but order
             // datatype 0 is JPEG
             if ( datatype == 0 )
             {
-                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){
+                buffer[ i ] = *( unsigned int *)&( ( struct rgba32 ){
                     ( double )c64.a / 256, ( double )c64.r / 256,
                     ( double )c64.g / 256, ( double )c64.b / 256
                 } );
@@ -197,7 +197,7 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
             // If datatype is png, include all channels
             else if ( datatype == 1 )
             {
-                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){
+                buffer[ i ] = *( unsigned int *)&( ( struct rgba32 ){
                     ( double )c64.r / 256, ( double )c64.g / 256,
                     ( double )c64.b / 256, ( double )c64.a / 256
                 } );
@@ -205,7 +205,7 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
             // Others
             else
             {
-                buffer[ i ] = *( unsigned int *)&( ( rgba32 ){
+                buffer[ i ] = *( unsigned int *)&( ( struct rgba32 ){
                     ( double )c64.b / 256, ( double )c64.g / 256,
                     ( double )c64.r / 256, ( double )c64.a / 256
                 } );
@@ -229,16 +229,16 @@ unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype
         int size = canvas->width * canvas->height;
         int i = 0; for ( ; i < size; i++ )
         {
-            rgba32 c = *( rgba32 *)&buffer[ i ];
+            struct rgba32 c = *( struct rgba32 *)&buffer[ i ];
 
             // Set the colors in 32-bit order
             // datatype 0 is JPEG
             if ( datatype == 0 )
-                c = ( rgba32 ){ c.a, c.r, c.g, c.b };
+                c = ( struct rgba32 ){ c.a, c.r, c.g, c.b };
             else if ( datatype == 1 )
-                c = ( rgba32 ){ c.r, c.g, c.b, c.a };
+                c = ( struct rgba32 ){ c.r, c.g, c.b, c.a };
             else
-                c = ( rgba32 ){ c.b, c.g, c.r, c.a };
+                c = ( struct rgba32 ){ c.b, c.g, c.r, c.a };
 
             buffer[ i ] = *( unsigned int *)&c;
         }
@@ -440,7 +440,7 @@ void makeImportWindow ( )
     );
 }
 
-void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename )
+void createImageFromAnimation ( struct oCanvas *canv, int datatype, char *filename )
 {
     // Get some rules
     int AnimMode = 0, AnimMethod = 0, FrameStart = 0, FrameEnd = 0;

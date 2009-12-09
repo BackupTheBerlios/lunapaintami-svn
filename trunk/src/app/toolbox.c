@@ -199,7 +199,7 @@ IPTR tbxPaintPreview ( )
             int offx = ( ( double )x / bpw ) * brushTool.width;
             int offy = ( ( double )y / h ) * brushTool.height;
 
-            rgbaData rgba = canvasColorToRGBA (
+            struct rgbaData rgba = canvasColorToRGBA (
                 brushTool.buffer[ offy * brushTool.width + offx ]
             );
 

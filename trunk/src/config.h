@@ -32,12 +32,12 @@
     "Special thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
 #define VERSIONSTRING "$VER: Lunapaint 0.4 (18.11.2009) by LunaPaint Development Team\n"
 
-typedef struct LunapaintPrefs
+struct LunapaintPrefs
 {
     char ScreenmodeType;
     char LayerBackgroundMode;
-} LunapaintPrefs;
+};
 
-extern LunapaintPrefs GlobalPrefs;
+extern struct LunapaintPrefs GlobalPrefs;
 
 #endif

@@ -64,16 +64,16 @@
 /*
     Creates a project window object and adds it to the PaintApp object
 */
-void CreateProjectWindow ( WindowList *lst );
+void CreateProjectWindow ( struct WindowList *lst );
 /*
     Destroys the project window object and removes it from the PaintApp
 */
-void DestroyProjectWindow ( WindowList *lst );
+void DestroyProjectWindow ( struct WindowList *lst );
 
 /*
     Save a project to disk
 */
-void SaveProject ( WindowList *lst );
+void SaveProject ( struct WindowList *lst );
 
 /*
     Load project from disk

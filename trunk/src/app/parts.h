@@ -78,7 +78,7 @@ extern BOOL keyboardEnabled;
 extern struct NewScreen *lunaScreen;
 extern struct Screen *lunaPubScreen;
 
-typedef struct rect__struct
+struct RectStruct
 {
     int x;
     int y;
@@ -89,7 +89,7 @@ typedef struct rect__struct
 /*
     A linked list consisting of windowID and a window object
 */
-typedef struct sWinList
+struct WindowList
 {
     Object          *win;           // The MUI window
 
@@ -123,14 +123,14 @@ typedef struct sWinList
     Object          *txtCoordX;     // X coordinates
     Object          *txtCoordY;     // Y coordinates
     Object          *txtZoomLevel;  // How much zoom
-    oCanvas         *canvas;        // Pixel buffer
+    struct oCanvas  *canvas;        // Pixel buffer
     unsigned int    id;             // Window ID
     BOOL            isActive;       // is the window active or not?
     BOOL            isVisible;      // If it is supposed to be visible
     BOOL            layersChg;      // Has the layercount changed?
-    RectStruct      prevBlit;       // previous blitted area
+    struct RectStruct prevBlit;     // previous blitted area
     struct Hook     CanvasKey_hook; // Hook for input keys
-    struct sWinList *nextwin;       // Next window in list
+    struct WindowList *nextwin;     // Next window in list
 } WindowList;
 
 /*
@@ -153,7 +153,7 @@ struct RGBitmapData
     unsigned int    scrollEntriesV; // Remembered scroll pos
     BOOL            mousepressed;   // If the mouse is pressed
     BOOL            isBusy;         // If the canvas is heavily busy on something
-    WindowList      *window;        // A pointer to the window
+    struct WindowList *window;      // A pointer to the window
     struct RastPort *rp;            // Rastport to draw on
 };
 

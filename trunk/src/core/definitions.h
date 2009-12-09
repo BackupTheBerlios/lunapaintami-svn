@@ -99,29 +99,29 @@ struct LunapaintFormat
     So first comes layers then frames. When resizing the animation
     or the layers, one has 4to restructure the list.
 */
-typedef struct gfxbuf {
-    struct gfxbuf *nextbuf;
+struct gfxbuffer {
+    struct gfxbuffer *nextbuf;
     BOOL visible;
     char opacity;
     unsigned char *name;
     unsigned long long int *buf;
-} gfxbuffer;
+};
 
 /*
     A simple 24bpp palette
 */
-char filledDrawing;
-unsigned int *globalPalette;
-unsigned int globalColor; // Current color value
-unsigned int currColor; // current color index
-unsigned int prevColor; // previous color index
+extern char filledDrawing;
+extern unsigned int *globalPalette;
+extern unsigned int globalColor; // Current color value
+extern unsigned int currColor; // current color index
+extern unsigned int prevColor; // previous color index
 
 /*
     A canvas holds all the information about a surface. A surface
     can be shown in a Window, can have frames (it always starts with 1
     frames), can have layers on the frames etc.
 */
-typedef struct typeCanvas
+struct oCanvas
 {
     unsigned int            width;
     unsigned int            height;
@@ -146,7 +146,7 @@ typedef struct typeCanvas
     unsigned int            visibleWidth;       // Visible part of image
     unsigned int            visibleHeight;      // Visible part of image
     double                  zoom;               // Amout of zoom on canvas
-    gfxbuffer               *buffer;            // Linked list
+    struct gfxbuffer        *buffer;            // Linked list
     unsigned long long int  *activebuffer;      // Points to the current layer/frame
     unsigned long long int  *swapbuffer;        // A swap buffer :-)
     unsigned int            *tmpBuf;            // Stores temp info if needed

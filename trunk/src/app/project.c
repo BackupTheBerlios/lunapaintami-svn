@@ -23,7 +23,7 @@
 
 #include "project.h"
 
-void CreateProjectWindow ( WindowList *lst )
+void CreateProjectWindow ( struct WindowList *lst )
 {
 
     STRPTR windowtitle = NULL;
@@ -72,14 +72,14 @@ void CreateProjectWindow ( WindowList *lst )
     );
 }
 
-void DestroyProjectWindow ( WindowList *lst )
+void DestroyProjectWindow ( struct WindowList *lst )
 {
     DoMethod ( PaintApp, OM_REMMEMBER, ( IPTR )lst->projectWin );
     MUI_DisposeObject ( lst->projectWin );
     lst->projectWin = NULL;
 }
 
-void SaveProject ( WindowList *lst )
+void SaveProject ( struct WindowList *lst )
 {
     if ( lst->filename == NULL ) return;
 
@@ -118,7 +118,7 @@ void SaveProject ( WindowList *lst )
     // Write all the layers out!
     int buffers = lst->canvas->totalLayers * lst->canvas->totalFrames;
     int gfxsize = lst->canvas->width * lst->canvas->height * 8;
-    gfxbuffer *buf = lst->canvas->buffer;
+    struct gfxbuffer *buf = lst->canvas->buffer;
     int i = 0; for ( ; i < buffers; i++ )
     {
         Write ( outFile, buf->buf, gfxsize );
@@ -200,8 +200,8 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
         // Load in the bitmap data
         int buffers = header->frameCount * header->layerCount;
         int framesize = header->width * header->height * 8;
-        gfxbuffer *buf = AllocVec ( sizeof ( gfxbuffer ), MEMF_CLEAR );
-        gfxbuffer *tmp = buf;
+        struct gfxbuffer *buf = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_CLEAR );
+        struct gfxbuffer *tmp = buf;
         int i = 0; for ( ; i < buffers; i++ )
         {
             tmp->buf = AllocVec ( framesize, MEMF_CLEAR );
@@ -211,7 +211,7 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
             Read ( inputFile, tmp->buf, framesize );
             if ( i + 1 < buffers )
             {
-                tmp->nextbuf = AllocVec ( sizeof ( gfxbuffer ), MEMF_CLEAR );
+                tmp->nextbuf = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_CLEAR );
                 tmp = tmp->nextbuf;
             }
             else
@@ -230,7 +230,7 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
                         {
                             char opacity;
                             Read ( inputFile, &opacity, 1 );
-                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
+                            struct gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
                             b->opacity = opacity;
                         }
                         break;
@@ -240,7 +240,7 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
                             char vis;
                             Read ( inputFile, &vis, 1 );
                             visible = vis == 1 ? TRUE : FALSE;
-                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
+                            struct gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
                             b->visible = visible;
                         }
                         break;
@@ -248,7 +248,7 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
                         {
                             unsigned char *name = AllocVec ( desc.datalength + 1, MEMF_ANY|MEMF_CLEAR );
                             Read ( inputFile, name, desc.datalength );
-                            gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
+                            struct gfxbuffer *b = getGfxbufferFromList ( buf, desc.layer, desc.frame, header->layerCount, header->frameCount );
                             if ( b->name ) FreeVec ( b->name ); // Free the dummy allocation
                             b->name = AllocVec ( desc.datalength + 1, MEMF_ANY|MEMF_CLEAR ); // +1 = null terminator
                             strncpy ( b->name, name, desc.datalength );

@@ -35,16 +35,16 @@
     Move the active layer on a canvas with x and y and wrap
     around.
 */
-void effectOffset ( int x, int y, oCanvas *canvas );
+void effectOffset ( int x, int y, struct oCanvas *canvas );
 
 /*
     Flip a buffer vertically
 */
-void effectFlipVert ( oCanvas *canvas );
+void effectFlipVert ( struct oCanvas *canvas );
 
 /*
     Flip a buffer horizontally
 */
-void effectFlipHoriz ( oCanvas *canvas );
+void effectFlipHoriz ( struct oCanvas *canvas );
 
 #endif

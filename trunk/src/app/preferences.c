@@ -24,7 +24,7 @@
 #include "preferences.h"
 
 struct Hook PrefsHandler_hook;
-LunapaintPrefs GlobalPrefs;
+struct LunapaintPrefs GlobalPrefs;
 
 Object *PrefsWindow;
 Object *PrefsScrnMdType;
@@ -187,13 +187,13 @@ BOOL savePreferences ( )
         goto prefs_save_ending;
     }
 
-    if ( PushChunk( handle, ID_PREF, ID_LUNAPAINT, sizeof( LunapaintPrefs ) ) )
+    if ( PushChunk( handle, ID_PREF, ID_LUNAPAINT, sizeof( struct LunapaintPrefs ) ) )
     {
         goto prefs_save_ending;
     }
 
     // Save prefs struct
-    if ( !WriteChunkBytes( handle, &GlobalPrefs, sizeof( LunapaintPrefs ) ) )
+    if ( !WriteChunkBytes( handle, &GlobalPrefs, sizeof( struct LunapaintPrefs ) ) )
     {
         goto prefs_save_ending;
     }
@@ -247,7 +247,7 @@ BOOL loadPreferences ( )
 
     context = CurrentChunk( handle );
 
-    if ( ReadChunkBytes ( handle, &GlobalPrefs, sizeof( LunapaintPrefs ) ) )
+    if ( ReadChunkBytes ( handle, &GlobalPrefs, sizeof( struct LunapaintPrefs ) ) )
         goto prefs_load_ending;
 
     result = TRUE;

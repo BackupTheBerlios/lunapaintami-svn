@@ -47,15 +47,15 @@ extern BOOL abortRedraw;
 extern int redrawTimes; // how many redrawtimes
 
 // Linked value list
-typedef struct valuelist
+struct ValueList
 {
     double x, y;
-    struct valuelist *Next;
-} ValueList;
+    struct ValueList *Next;
+};
 
 
 // Tool Line
-typedef struct tool_LineData
+struct toolLineData
 {
     int                     mode;           // The mode
     double                  x;              // Draw from
@@ -69,10 +69,10 @@ typedef struct tool_LineData
     unsigned long long int  *buffer;        // pixelbuffer
 } toolLineData;
 
-extern toolLineData lineTool;
+extern struct toolLineData lineTool;
 
 // Tool Brush
-typedef struct tool_BrushData
+struct toolBrushData
 {
     int                     width;      // Brush width
     int                     height;     // Brush height
@@ -81,7 +81,7 @@ typedef struct tool_BrushData
     int                     step;       // Brush steps in between draw
     int                     paintmode;  // The current paintmode
     char                    opacitymode;// How to use opacity
-    ValueList               *ContourBuffer; // For filled freehand drawing
+    struct ValueList        *ContourBuffer; // For filled freehand drawing
     BOOL                    RecordContour;  // Record pixels for contour or not?
     double                  ContourMinX, ContourMinY;   // Smallest x,y
     double                  ContourMaxX, ContourMaxY;   // Largest x,y
@@ -90,12 +90,12 @@ typedef struct tool_BrushData
     BOOL                    initialized;// Are we initialized?
     unsigned long long int  *buffer;    // Buffer for storing the brush
     unsigned long long int  *tmpbuf;    // Generic buffer for different things
-} toolBrushData;
+};
 
-extern toolBrushData brushTool;
+extern struct toolBrushData brushTool;
 
 // Tool Circle
-typedef struct tool_CircleData
+struct toolCircleData
 {
     int                     mode;       // The mode
     int                     x, y;       // Draw from
@@ -107,12 +107,12 @@ typedef struct tool_CircleData
     int                     bufheight;  // buffer height
     BOOL                    initialized;// Are we initialized or not?
     unsigned long long int  *buffer;    // pixelbuffer
-} toolCircleData;
+};
 
-extern toolCircleData circleTool;
+extern struct toolCircleData circleTool;
 
 // Tool Rectangle
-typedef struct tool_RectangleData
+struct toolRectData
 {
     int                     mode;           // The mode
     double                  x;              // Draw from
@@ -124,12 +124,12 @@ typedef struct tool_RectangleData
     double                  h;              // Height of buffer rect
     BOOL                    initialized;    // Are we initialized or not?
     unsigned long long int  *buffer;        // pixelbuffer
-} toolRectData;
+};
 
-extern toolRectData rectangleTool;
+extern struct toolRectData rectangleTool;
 
 // Tool Clipbrush
-typedef struct tool_ClipBrush
+struct toolClipBrushData
 {
     int                     mode;       // The mode
     double                  x;          // Draw from
@@ -141,14 +141,14 @@ typedef struct tool_ClipBrush
     double                  h;          // Height of buffer rect
     BOOL                    initialized;// Are we initialized or not?
     unsigned long long int  *buffer;    // pixelbuffer
-} toolClipBrushData;
+};
 
-extern toolClipBrushData clipbrushTool;
+extern struct toolClipBrushData clipbrushTool;
 
 /*
     Initialize a canvas and return a struct with a canvas in it
 */
-oCanvas* Init_Canvas (
+struct oCanvas* Init_Canvas (
     unsigned int w, unsigned int h, unsigned int layers,
     unsigned int frames, BOOL generateBuffers
 );
@@ -156,12 +156,12 @@ oCanvas* Init_Canvas (
 /*
     Control the frames on a canvas
 */
-void NextFrame ( oCanvas *canvas );
-void PrevFrame ( oCanvas *canvas );
-int GotoFrame ( oCanvas *canvas, unsigned int frame );
-int NextLayer ( oCanvas *canvas );
-int PrevLayer ( oCanvas *canvas );
-int GotoLayer ( oCanvas *canvas, unsigned int layer );
+void NextFrame ( struct oCanvas *canvas );
+void PrevFrame ( struct oCanvas *canvas );
+int GotoFrame ( struct oCanvas *canvas, unsigned int frame );
+int NextLayer ( struct oCanvas *canvas );
+int PrevLayer ( struct oCanvas *canvas );
+int GotoLayer ( struct oCanvas *canvas, unsigned int layer );
 
 /*
     Get a pixel from the canvas
@@ -177,58 +177,58 @@ unsigned long long int GetFlatPixelFromCanvas ( unsigned int x, unsigned int y )
     Check which layer / frame we are using and set the pointer to the active
     buffer...
 */
-void setActiveBuffer ( oCanvas *canvas );
+void setActiveBuffer ( struct oCanvas *canvas );
 
 /*
     Return a pointer to the next frame (wrap around)
 */
-unsigned long long int *getNextFrame ( oCanvas *canvas );
+unsigned long long int *getNextFrame ( struct oCanvas *canvas );
 
 /*
     Return a pointer to the prev frame (wrap around)
 */
-unsigned long long int *getPrevFrame ( oCanvas *canvas );
+unsigned long long int *getPrevFrame ( struct oCanvas *canvas );
 
 /*
     Return a pointer to the current gfxbuffer struct
 */
-gfxbuffer *getActiveGfxbuffer ( oCanvas *canvas );
+struct gfxbuffer *getActiveGfxbuffer ( struct oCanvas *canvas );
 
 /*
     Return a pointer to a specified gfxbuffer
 */
-gfxbuffer *getGfxbuffer ( oCanvas *canvas, int layer, int frame );
-gfxbuffer *getGfxbufferFromList ( gfxbuffer *buf, int layer, int frame, int totallayers, int totalframes );
+struct gfxbuffer *getGfxbuffer ( struct oCanvas *canvas, int layer, int frame );
+struct gfxbuffer *getGfxbufferFromList ( struct gfxbuffer *buf, int layer, int frame, int totallayers, int totalframes );
 
 /*
     Free the memory in a canvas
 */
-void Destroy_Canvas ( oCanvas *canvas );
+void Destroy_Canvas ( struct oCanvas *canvas );
 
 /*
     Free memory in a canvas buffer
 */
-void Destroy_Buffer ( oCanvas *canv );
+void Destroy_Buffer ( struct oCanvas *canv );
 
 /*
     Draw the layers etc and return an unsigned int buffer for use by
     redrawScreenbufferRect and others
 */
 inline unsigned int *renderCanvas (
-    oCanvas *canvas, unsigned int rx, unsigned int ry,
+    struct oCanvas *canvas, unsigned int rx, unsigned int ry,
     unsigned int rw, unsigned int rh, BOOL Transparent
 );
 
 /*
     Scroll the canvas screen storage by x,y (destructive moving)
 */
-void scrollScreenStorage ( oCanvas *canvas, int x, int y );
+void scrollScreenStorage ( struct oCanvas *canvas, int x, int y );
 
 /*
     Draw all layers onto the screenbuffer constrained by rect
 */
 BOOL redrawScreenbufferRect (
-    oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw,
+    struct oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw,
     unsigned int rh, BOOL updateStorage
 );
 
@@ -236,7 +236,7 @@ BOOL redrawScreenbufferRect (
     Draw all layers onto the screenbuffer in specified
     canvas data
 */
-BOOL redrawScreenbuffer ( oCanvas *canvas );
+BOOL redrawScreenbuffer ( struct oCanvas *canvas );
 
 /*
     Initialize the palette with standard colors...
@@ -251,37 +251,37 @@ void loadDefaultPalette ( );
 /*
     Insert a new layer on each frame
 */
-void addLayer ( oCanvas *canv );
+void addLayer ( struct oCanvas *canv );
 
 /*
     Swap two layers
 */
-void swapLayers ( oCanvas *canv );
+void swapLayers ( struct oCanvas *canv );
 
 /*
     Copy one layer to another
 */
-void copyLayers ( oCanvas *canv );
+void copyLayers ( struct oCanvas *canv );
 
 /*
     Merge two laywers
 */
-void mergeLayers ( oCanvas *canv );
+void mergeLayers ( struct oCanvas *canv );
 
 /*
     Delete a layer
 */
-void deleteLayer ( oCanvas *canv );
+void deleteLayer ( struct oCanvas *canv );
 
 /*
     Copy data to swap
 */
-void copyToSwap ( oCanvas *canv );
+void copyToSwap ( struct oCanvas *canv );
 
 /*
     Swap with spare
 */
-void swapCanvasBuffers ( oCanvas *canv );
+void swapCanvasBuffers ( struct oCanvas *canv );
 
 
 /*
@@ -292,8 +292,8 @@ inline unsigned int drawToolPreview ( int x, int y );
 /*
     Use the value list
 */
-void addListValue ( double x, double y, ValueList **lst );
-void freeValueList ( ValueList **lst );
+void addListValue ( double x, double y, struct ValueList **lst );
+void freeValueList ( struct ValueList **lst );
 
 #endif
 

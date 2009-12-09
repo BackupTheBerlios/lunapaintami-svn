@@ -34,73 +34,73 @@
     Some color structs
 */
 
-typedef struct
+struct rgbData
 {
     unsigned int r, g, b;
-} rgbData;
+};
 
-typedef struct
+struct rgbaDataL
 {
     unsigned long long int r, g, b, a;
-} rgbaDataL;
+};
 
-typedef struct
+struct rgbaData
 {
     unsigned int r, g, b, a;
-} rgbaData;
+};
 
-typedef struct
+struct rgba32
 {
     unsigned char r, g, b, a;
-} rgba32;
+};
 
-typedef struct
+struct rgb24
 {
     unsigned char r, g, b;
-} rgb24;
+};
 
-typedef struct
+struct rgba64
 {
     unsigned short r, g, b, a;
-} rgba64;
+};
 
-typedef struct
+struct bgra32
 {
     unsigned char b, g, r, a;
-} bgra32;
+};
 
-typedef struct
+struct abgr32
 {
     unsigned char a, b, g, r;
-} abgr32;
+};
 
 /*
     Take an unsigned int color in ABGR format and convert to a
     struct containing the R, G, B channels separately
 */
-rgbData paletteColorToRGB ( unsigned int color );
+struct rgbData paletteColorToRGB ( unsigned int color );
 
 /*
     Palettecolor to rgba64
 */
-rgba64 PaletteToRgba64 ( unsigned int rgb );
+struct rgba64 PaletteToRgba64 ( unsigned int rgb );
 
 /*
     Take unsigned long long int and extract rgba data
     in rgbaData
 */
-rgbaData canvasColorToRGBA ( unsigned long long int color );
+struct rgbaData canvasColorToRGBA ( unsigned long long int color );
 
 /*
     Take unsigned long long int and extract rgba and return
     in a struct typedef rgbaDataL
 */
-rgbaDataL canvasColorToRGBA_ull ( unsigned long long int color );
+struct rgbaDataL canvasColorToRGBA_ull ( unsigned long long int color );
 
 /*
     Take unsigned int and return rgba
 */
-rgbaData bufferToRGBA ( unsigned int color );
+struct rgbaData bufferToRGBA ( unsigned int color );
 
 /*
     Take r, g, b separately and join them to a palette color of type

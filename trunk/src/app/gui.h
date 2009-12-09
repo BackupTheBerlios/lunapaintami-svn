@@ -63,7 +63,7 @@
 
 #include "../config.h"
 
-typedef struct ObjectBOOL
+struct ObjectBOOL
 {
     Object *obj;
     BOOL value;
@@ -80,7 +80,7 @@ extern Object *mainPulldownMenu;
     - The canvases is managed in the canvases list
 */
 extern Object *PaintApp;
-extern WindowList *canvases;
+extern struct WindowList *canvases;
 extern Object *testWindow;
 extern Object *AlertWindow;
 extern Object *AlertText;

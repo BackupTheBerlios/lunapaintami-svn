@@ -88,7 +88,7 @@ extern struct Hook exportanimation_hook;
 /*
     Generate an exportable buffer
 */
-unsigned int *generateExportableBuffer ( oCanvas *canvas, int mode, int datatype );
+unsigned int *generateExportableBuffer ( struct oCanvas *canvas, int mode, int datatype );
 
 /*
     Generate the export window
@@ -103,7 +103,7 @@ void makeImportWindow ( );
     Create an image from an animation by the choices done in the
     gui
 */
-void createImageFromAnimation ( oCanvas *canv, int datatype, char *filename );
+void createImageFromAnimation ( struct oCanvas *canv, int datatype, char *filename );
 
 /*
     Export a jpeg image (for now only jpeg)

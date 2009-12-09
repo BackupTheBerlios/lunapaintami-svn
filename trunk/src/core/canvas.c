@@ -25,14 +25,14 @@
 
 BOOL abortRedraw;
 int redrawTimes;
-toolLineData lineTool;
-toolBrushData brushTool;
-toolCircleData circleTool;
-toolRectData rectangleTool;
-toolClipBrushData clipbrushTool;
+struct toolLineData lineTool;
+struct toolBrushData brushTool;
+struct toolCircleData circleTool;
+struct toolRectData rectangleTool;
+struct toolClipBrushData clipbrushTool;
 
 
-oCanvas* Init_Canvas (
+struct oCanvas* Init_Canvas (
     unsigned int w, unsigned int h,
     unsigned int layers, unsigned int frames,
     BOOL generateBuffers
@@ -40,15 +40,15 @@ oCanvas* Init_Canvas (
 {
     int bufsize = w * h * 8;
     int scope = w * h;
-    oCanvas *canv = AllocVec ( sizeof ( oCanvas ), MEMF_ANY );
+    struct oCanvas *canv = AllocVec ( sizeof ( struct oCanvas ), MEMF_ANY );
     canv->screenbuffer = NULL;
     canv->buffer = NULL;
 
     // Reserve memory for all the images in the linked list:
     if ( generateBuffers )
     {
-        canv->buffer = AllocVec ( sizeof ( gfxbuffer ), MEMF_ANY );
-        gfxbuffer *tmp = canv->buffer;
+        canv->buffer = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_ANY );
+        struct gfxbuffer *tmp = canv->buffer;
         int span = layers * frames;
         int a = 0; for ( ; a < span; a++ )
         {
@@ -63,7 +63,7 @@ oCanvas* Init_Canvas (
                 tmp->buf[ i ] = TRANSCOLOR;
 
             if ( a < span - 1 )
-                tmp->nextbuf = AllocVec ( sizeof ( gfxbuffer ), MEMF_ANY );
+                tmp->nextbuf = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_ANY );
             else tmp->nextbuf = NULL; // <- marks the end
             tmp = tmp->nextbuf;
         }
@@ -89,7 +89,7 @@ oCanvas* Init_Canvas (
     return canv;
 }
 
-void NextFrame ( oCanvas *canvas )
+void NextFrame ( struct oCanvas *canvas )
 {
     if ( canvas->totalFrames > canvas->currentFrame + 1 )
         canvas->currentFrame++;
@@ -97,7 +97,7 @@ void NextFrame ( oCanvas *canvas )
     setActiveBuffer ( canvas );
 }
 
-void PrevFrame ( oCanvas *canvas )
+void PrevFrame ( struct oCanvas *canvas )
 {
     if ( canvas->currentFrame > 0 )
         canvas->currentFrame--;
@@ -105,7 +105,7 @@ void PrevFrame ( oCanvas *canvas )
     setActiveBuffer ( canvas );
 }
 
-void Destroy_Canvas ( oCanvas *canvas )
+void Destroy_Canvas ( struct oCanvas *canvas )
 {
     globalActiveCanvas = NULL;
 
@@ -128,24 +128,24 @@ void Destroy_Canvas ( oCanvas *canvas )
         FreeVec ( canvas );
 }
 
-void Destroy_Buffer ( oCanvas *canv )
+void Destroy_Buffer ( struct oCanvas *canv )
 {
-    gfxbuffer *buf = canv->buffer;
+    struct gfxbuffer *buf = canv->buffer;
     canv->buffer = NULL;
     while ( buf != NULL )
     {
         if ( buf->name != NULL ) FreeVec ( buf->name );
         if ( buf->buf != NULL ) FreeVec ( buf->buf );
-        gfxbuffer *tmp = buf;
+        struct gfxbuffer *tmp = buf;
         buf = buf->nextbuf;
         FreeVec ( tmp );
     }
 }
 
-void setActiveBuffer ( oCanvas *canvas )
+void setActiveBuffer ( struct oCanvas *canvas )
 {
     if ( canvas == NULL ) return;
-    gfxbuffer *buf = canvas->buffer;
+    struct gfxbuffer *buf = canvas->buffer;
     int i = 0; while ( buf != NULL )
     {
         int f = i / canvas->totalLayers;
@@ -161,9 +161,9 @@ void setActiveBuffer ( oCanvas *canvas )
     return;
 }
 
-unsigned long long int *getNextFrame ( oCanvas *canvas )
+unsigned long long int *getNextFrame ( struct oCanvas *canvas )
 {
-    gfxbuffer *buf = canvas->buffer;
+    struct gfxbuffer *buf = canvas->buffer;
     int target = ( canvas->currentFrame + 1 ) % canvas->totalFrames;
     int size = canvas->totalFrames * canvas->totalLayers;
     int i = 0; for ( ; i < size; i++ )
@@ -176,9 +176,9 @@ unsigned long long int *getNextFrame ( oCanvas *canvas )
     return NULL;
 }
 
-unsigned long long int *getPrevFrame ( oCanvas *canvas )
+unsigned long long int *getPrevFrame ( struct oCanvas *canvas )
 {
-    gfxbuffer *buf = canvas->buffer;
+    struct gfxbuffer *buf = canvas->buffer;
     int target = ( canvas->currentFrame - 1 );
     if ( target < 0 ) target = canvas->totalFrames - 1;
     int size = canvas->totalFrames * canvas->totalLayers;
@@ -192,9 +192,9 @@ unsigned long long int *getPrevFrame ( oCanvas *canvas )
     return NULL;
 }
 
-gfxbuffer *getActiveGfxbuffer ( oCanvas *canvas )
+struct gfxbuffer *getActiveGfxbuffer ( struct oCanvas *canvas )
 {
-    gfxbuffer *buf = canvas->buffer;
+    struct gfxbuffer *buf = canvas->buffer;
     int size = canvas->totalFrames * canvas->totalLayers;
     int i = 0; for ( ; i < size; i++ )
     {
@@ -206,9 +206,9 @@ gfxbuffer *getActiveGfxbuffer ( oCanvas *canvas )
     return NULL;
 }
 
-gfxbuffer *getGfxbuffer ( oCanvas *canvas, int layer, int frame )
+struct gfxbuffer *getGfxbuffer ( struct oCanvas *canvas, int layer, int frame )
 {
-    gfxbuffer *buf = canvas->buffer;
+    struct gfxbuffer *buf = canvas->buffer;
     int size = canvas->totalFrames * canvas->totalLayers;
     int i = 0; for ( ; i < size; i++ )
     {
@@ -220,9 +220,9 @@ gfxbuffer *getGfxbuffer ( oCanvas *canvas, int layer, int frame )
     return NULL;
 }
 
-gfxbuffer *getGfxbufferFromList ( gfxbuffer *buf, int layer, int frame, int totallayers, int totalframes )
+struct gfxbuffer *getGfxbufferFromList ( struct gfxbuffer *buf, int layer, int frame, int totallayers, int totalframes )
 {
-    if ( buf == NULL ) return ( gfxbuffer *)NULL;
+    if ( buf == NULL ) return NULL;
     int size = totalframes * totallayers;
     int i = 0; for ( ; i < size; i++ )
     {
@@ -235,7 +235,7 @@ gfxbuffer *getGfxbufferFromList ( gfxbuffer *buf, int layer, int frame, int tota
 }
 
 inline unsigned int *renderCanvas (
-    oCanvas *canvas, unsigned int rx, unsigned int ry,
+    struct oCanvas *canvas, unsigned int rx, unsigned int ry,
     unsigned int rw, unsigned int rh, BOOL Transparent
 )
 {
@@ -255,7 +255,7 @@ inline unsigned int *renderCanvas (
     if ( tempBuf == NULL ){ return NULL; };
 
     // Start!
-    gfxbuffer *buf = canvas->buffer;
+    struct gfxbuffer *buf = canvas->buffer;
     int i = 0; for ( ; i < len; i++ )
     {
         int l = ( i % layerNumAndTrans ) - 1;
@@ -292,27 +292,27 @@ inline unsigned int *renderCanvas (
                     {
                         if ( Transparent )
                         {
-                            color = *( unsigned int *)&( ( rgba32 ){ 128, 128, 128, 0 } );
+                            color = *( unsigned int *)&( ( struct rgba32 ){ 128, 128, 128, 0 } );
                         }
                         else
                         {
                             switch ( GlobalPrefs.LayerBackgroundMode )
                             {
                                 case 1:
-                                    color = *( unsigned int *)&( ( rgba32 ){ 0, 0, 0, 255 } );
+                                    color = *( unsigned int *)&( ( struct rgba32 ){ 0, 0, 0, 255 } );
                                     break;
                                 case 2:
-                                    color = *( unsigned int *)&( ( rgba32 ){ 128, 128, 128, 255 } );
+                                    color = *( unsigned int *)&( ( struct rgba32 ){ 128, 128, 128, 255 } );
                                     break;
                                 case 3:
-                                    color = *( unsigned int *)&( ( rgba32 ){ 255, 255, 255, 255 } );
+                                    color = *( unsigned int *)&( ( struct rgba32 ){ 255, 255, 255, 255 } );
                                     break;
                                 default:
                                     {
-                                        color = *( unsigned int *)&( ( rgba32 ){ 128, 128, 128, 255 } );
+                                        color = *( unsigned int *)&( ( struct rgba32 ){ 128, 128, 128, 255 } );
                                         int checkCol = ( ( x % 32 ) + ( int )( y / 16 ) * 16 ) % 32;
                                         if ( checkCol >= 16 )
-                                            color = *( unsigned int *)&( ( rgba32 ){ 90, 90, 90, 255 } );
+                                            color = *( unsigned int *)&( ( struct rgba32 ){ 90, 90, 90, 255 } );
                                     }
                                     break;
                             }
@@ -322,10 +322,10 @@ inline unsigned int *renderCanvas (
                     {
                         // Get tempbuffer color and current layer color
                         int boffset = XminRX * zoom + tboffsety;
-                        rgba32 col1 = *( rgba32 *)&tempBuf[ boffset ];
+                        struct rgba32 col1 = *( struct rgba32 *)&tempBuf[ boffset ];
 
                         // Get color from current canvas buffer
-                        rgba64 col2t = *( rgba64 *)&currentBuf[ canvymul + x ];
+                        struct rgba64 col2t = *( struct rgba64 *)&currentBuf[ canvymul + x ];
 
                         // Convert 16-bit pr pixel to 8
                         int     a = col2t.r / 256,
@@ -356,7 +356,7 @@ inline unsigned int *renderCanvas (
                         // Add onion skin if needed
                         if ( canvas->onion == 1 )
                         {
-                            rgba64 onioncol = *( rgba64 *)&onionBuf[ canvymul + x ];
+                            struct rgba64 onioncol = *( struct rgba64 *)&onionBuf[ canvymul + x ];
                             r = onioncol.a / 256;
                             g = onioncol.b / 256;
                             b = onioncol.g / 256;
@@ -376,7 +376,7 @@ inline unsigned int *renderCanvas (
                             unsigned int test = drawToolPreview ( x, y );
                             if ( test != 0 )
                             {
-                                rgba32 blend = *( rgba32 *)&test;
+                                struct rgba32 blend = *( struct rgba32 *)&test;
                                 double balph = blend.a / 255.0;
                                 col1.r -= ( col1.r - blend.b ) * balph;
                                 col1.g -= ( col1.g - blend.g ) * balph;
@@ -416,7 +416,7 @@ inline unsigned int *renderCanvas (
 }
 
 // Scroll the canvas screen storage
-void scrollScreenStorage ( oCanvas *canvas, int x, int y )
+void scrollScreenStorage ( struct oCanvas *canvas, int x, int y )
 {
     if ( !canvas->screenstorage ) return;
     unsigned int *tmpBuf = AllocVec ( canvas->scrStorageHeight * canvas->scrStorageWidth * 4, MEMF_ANY );
@@ -435,8 +435,8 @@ void scrollScreenStorage ( oCanvas *canvas, int x, int y )
 }
 
 BOOL redrawScreenbufferRect (
-    oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw, unsigned int rh,
-    BOOL updateStorage
+    struct oCanvas *canvas, unsigned int rx, unsigned int ry, unsigned int rw,
+    unsigned int rh, BOOL updateStorage
 )
 {
     // Get an unsigned int
@@ -518,7 +518,7 @@ BOOL redrawScreenbufferRect (
     return TRUE;
 }
 
-BOOL redrawScreenbuffer ( oCanvas *canvas )
+BOOL redrawScreenbuffer ( struct oCanvas *canvas )
 {
     int offsetx 	= canvas->offsetx / canvas->zoom;
     int offsety 	= canvas->offsety / canvas->zoom;
@@ -549,9 +549,9 @@ void loadDefaultPalette ( )
     else printf ( "Failed to load default palette..\n" );
 }
 
-void addLayer ( oCanvas *canv )
+void addLayer ( struct oCanvas *canv )
 {
-    gfxbuffer *pos = canv->buffer;
+    struct gfxbuffer *pos = canv->buffer;
 
     // Go though each frame
     int size = canv->width * canv->height;
@@ -560,7 +560,7 @@ void addLayer ( oCanvas *canv )
         // Go to the last layer
         int l = 0; for ( ; l < canv->totalLayers - 1; l++ ) pos = pos->nextbuf;
         // Add new blank layer
-        gfxbuffer *newlayer = AllocVec ( sizeof ( gfxbuffer ), MEMF_ANY );
+        struct gfxbuffer *newlayer = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_ANY );
         newlayer->buf = AllocVec ( size * 8, MEMF_ANY );
         int i = 0; for ( ; i < size; i++ ) newlayer->buf[ i ] = TRANSCOLOR;
         newlayer->opacity = 100;
@@ -579,9 +579,11 @@ void addLayer ( oCanvas *canv )
     setActiveBuffer ( canv );
 }
 
-void swapLayers ( oCanvas *canv )
+void swapLayers ( struct oCanvas *canv )
 {
-    gfxbuffer *curr = NULL, *prev = NULL, *pos = canv->buffer;
+    struct gfxbuffer *curr = NULL;
+    struct gfxbuffer *prev = NULL;
+    struct gfxbuffer *pos = canv->buffer;
 
     // Go through frames and layers with pos and store addy to
     // current gfxbuffer and previous selected gfxbuffer
@@ -622,9 +624,11 @@ void swapLayers ( oCanvas *canv )
     setActiveBuffer ( canv );
 }
 
-void copyLayers ( oCanvas *canv )
+void copyLayers ( struct oCanvas *canv )
 {
-    gfxbuffer *curr = NULL, *prev = NULL, *pos = canv->buffer;
+    struct gfxbuffer *curr = NULL;
+    struct gfxbuffer *prev = NULL;
+    struct gfxbuffer *pos = canv->buffer;
 
     // Go through frames and layers with pos and store addy to
     // current gfxbuffer and previous selected gfxbuffer
@@ -643,12 +647,14 @@ void copyLayers ( oCanvas *canv )
     memcpy ( curr->buf, prev->buf, canv->width * canv->height * 8 );
 }
 
-void mergeLayers ( oCanvas *canv )
+void mergeLayers ( struct oCanvas *canv )
 {
     if ( canv->currentLayer == canv->previousLayer )
         return;
 
-    gfxbuffer *backBuf = NULL, *foreBuf = NULL, *pos = canv->buffer;
+    struct gfxbuffer *backBuf = NULL;
+    struct gfxbuffer *foreBuf = NULL;
+    struct gfxbuffer *pos = canv->buffer;
 
     // Make sure that Foreground is the highest sortorder
     ULONG Background = canv->currentLayer;
@@ -684,13 +690,13 @@ void mergeLayers ( oCanvas *canv )
     int i = 0; for ( ; i < range; i++ )
     {
         // Layer to act as a background
-        rgba64 col1 = *( rgba64 *)&backBuf->buf[ i ];
-        col1 = ( rgba64 ){ col1.a, col1.b, col1.g, col1.r };
+        struct rgba64 col1 = *( struct rgba64 *)&backBuf->buf[ i ];
+        col1 = ( struct rgba64 ){ col1.a, col1.b, col1.g, col1.r };
         if ( backBuf->opacity < 100 ) col1.a = col1.a * backgroundOpacity;
 
         // Layer to act as foreground to be rendered over background
-        rgba64 col2 = *( rgba64 *)&foreBuf->buf[ i ];
-        col2 = ( rgba64 ){ col2.a, col2.b, col2.g, col2.r };
+        struct rgba64 col2 = *( struct rgba64 *)&foreBuf->buf[ i ];
+        col2 = ( struct rgba64 ){ col2.a, col2.b, col2.g, col2.r };
         if ( foreBuf->opacity < 100 ) col2.a = col2.a * foregroundOpacity;
 
         // Get and set alpha
@@ -722,7 +728,7 @@ void mergeLayers ( oCanvas *canv )
 
         // Set new color
         backBuf->buf[ i ] =
-            *( unsigned long long int *)&( ( rgba64 ){ col1.a, col1.b, col1.g, col1.r } );
+            *( unsigned long long int *)&( ( struct rgba64 ){ col1.a, col1.b, col1.g, col1.r } );
     }
 
     // Make sure we have 100% opacity now
@@ -733,7 +739,7 @@ void mergeLayers ( oCanvas *canv )
     deleteLayer ( canv );
 }
 
-void deleteLayer ( oCanvas *canv )
+void deleteLayer ( struct oCanvas *canv )
 {
     // Just clear the last remaining layer..
     // we must have at least 1 layer!
@@ -747,7 +753,7 @@ void deleteLayer ( oCanvas *canv )
 
     // Delete the active layer on all frames
 
-    gfxbuffer **pos = &canv->buffer;
+    struct gfxbuffer **pos = &canv->buffer;
 
     int f = 0; for ( ; f < canv->totalFrames; f++ )
     {
@@ -758,7 +764,7 @@ void deleteLayer ( oCanvas *canv )
             // Strip this
             if ( l == canv->currentLayer )
             {
-                gfxbuffer *tmp = *pos;
+                struct gfxbuffer *tmp = *pos;
                 *pos = tmp->nextbuf;
                 // Free layer from mem
                 if ( tmp->buf != NULL )
@@ -770,7 +776,7 @@ void deleteLayer ( oCanvas *canv )
             }
             else
             {
-                gfxbuffer *tmp = *pos;
+                struct gfxbuffer *tmp = *pos;
                 pos = &tmp->nextbuf;
             }
         }
@@ -785,16 +791,16 @@ void deleteLayer ( oCanvas *canv )
     setActiveBuffer ( canv );
 }
 
-void copyToSwap ( oCanvas *canv )
+void copyToSwap ( struct oCanvas *canv )
 {
     memcpy ( canv->swapbuffer, canv->activebuffer, canv->width * canv->height * 8 );
 }
 
-void swapCanvasBuffers ( oCanvas *canv )
+void swapCanvasBuffers ( struct oCanvas *canv )
 {
     if ( globalActiveCanvas != NULL )
     {
-        gfxbuffer *pos = canv->buffer;
+        struct gfxbuffer *pos = canv->buffer;
         if ( !canv->activebuffer ) return;
         int f = 0; for ( ; f < canv->totalFrames; f++ )
         {
@@ -840,7 +846,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int bufpos = ( cbyY * brushTool.width ) + cbxX;
-                    rgba64 *color = ( rgba64 *)&brushTool.buffer[ bufpos ];
+                    struct rgba64 *color = ( struct rgba64 *)&brushTool.buffer[ bufpos ];
 
                     if ( color->r > 0 )
                     {
@@ -861,7 +867,7 @@ unsigned int drawToolPreview ( int x, int y )
             {
                 if ( x == ( int )cMouseX && y == ( int )cMouseY )
                 {
-                    rgbData data = paletteColorToRGB ( globalPalette[ currColor ] );
+                    struct rgbData data = paletteColorToRGB ( globalPalette[ currColor ] );
                     return ( 255 << 24 ) | ( data.b << 16 ) | ( data.g << 8 ) | data.r;
                 }
             }
@@ -887,7 +893,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int bufpos = ( cbyY * brushTool.width ) + cbxX;
-                    rgba64 *color = ( rgba64 *)&brushTool.buffer[ bufpos ];
+                    struct rgba64 *color = ( struct rgba64 *)&brushTool.buffer[ bufpos ];
                     if ( color->r > 0 )
                     {
                         return
@@ -908,7 +914,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int dataoff = ( ( int )( y - lineTool.oy ) * ( int )lineTool.w ) + ( int )( x - lineTool.ox );
-                    rgba64 *color = ( rgba64 *)&lineTool.buffer[ dataoff ];
+                    struct rgba64 *color = ( struct rgba64 *)&lineTool.buffer[ dataoff ];
 
                     if ( color->r > 0 )
                     {
@@ -942,7 +948,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int bufpos = ( cbyY * brushTool.width ) + cbxX;
-                    rgba64 *color = ( rgba64 *)&brushTool.buffer[ bufpos ];
+                    struct rgba64 *color = ( struct rgba64 *)&brushTool.buffer[ bufpos ];
                     if ( color->r > 0 )
                     {
                         return
@@ -963,7 +969,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int dataoff = ( ( int )( y - rectangleTool.oy ) * ( int )rectangleTool.w ) + ( int )( x - rectangleTool.ox );
-                    rgba64 *color = ( rgba64 *)&rectangleTool.buffer[ dataoff ];
+                    struct rgba64 *color = ( struct rgba64 *)&rectangleTool.buffer[ dataoff ];
 
                     if ( color->r > 0 )
                     {
@@ -998,7 +1004,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int bufpos = ( cbyY * brushTool.width ) + cbxX;
-                    rgba64 *color = ( rgba64 *)&brushTool.buffer[ bufpos ];
+                    struct rgba64 *color = ( struct rgba64 *)&brushTool.buffer[ bufpos ];
                     // Notice the reverse alignment here
                     if ( color->r > 0 )
                     {
@@ -1025,7 +1031,7 @@ unsigned int drawToolPreview ( int x, int y )
                 {
                     int dataoff = ( ( y - circleTool.oy ) * circleTool.bufwidth ) + ( x - circleTool.ox );
 
-                    rgba64 *color = ( rgba64 *)&circleTool.buffer[ dataoff ];
+                    struct rgba64 *color = ( struct rgba64 *)&circleTool.buffer[ dataoff ];
 
                     if ( color->r > 0 )
                     {
@@ -1045,7 +1051,7 @@ unsigned int drawToolPreview ( int x, int y )
             {
                 if ( x == cMouseX && y == cMouseY )
                 {
-                    rgbData d = paletteColorToRGB ( globalPalette[ currColor ] );
+                    struct rgbData d = paletteColorToRGB ( globalPalette[ currColor ] );
                     return ( 255 << 24 ) | ( d.b << 16 ) | ( d.g << 8 ) | d.r;
                 }
             }
@@ -1059,7 +1065,7 @@ unsigned int drawToolPreview ( int x, int y )
                 )
                 {
                     int dataoff = ( ( int )( y - clipbrushTool.oy ) * ( int )clipbrushTool.w ) + ( int )( x - clipbrushTool.ox );
-                    rgba64 *color = ( rgba64 *)&clipbrushTool.buffer[ dataoff ];
+                    struct rgba64 *color = ( struct rgba64 *)&clipbrushTool.buffer[ dataoff ];
 
                     // Notice the reverse alignment here
                     if ( color->r > 0 )
@@ -1081,9 +1087,9 @@ unsigned int drawToolPreview ( int x, int y )
 }
 
 // Valuelist used to record if there is a pixel somewhere or not
-void addListValue ( double x, double y, ValueList **lst )
+void addListValue ( double x, double y, struct ValueList **lst )
 {
-    ValueList *new = AllocVec ( sizeof ( ValueList ), MEMF_ANY|MEMF_CLEAR );
+    struct ValueList *new = AllocVec ( sizeof ( struct ValueList ), MEMF_ANY|MEMF_CLEAR );
     if ( *lst != NULL )
     {
         new->x = ( *lst )->x;
@@ -1099,12 +1105,12 @@ void addListValue ( double x, double y, ValueList **lst )
     new->Next = *lst;
     *lst = new;
 }
-void freeValueList ( ValueList **lst )
+void freeValueList ( struct ValueList **lst )
 {
-    ValueList *pos = *lst;
+    struct ValueList *pos = *lst;
     while ( pos != NULL )
     {
-        ValueList *tmp = pos;
+        struct ValueList *tmp = pos;
         pos = pos->Next;
         FreeVec ( tmp );
     }

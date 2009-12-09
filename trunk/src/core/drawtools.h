@@ -38,8 +38,8 @@
 #define DEG 57.29577957855229514f
 
 // Some array tools
-int fStackPointer;
-BOOL isFilling;
+extern int fStackPointer;
+extern BOOL isFilling;
 
 BOOL fPop ( int *x, int *y, int pitch, int *fStack );
 void fPush ( int x, int y, int limit, int pitch, int *fStack );
@@ -48,7 +48,7 @@ void fEmptyStack ( int *fStack );
 // Draw a line from x1,y1 to x2,y2 on defined buffer
 // endpoint is if you are doing this in a draw operation
 // where you don't want to draw over a coord two times
-Affrect drawLine (
+struct Affrect drawLine (
     double x1, double y1, double x2, double y2,
     int bufferwidth, int bufferheight,
     unsigned long long int *buffer, BOOL subtract_endpoint
@@ -60,24 +60,27 @@ void drawLineCharbuf (
     unsigned char *buffer, unsigned char value
 );
 
-Affrect plotBrush (
+struct Affrect plotBrush (
     double x, double y,
     int bufferwidth, int bufferheight,
     unsigned long long int *buffer
 );
 
 inline void pixelAntialias (
-    double x, double y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf
+    double x, double y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf
 );
 
 inline void pixelPlain (
-    int x, int y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf
+    int x, int y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf
 );
 
 
-inline unsigned long long int processPixel ( rgba64 origCol, rgba64 paintCol, double x, double y, double diffx, double diffy );
+inline unsigned long long int processPixel (
+    struct rgba64 origCol, struct rgba64 paintCol, double x, double y,
+    double diffx, double diffy
+);
 
-Affrect floodFill (
+struct Affrect floodFill (
     int x, int y,
     int bufferwidth, int bufferheight,
     unsigned long long int color,
@@ -91,7 +94,7 @@ void fillCharbuf (
     unsigned char *buffer, unsigned char value
 );
 
-Affrect drawCircle (
+struct Affrect drawCircle (
     double x, double y, double w, double h,
     unsigned int bufferwidth, unsigned int bufferheight,
     unsigned long long int *buffer
@@ -100,6 +103,6 @@ Affrect drawCircle (
 /*
     Snap a color to the palette
 */
-rgba64 snapToPalette ( rgba64 color, BOOL selectIndex );
+struct rgba64 snapToPalette ( struct rgba64 color, BOOL selectIndex );
 
 #endif

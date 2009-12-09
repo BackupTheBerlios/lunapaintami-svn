@@ -48,7 +48,7 @@ AROS_UFH3 ( void, projFunc,
     // of it
     unsigned char *projectName = NULL;
 
-    WindowList *lst = *( WindowList **)param;
+    struct WindowList *lst = *( struct WindowList **)param;
 
     get ( lst->projName, MUIA_String_Contents, &projectName );
     set ( lst->win, MUIA_Window_Title, projectName );
@@ -595,7 +595,7 @@ void moveScrollbarRight ( )
     set ( globalActiveWindow->scrollH, MUIA_Prop_First, pos + dist );
 }
 
-void constrainOffset ( oCanvas *canvas )
+void constrainOffset ( struct oCanvas *canvas )
 {
     // Get some vars
     int zoom = canvas->zoom;
@@ -727,7 +727,7 @@ IPTR _RGBitmapRedraw ( Class *CLASS, Object *self )
             // Accelerated redraw
             if ( data->window->rRectW || data->window->rRectH )
             {
-                oCanvas *canvas = data->window->canvas;
+                struct oCanvas *canvas = data->window->canvas;
                 int offsetx 	= ( canvas->offsetx + data->window->rRectX ) / canvas->zoom;
                 int offsety 	= ( canvas->offsety + data->window->rRectY ) / canvas->zoom;
                 int width 		= ( double )data->window->rRectW / canvas->zoom;
@@ -815,7 +815,7 @@ IPTR _RGBitmapRedraw ( Class *CLASS, Object *self )
     return ( IPTR )NULL;
 }
 
-void SnapOffsetToZoom ( oCanvas *canv )
+void SnapOffsetToZoom ( struct oCanvas *canv )
 {
     if ( canv == NULL ) canv = globalActiveCanvas;
     // Contstrain offset to zoom
@@ -824,7 +824,7 @@ void SnapOffsetToZoom ( oCanvas *canv )
     *ofy = ( int )( *ofy / zoom ) * zoom;
 }
 
-void UpdateCanvasInfo ( WindowList *win )
+void UpdateCanvasInfo ( struct WindowList *win )
 {
     unsigned char frameText[ 32 ];
     unsigned char layerText[ 32 ];
@@ -971,7 +971,7 @@ void addCanvaswindow (
     BOOL generateCanvas
 )
 {
-    WindowList *temp = canvases; // Put current in temp
+    struct WindowList *temp = canvases; // Put current in temp
     canvases = AllocVec ( sizeof ( WindowList ), MEMF_CLEAR );
 
     struct MUI_CustomClass *mcc =
@@ -1063,7 +1063,7 @@ void addCanvaswindow (
     areaData->mousepressed          = FALSE;
     canvases->id                    = globalWindowIncrement;
     canvases->layersChg             = TRUE; // initially, say yes layers changed
-    canvases->prevBlit              = ( RectStruct ){ 0, 0, 0, 0 };
+    canvases->prevBlit              = ( struct RectStruct ){ 0, 0, 0, 0 };
     canvases->filename              = NULL; // set the filename to null *obviously*
     canvases->rRectX                = 0;
     canvases->rRectY                = 0;
@@ -1137,7 +1137,7 @@ void addCanvaswindow (
     globalWindowIncrement++;
 }
 
-void showFullscreenWindow ( oCanvas *canvas )
+void showFullscreenWindow ( struct oCanvas *canvas )
 {
     // Prevent tool preview
     int Tool = globalCurrentTool;
@@ -1148,7 +1148,7 @@ void showFullscreenWindow ( oCanvas *canvas )
     keyboardEnabled = TRUE;
 
     // Hide all other canvas windows
-    WindowList *l = canvases;
+    struct WindowList *l = canvases;
     do
     {
         set ( l->win, MUIA_Window_Open, FALSE );
@@ -1221,7 +1221,7 @@ void hideFullscreenWindow ( )
 
 
     // Show all other canvas windows
-    WindowList *l = canvases;
+    struct WindowList *l = canvases;
     while ( l != NULL )
     {
         set ( l->win, MUIA_Window_Open, TRUE );
@@ -1242,7 +1242,7 @@ void hideFullscreenWindow ( )
 
 Object *getCanvaswindowById ( unsigned int id )
 {
-    WindowList *tmp = canvases;
+    struct WindowList *tmp = canvases;
 
     while ( tmp != NULL )
     {
@@ -1253,9 +1253,9 @@ Object *getCanvaswindowById ( unsigned int id )
     return NULL;
 }
 
-WindowList *getCanvasDataById ( unsigned int id )
+struct WindowList *getCanvasDataById ( unsigned int id )
 {
-    WindowList *tmp = canvases;
+    struct WindowList *tmp = canvases;
 
     while ( tmp != NULL )
     {
@@ -1268,7 +1268,7 @@ WindowList *getCanvasDataById ( unsigned int id )
 
 void deleteCanvaswindows ( )
 {
-    WindowList *tmp = NULL;
+    struct WindowList *tmp = NULL;
 
     while ( canvases != NULL )
     {
@@ -1296,9 +1296,9 @@ IPTR removeActiveWindow ( Class *CLASS, Object *self )
     set ( data->window->win, MUIA_Window_Open, FALSE );
     DoMethod ( PaintApp, OM_REMMEMBER, ( IPTR )data->window->win );
 
-    WindowList *tmp = NULL;
-    WindowList *ptr = canvases;
-    WindowList *prev = NULL;
+    struct WindowList *tmp = NULL;
+    struct WindowList *ptr = canvases;
+    struct WindowList *prev = NULL;
 
     while ( ptr != NULL )
     {
@@ -1337,7 +1337,7 @@ IPTR removeActiveWindow ( Class *CLASS, Object *self )
 
 void blitAreaRect (
     int x, int y, int w, int h,
-    oCanvas* canvas, struct RastPort *rp
+    struct oCanvas* canvas, struct RastPort *rp
 )
 {
     // Get zoom - bork bork
@@ -1648,7 +1648,7 @@ void blitToolPreview ( int x, int y, int w, int h )
 {
     removePrevToolPreview ( );
     blitAreaRect ( x, y, w, h, globalActiveCanvas, _rp ( globalActiveWindow->area ) );
-    globalActiveWindow->prevBlit = ( RectStruct ){ x, y, w, h };
+    globalActiveWindow->prevBlit = ( struct RectStruct ){ x, y, w, h };
 }
 
 ULONG _getAreaWidth ( )

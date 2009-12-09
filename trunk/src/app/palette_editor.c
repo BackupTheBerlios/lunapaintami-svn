@@ -154,7 +154,7 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
             if ( 1 )
             {
                 // Update slider positions when the window is initialized
-                rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
+                struct rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
@@ -356,7 +356,7 @@ IPTR PaletteEvents ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg )
                         }
 
                         // Update slider positions
-                        rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
+                        struct rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
                         set ( palSlideR, MUIA_Numeric_Value, colors.r );
                         set ( palSlideG, MUIA_Numeric_Value, colors.g );
                         set ( palSlideB, MUIA_Numeric_Value, colors.b );
@@ -386,7 +386,7 @@ IPTR PaletteActions ( ULONG action )
                 // Paste copied color
                 *( globalPalette + currColor ) = tempCopiedColor;
                 // Update slider positions
-                rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
+                struct rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
@@ -403,7 +403,7 @@ IPTR PaletteActions ( ULONG action )
                 *( globalPalette + prevColor ) = *( globalPalette + currColor );
                 *( globalPalette + currColor ) = tempcol;
                 // Update slider positions
-                rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
+                struct rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
@@ -435,7 +435,7 @@ IPTR PaletteActions ( ULONG action )
                 FreeVec ( temp );
 
                 // Update slider positions
-                rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
+                struct rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
@@ -450,12 +450,12 @@ IPTR PaletteActions ( ULONG action )
             {
                 unsigned int firstCol = ( currColor > prevColor ) ? prevColor : currColor;
                 unsigned int lastCol = ( currColor > prevColor ) ? currColor : prevColor;
-                rgbData source = paletteColorToRGB ( *( globalPalette + firstCol ) );
-                rgbData dest = paletteColorToRGB ( *( globalPalette + lastCol ) );
+                struct rgbData source = paletteColorToRGB ( *( globalPalette + firstCol ) );
+                struct rgbData dest = paletteColorToRGB ( *( globalPalette + lastCol ) );
                 int span = lastCol - firstCol;
                 unsigned int i; for ( i = 1; i < span; i++ )
                 {
-                    rgbData result;
+                    struct rgbData result;
                     int dr = ( int )dest.r;
                     int dg = ( int )dest.g;
                     int db = ( int )dest.b;
@@ -480,7 +480,7 @@ IPTR PaletteActions ( ULONG action )
                 unsigned int a = 0; for ( a = 0; a < 256; a++ )
                     *( globalPalette + a ) = tempColor;
                 // Update slider positions
-                rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
+                struct rgbData colors = paletteColorToRGB ( *( globalPalette + currColor ) );
                 set ( palSlideR, MUIA_Numeric_Value, colors.r );
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
@@ -641,7 +641,7 @@ void Init_PaletteMethods ( )
     paletteClose_hook.h_Entry = ( HOOKFUNC )&paletteClose_func;
 
     // Set initial slider positions
-    rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
+    struct rgbData colors = paletteColorToRGB ( globalPalette[ currColor ] );
     set ( palSlideR, MUIA_Numeric_Value, colors.r );
     set ( palSlideG, MUIA_Numeric_Value, colors.g );
     set ( palSlideB, MUIA_Numeric_Value, colors.b );

@@ -175,7 +175,7 @@ IPTR _RGBitmapRedraw ( Class *CLASS, Object *self );
 /*
     Update Frame: 1/1 etc
 */
-void UpdateCanvasInfo ( WindowList *win );
+void UpdateCanvasInfo ( struct WindowList *win );
 
 /*
     Scroll the active canvas
@@ -185,7 +185,7 @@ IPTR ScrollCanvas ( int x, int y );
 /*
     Snap offset coords to zoom (globalactivecanvas)
 */
-void SnapOffsetToZoom ( oCanvas *canv );
+void SnapOffsetToZoom ( struct oCanvas *canv );
 
 /*
     Check if active window has changed and
@@ -211,13 +211,13 @@ void addCanvaswindow (
 /*
     Show/Hide the fullscreen editing window
 */
-void showFullscreenWindow ( oCanvas *canvas );
+void showFullscreenWindow ( struct oCanvas *canvas );
 void hideFullscreenWindow ( );
 
 /*
     Contstrain offset values within scope of canvas
 */
-void constrainOffset ( oCanvas *canvas );
+void constrainOffset ( struct oCanvas *canvas );
 
 /*
     Test if we're hitting "walls"
@@ -232,7 +232,7 @@ Object *getCanvaswindowById ( unsigned int id );
 /*
     This function sends back a pointer to the window struct
 */
-WindowList *getCanvasDataById ( unsigned int id );
+struct WindowList *getCanvasDataById ( unsigned int id );
 
 /*
     Import an image rawly! :-D
@@ -259,7 +259,7 @@ IPTR removeActiveWindow ( Class *CLASS, Object *self );
 */
 void blitAreaRect (
     int x, int y, int w, int h,
-    oCanvas* canvas, struct RastPort *rp
+    struct oCanvas* canvas, struct RastPort *rp
 );
 
 /*

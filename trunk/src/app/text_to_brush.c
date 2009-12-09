@@ -234,7 +234,7 @@ void RenderTextToBrushBuffer ( )
     STRPTR text = ( STRPTR )XGET ( ttbw_TextString, MUIA_String_Contents );
 
     unsigned int *buffer = NULL;
-    Affrect rect = RenderTextToBuffer ( text, ( char *)myFont, fontSize, &buffer );
+    struct Affrect rect = RenderTextToBuffer ( text, ( char *)myFont, fontSize, &buffer );
     brushTool.width = rect.w;
     brushTool.height = rect.h;
     globalBrushMode = 1; // <- prevent brush generation (same as when using clipbrush)
@@ -258,7 +258,7 @@ void RenderTextToBrushBuffer ( )
     }
 }
 
-Affrect RenderTextToBuffer (
+struct Affrect RenderTextToBuffer (
     unsigned char *text, char *font,
     int size, unsigned int **buffer
 )
@@ -314,7 +314,7 @@ Affrect RenderTextToBuffer (
         if ( ( error = FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER ) ) ) continue;
         // Blit over the bitmap from the glyph
         int bitmapsize = slot->bitmap.width * slot->bitmap.rows;
-        rgbData rgb = paletteColorToRGB ( globalPalette[ currColor ] );
+        struct rgbData rgb = paletteColorToRGB ( globalPalette[ currColor ] );
         int i = 0; for ( ; i < bitmapsize; i++ )
         {
             int x = i % slot->bitmap.width;
@@ -327,7 +327,7 @@ Affrect RenderTextToBuffer (
     }
 
     // Return affected space
-    Affrect rect;
+    struct Affrect rect;
     rect.x = 0; rect.y = 0;
     rect.w = bufWidth; rect.h = bufHeight;
     FT_Done_Face ( face );
@@ -340,5 +340,5 @@ Affrect RenderTextToBuffer (
     D(bug("Error initializing freetype library or its parts.\n"));
     FT_Done_Face ( face );
     FT_Done_FreeType( library );
-    return ( Affrect ){ 0, 0, 0, 0 };
+    return ( struct Affrect ){ 0, 0, 0, 0 };
 }

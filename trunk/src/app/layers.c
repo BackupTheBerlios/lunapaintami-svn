@@ -51,7 +51,7 @@ struct Hook changeOpacityHook;
 struct Hook acknowledgeOpacity;
 struct Hook acknowledgeLayName;
 struct Hook changeVisibilityHook;
-oCanvas* lastDrawnCanvas;
+struct oCanvas* lastDrawnCanvas;
 BOOL forceLayerRedraw;
 
 
@@ -66,7 +66,7 @@ AROS_UFH3 ( void, changeOpacityFunc,
     // Fix it
     if ( globalActiveCanvas != NULL )
     {
-        gfxbuffer *buf = globalActiveCanvas->buffer;
+        struct gfxbuffer *buf = globalActiveCanvas->buffer;
         char opacity = ( char )XGET( LayerOpacity, MUIA_Numeric_Value );
         int max = globalActiveCanvas->totalFrames * globalActiveCanvas->totalLayers;
 
@@ -96,7 +96,7 @@ AROS_UFH3 ( void, changeVisibilityFunc,
     // Fix it
     if ( globalActiveCanvas != NULL )
     {
-        gfxbuffer *buf = globalActiveCanvas->buffer;
+        struct gfxbuffer *buf = globalActiveCanvas->buffer;
         BOOL visible = FALSE;
         int max = globalActiveCanvas->totalFrames * globalActiveCanvas->totalLayers;
 
@@ -164,7 +164,7 @@ AROS_UFH3 ( void, acknowledgeLayNameFunc,
     // Fix it
     if ( globalActiveCanvas )
     {
-        gfxbuffer *buf = globalActiveCanvas->buffer;
+        struct gfxbuffer *buf = globalActiveCanvas->buffer;
         int max = globalActiveCanvas->totalFrames * globalActiveCanvas->totalLayers;
         int i = 0; for ( ; i < max; i++ )
         {
@@ -203,7 +203,7 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
     else
     {
         // Make sure the layer window shows correct opacity
-        gfxbuffer *buf = getActiveGfxbuffer ( globalActiveCanvas );
+        struct gfxbuffer *buf = getActiveGfxbuffer ( globalActiveCanvas );
         int opa = XGET( LayerOpacity, MUIA_Numeric_Value );
         if ( opa != buf->opacity )
         {
@@ -294,7 +294,7 @@ IPTR _Layers_MUIM_HandleInput ( Class *CLASS, Object *self, Msg message )
                     {
                         globalActiveCanvas->previousLayer = globalActiveCanvas->currentLayer;
                         globalActiveCanvas->currentLayer = wantedLayer;
-                        gfxbuffer *buf = getActiveGfxbuffer ( globalActiveCanvas );
+                        struct gfxbuffer *buf = getActiveGfxbuffer ( globalActiveCanvas );
                         set ( LayerOpacity, MUIA_Numeric_Value, ( IPTR )buf->opacity );
                         set ( LayerName, MUIA_String_Contents, ( STRPTR )buf->name );
                         setActiveBuffer ( globalActiveCanvas );
@@ -727,7 +727,7 @@ BOOL layerRender ( Class *CLASS, Object *self )
     if ( LayersWidgetTmpBuf != NULL ) FreeVec ( LayersWidgetTmpBuf );
     LayersWidgetTmpBuf = AllocVec ( areaWidth * areaHeight * 4, MEMF_ANY|MEMF_CLEAR );
 
-    gfxbuffer *buf = globalActiveCanvas->buffer;
+    struct gfxbuffer *buf = globalActiveCanvas->buffer;
 
     int uxuw = ux + uw;
     int uyuh = uy + uh;
@@ -772,18 +772,18 @@ BOOL layerRender ( Class *CLASS, Object *self )
                                 // Image
                                 else
                                 {
-                                    rgbaData rgba = canvasColorToRGBA (
+                                    struct rgbaData rgba = canvasColorToRGBA (
                                         buf->buf[ py * globalActiveCanvas->width + px ]
                                     );
                                     // Checks
-                                    unsigned int colr = *( unsigned int *)&( ( rgba32 ){ 128, 128, 128, 255 } );
+                                    unsigned int colr = *( unsigned int *)&( ( struct rgba32 ){ 128, 128, 128, 255 } );
                                     int checkCol = ( ( x % 16 ) + ( int )( y / 8 ) * 8 ) % 16;
                                     if ( checkCol >= 8 )
-                                        colr = *( unsigned int *)&( ( rgba32 ){ 90, 90, 90, 255 } );
+                                        colr = *( unsigned int *)&( ( struct rgba32 ){ 90, 90, 90, 255 } );
                                     // Blend
                                     if ( rgba.a > 0 )
                                     {
-                                        rgba32 blend = *( rgba32 *)&colr;
+                                        struct rgba32 blend = *( struct rgba32 *)&colr;
                                         double balph = ( double )rgba.a / 255;
                                         // Convert to safe mode
                                         int r = ( int )blend.r, g = ( int )blend.g, b = ( int )blend.b;
@@ -821,8 +821,8 @@ void RenderLayerNames ( int x, int y, int w, int h )
     // illegal w/h
     if ( !w || !h ) return;
 
-    oCanvas *canv = globalActiveCanvas;
-    gfxbuffer *buf = canv->buffer;
+    struct oCanvas *canv = globalActiveCanvas;
+    struct gfxbuffer *buf = canv->buffer;
     int size = canv->totalLayers * canv->totalFrames;
     Object *obj = WidgetLayers;
     int areaHeight = ( int )XGET( WidgetLayers, MUIA_Height );

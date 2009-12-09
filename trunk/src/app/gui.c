@@ -34,7 +34,7 @@ Object *mainPulldownMenu;
     - The canvases is managed in the canvases list
 */
 Object *PaintApp;
-WindowList *canvases;
+struct WindowList *canvases;
 Object *testWindow;
 Object *AlertWindow;
 Object *AlertText;

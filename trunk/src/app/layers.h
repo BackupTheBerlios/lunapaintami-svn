@@ -76,7 +76,7 @@ extern struct Hook changeOpacityHook;
 extern struct Hook acknowledgeOpacity;
 extern struct Hook acknowledgeLayName;
 extern struct Hook changeVisibilityHook;
-extern oCanvas* lastDrawnCanvas;
+extern struct oCanvas* lastDrawnCanvas;
 extern BOOL forceLayerRedraw;
 
 /*

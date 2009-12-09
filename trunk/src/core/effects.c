@@ -23,7 +23,7 @@
 
 #include "effects.h"
 
-void effectOffset ( int x, int y, oCanvas *canvas )
+void effectOffset ( int x, int y, struct oCanvas *canvas )
 {
     unsigned long long int *buffer = AllocVec ( canvas->width * canvas->height * 8, MEMF_ANY );
 
@@ -63,7 +63,7 @@ void effectOffset ( int x, int y, oCanvas *canvas )
     FreeVec ( buffer );
 }
 
-void effectFlipVert ( oCanvas *canvas )
+void effectFlipVert ( struct oCanvas *canvas )
 {
     unsigned long long int *buf = canvas->activebuffer;
     int cx; for ( cx = 0; cx < canvas->width; cx++ )
@@ -80,7 +80,7 @@ void effectFlipVert ( oCanvas *canvas )
     }
 }
 
-void effectFlipHoriz ( oCanvas *canvas )
+void effectFlipHoriz ( struct oCanvas *canvas )
 {
     unsigned long long int *buf = canvas->activebuffer;
     int cy; for ( cy = 0; cy < canvas->height; cy++ )

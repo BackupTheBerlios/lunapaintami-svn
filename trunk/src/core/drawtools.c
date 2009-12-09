@@ -23,6 +23,11 @@
 
 #include "drawtools.h"
 
+
+int fStackPointer;
+BOOL isFilling;
+
+
 BOOL fPop ( int *x, int *y, int pitch, int *fStack )
 {
     if ( fStackPointer > 0 )
@@ -45,7 +50,7 @@ void fPush ( int x, int y, int limit, int pitch, int *fStack )
     }
 }
 
-Affrect drawLine (
+struct Affrect drawLine (
     double x1, double y1, double x2, double y2,
     int bufferwidth, int bufferheight,
     unsigned long long int *buffer, BOOL subtract_endpoint
@@ -113,7 +118,7 @@ Affrect drawLine (
     // Return affected coorinates
     int offx = brushTool.width / 2.0;
     int offy = brushTool.height / 2.0;
-    Affrect rect = {
+    struct Affrect rect = {
         ( int )( X - 1 - offx ), ( int )( Y - 1 - offy ),
         ( int )( W + brushTool.width + 2 ), ( int )( H + brushTool.height + 2 )
     };
@@ -183,7 +188,7 @@ void drawLineCharbuf (
     }
 }
 
-Affrect plotBrush (
+struct Affrect plotBrush (
     double x, double y,
     int bufferwidth, int bufferheight,
     unsigned long long int *buffer
@@ -195,9 +200,9 @@ Affrect plotBrush (
     // Special case for 1x1 brushes
     if ( brushTool.width == 1 && brushTool.height == 1 )
     {
-        rgba64 sourcecol = *( rgba64 *)brushTool.buffer;
+        struct rgba64 sourcecol = *( struct rgba64 *)brushTool.buffer;
         if ( x < 0 || x >= bufferwidth || y < 0 || y >= bufferheight )
-            return ( Affrect ){ 0, 0, 0, 0 };
+            return ( struct Affrect ){ 0, 0, 0, 0 };
         if ( brushTool.antialias )
             pixelAntialias ( x, y, sourcecol, bufferwidth, bufferheight, buffer );
         else
@@ -221,7 +226,7 @@ Affrect plotBrush (
                 {
                     int pos = ymul + bx;
                     double px = bx + offxx;
-                    rgba64 col2 = *( rgba64 *)&brushTool.buffer[ pos ];
+                    struct rgba64 col2 = *( struct rgba64 *)&brushTool.buffer[ pos ];
                     pixelAntialias ( px, py, col2, bufferwidth, bufferheight, buffer );
 
                 }
@@ -237,7 +242,7 @@ Affrect plotBrush (
                 {
                     int pos = ymul + bx;
                     double px = bx + offxx;
-                    rgba64 col2 = *( rgba64 *)&brushTool.buffer[ pos ];
+                    struct rgba64 col2 = *( struct rgba64 *)&brushTool.buffer[ pos ];
                     pixelPlain ( ( int )px, ( int )py, col2, bufferwidth, bufferheight, buffer );
                 }
             }
@@ -245,12 +250,12 @@ Affrect plotBrush (
     }
 
     // Return the affected area (x,y,w,h)
-    Affrect rect = { ( int )( x - offx - 1 ), ( int )( y - offy - 1 ), brushTool.width + 2, brushTool.height + 2 };
+    struct Affrect rect = { ( int )( x - offx - 1 ), ( int )( y - offy - 1 ), brushTool.width + 2, brushTool.height + 2 };
     return rect;
 }
 
 inline void pixelAntialias (
-    double x, double y, rgba64 paintcol,
+    double x, double y, struct rgba64 paintcol,
     int bw, int bh, unsigned long long int *buf
 )
 {
@@ -267,7 +272,7 @@ inline void pixelAntialias (
             int datax = ox + anx;
             if ( datax < 0 || datax >= bw ) continue;
             int dataoffset = yml + datax;
-            rgba64 sourcecol = *( rgba64 *)&buf[ dataoffset ];
+            struct rgba64 sourcecol = *( struct rgba64 *)&buf[ dataoffset ];
             buf[ dataoffset ] = processPixel (
                 sourcecol, paintcol, datax, datay, x - datax, y - datay
             );
@@ -275,16 +280,16 @@ inline void pixelAntialias (
     }
 }
 
-inline void pixelPlain ( int x, int y, rgba64 paintcol, int bw, int bh, unsigned long long int *buf )
+inline void pixelPlain ( int x, int y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf )
 {
     if ( y < 0 || y >= bh || x < 0 || x >= bw ) return;
     int dataoffset = ( y * bw ) + x;
-    rgba64 sourcecol = *( rgba64 *)&buf[ dataoffset ];
+    struct rgba64 sourcecol = *( struct rgba64 *)&buf[ dataoffset ];
     buf[ dataoffset ] = processPixel ( sourcecol, paintcol, x, y, x, y );
 }
 
 inline unsigned long long int processPixel (
-    rgba64 origCol, rgba64 paintCol,
+    struct rgba64 origCol, struct rgba64 paintCol,
     double x, double y, double diffx, double diffy
 )
 {
@@ -341,7 +346,7 @@ inline unsigned long long int processPixel (
         case LUNA_PAINTMODE_COLOR:
 
             {
-                rgba64 cols = PaletteToRgba64 ( globalPalette[ currColor ] );
+                struct rgba64 cols = PaletteToRgba64 ( globalPalette[ currColor ] );
                 if ( a1 <= 0 )
                 {
                     r1 = cols.r;
@@ -446,7 +451,7 @@ inline unsigned long long int processPixel (
                             ysy3 >= 0 && ysy3 < globalActiveCanvas->height )
                         {
                             int offset = yoffset + xsx3;
-                            rgba64 tmp = *( rgba64 *)&globalActiveCanvas->activebuffer[ offset ];
+                            struct rgba64 tmp = *( struct rgba64 *)&globalActiveCanvas->activebuffer[ offset ];
                             r += tmp.a;
                             g += tmp.b;
                             b += tmp.g;
@@ -504,7 +509,7 @@ inline unsigned long long int processPixel (
                             ysy3 >= 0 && ysy3 < globalActiveCanvas->height )
                         {
                             int offset = yoffset + xsx3;
-                            rgba64 tmp = *( rgba64 *)&globalActiveCanvas->activebuffer[ offset ];
+                            struct rgba64 tmp = *( struct rgba64 *)&globalActiveCanvas->activebuffer[ offset ];
                             r += tmp.a;
                             g += tmp.b;
                             b += tmp.g;
@@ -557,7 +562,7 @@ inline unsigned long long int processPixel (
     }
 
     // Resulting 64bit pixel
-    rgba64 result = { origCol.a, origCol.b, origCol.g, origCol.r };
+    struct rgba64 result = { origCol.a, origCol.b, origCol.g, origCol.r };
 
     // Snap to colors
     if ( globalColorMode == LUNA_COLORMODE_SNAP && brushTool.paintmode != LUNA_PAINTMODE_ERASE )
@@ -566,7 +571,7 @@ inline unsigned long long int processPixel (
     return *( unsigned long long int * )&result;
 }
 
-Affrect floodFill (
+struct Affrect floodFill (
     int x, int y,
     int bufferwidth, int bufferheight,
     unsigned long long int color,
@@ -577,10 +582,10 @@ Affrect floodFill (
 {
     // Exit if out of bounds for filling or otherwise we're not allowed
     if ( x < 0 || y < 0 || x >= bufferwidth || y >= bufferheight || clickColor == color )
-        return ( Affrect ){ 0, 0, 0, 0 };
+        return ( struct Affrect ){ 0, 0, 0, 0 };
 
     // redraw all rect =)
-    Affrect rect = { x, y, 1, 1 };
+    struct Affrect rect = { x, y, 1, 1 };
 
     unsigned int click8 = bufferToScreenColor ( clickColor );
     unsigned int clicka = ( click8 << 24 ) >> 24; // a part of rgba
@@ -730,7 +735,7 @@ void fillCharbuf (
 }
 
 
-Affrect drawCircle (
+struct Affrect drawCircle (
     double x, double y, double w, double h,
     unsigned int bufferwidth, unsigned int bufferheight,
     unsigned long long int *buffer
@@ -816,7 +821,7 @@ Affrect drawCircle (
 
     int offx = brushTool.width / 2.0;
     int offy = brushTool.height / 2.0;
-    Affrect rect = {
+    struct Affrect rect = {
         x - w - offx - 2,
         y - h - offy - 2,
         ( w * 2 ) + ( ( offx + 2 ) * 2 ),
@@ -825,17 +830,17 @@ Affrect drawCircle (
     return rect;
 }
 
-rgba64 snapToPalette ( rgba64 color, BOOL selectIndex )
+struct rgba64 snapToPalette ( struct rgba64 color, BOOL selectIndex )
 {
     int rating = 1024; // high number
     int index = 0;
-    rgba32 testcol = { color.r / 256, color.g / 256, color.b / 256, color.a / 256 };
+    struct rgba32 testcol = { color.r / 256, color.g / 256, color.b / 256, color.a / 256 };
 
     // find the colors that are the most alike
     // giving the best diff rating (the least different)
     int c = 0; for ( ; c < 256; c++ )
     {
-        rgba32 curcol = *( rgba32 *)&globalPalette[ c ];
+        struct rgba32 curcol = *( struct rgba32 *)&globalPalette[ c ];
         int test =
             abs( curcol.r - testcol.a ) +
             abs( curcol.g - testcol.b ) +
@@ -847,7 +852,7 @@ rgba64 snapToPalette ( rgba64 color, BOOL selectIndex )
         }
     }
     // Return the result
-    rgba32 rescol = *( rgba32 *)&globalPalette[ index ];
+    struct rgba32 rescol = *( struct rgba32 *)&globalPalette[ index ];
 
     if ( selectIndex )
     {
@@ -855,7 +860,7 @@ rgba64 snapToPalette ( rgba64 color, BOOL selectIndex )
         DoMethod ( tbxAreaPalette, MUIM_Draw );
     }
 
-    rgba64 res = {
+    struct rgba64 res = {
         MAXCOLOR,
         ( unsigned long long int )( rescol.b / 255.0 * MAXCOLOR ),
         ( unsigned long long int )( rescol.g / 255.0 * MAXCOLOR ),

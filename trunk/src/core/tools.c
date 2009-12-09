@@ -35,7 +35,7 @@ BOOL toolBrush ( )
 
     if ( MouseButtonL || MouseButtonR )
     {
-        WindowList *window = globalActiveWindow;
+        struct WindowList *window = globalActiveWindow;
 
         // Remember old values
         pMouseX = dMouseX;
@@ -49,7 +49,7 @@ BOOL toolBrush ( )
         double x2 = dMouseX;
         double y2 = dMouseY;
 
-        Affrect rect = { 0, 0, 0, 0 };
+        struct Affrect rect = { 0, 0, 0, 0 };
 
         // Setup or empty the contour buffer for filled drawing
         if ( brushTool.RecordContour && brushTool.ContourBuffer == NULL && filledDrawing != DRAW_DRAW )
@@ -157,7 +157,7 @@ void toolBrushFill ( )
     int i = 0; for ( ; i < size; i++ ) pixelBuffer[ i ] = 1;
 
     // Draw shape
-    ValueList *ptr = brushTool.ContourBuffer;
+    struct ValueList *ptr = brushTool.ContourBuffer;
     double px = ( ptr->x - MinX ) + margin, py = ( ptr->y - MinY ) + margin, dx = 0, dy = 0;
     while ( ptr != NULL )
     {
@@ -237,7 +237,7 @@ void makeToolBrush ( )
     // Only one radius is used when generating circular brushes
     double hRad = brushTool.width / 2.0;
 
-    rgbaDataL rgba = canvasColorToRGBA_ull (
+    struct rgbaDataL rgba = canvasColorToRGBA_ull (
         PaletteToBuffercolor ( globalColor )
     );
 
@@ -388,7 +388,7 @@ BOOL toolLine ( )
     {
         if ( lineTool.mode == 1 )
         {
-            Affrect rect = drawLine (
+            struct Affrect rect = drawLine (
                 lineTool.x,
                 lineTool.y,
                 lineTool.dx,
@@ -687,7 +687,7 @@ BOOL toolCircle ( )
     {
         if ( circleTool.mode == 1 )
         {
-            Affrect rect = drawCircle (
+            struct Affrect rect = drawCircle (
                 circleTool.ox + circleTool.w + ( brushTool.width / 2.0 ),
                 circleTool.oy + circleTool.h + ( brushTool.height / 2.0 ),
                 circleTool.w,  circleTool.h,
@@ -919,7 +919,7 @@ BOOL toolColorPicker ( )
             ( int )( cMouseY ) * globalActiveCanvas->width + ( int )( cMouseX )
         ];
 
-        rgba64 result = *( rgba64 *)&( color );
+        struct rgba64 result = *( struct rgba64 *)&( color );
 
         if ( globalColorMode == LUNA_COLORMODE_SNAP )
             result = snapToPalette ( result, TRUE );

@@ -53,16 +53,16 @@
 #include "app/parts.h"
 #endif
 
-typedef struct Affected_Rect
+struct Affrect
 {
     int x;
     int y;
     int w;
     int h;
-} Affrect;
+};
 
-WindowList*                 globalActiveWindow;
-oCanvas*                    globalActiveCanvas;
+struct WindowList*          globalActiveWindow;
+struct oCanvas*             globalActiveCanvas;
 int                         globalWindowIncrement;
 int                         globalEvents;
 int                         globalCurrentTool;
