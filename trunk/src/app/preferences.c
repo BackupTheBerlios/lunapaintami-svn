@@ -147,7 +147,7 @@ BOOL savePreferences ( )
     BOOL result = FALSE;
     BPTR filehandle = NULL;
 
-    if ( ( filehandle = Open ( "Lunapaint:lunapaint.prefs", MODE_NEWFILE ) ) == NULL )
+    if ( ( filehandle = Open ( "PROGDIR:lunapaint.prefs", MODE_NEWFILE ) ) == NULL )
         return FALSE;
 
     if ( !( handle = AllocIFF() ) )
@@ -230,7 +230,7 @@ BOOL loadPreferences ( )
     if ( !( handle = AllocIFF( ) ) )
         return FALSE;
 
-    if ( ( filehandle = Open ( "Lunapaint:lunapaint.prefs", MODE_OLDFILE ) ) == NULL )
+    if ( ( filehandle = Open ( "PROGDIR:lunapaint.prefs", MODE_OLDFILE ) ) == NULL )
         goto prefs_load_ending;
 
     handle->iff_Stream = ( IPTR )filehandle;

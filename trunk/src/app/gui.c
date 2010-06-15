@@ -405,7 +405,7 @@ void Init_Backdrop ( )
         MUIA_Window_UseBottomBorderScroller,        FALSE,
         MUIA_Window_UseRightBorderScroller,         FALSE,
         WindowContents, ( IPTR )VGroup,
-            MUIA_Background, ( IPTR )"5:Lunapaint:data/backdrop.png",
+            MUIA_Background, ( IPTR )"5:PROGDIR:data/backdrop.png",
             Child, RectangleObject, End,
         End,
     End;

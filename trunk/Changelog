@@ -1,9 +1,10 @@
 Lunapaint v0.4
 
  * Fixed: Use AddPart for correct combination of drawer and file
- * Fixed: Print error message when project file doesn' start with
+ * Fixed: Print error message when project file doesn't start with
           magic word during loading a project
- * NEW: Added loading of projects from the command linne.
+ * NEW:   Added loading of projects from the command line.
+ * Fixed: Use PROGDIR: instead of LUNAPAINT:
 
 Lunapaint v0.3.3b
  

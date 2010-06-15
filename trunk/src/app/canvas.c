@@ -1177,7 +1177,7 @@ void showFullscreenWindow ( struct oCanvas *canvas )
                 InnerSpacing ( 0, 0 ),
                 MUIA_Group_HorizSpacing, 0,
                 MUIA_Group_VertSpacing, 0,
-                MUIA_Background, ( IPTR )"5:Lunapaint:data/backdrop.png",
+                MUIA_Background, ( IPTR )"5:PROGDIR:data/backdrop.png",
             End ),
         End;
         DoMethod ( PaintApp, OM_ADDMEMBER, ( IPTR )windowFullscreen );

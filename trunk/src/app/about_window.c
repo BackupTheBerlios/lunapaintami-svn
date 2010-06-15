@@ -39,7 +39,7 @@ void Init_AboutWindow ( )
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, ( IPTR )ImageObject,
                     MUIA_Frame, MUIV_Frame_Group,
-                    MUIA_Image_Spec, (IPTR)"3:Lunapaint:data/lunaabout_logo.png",
+                    MUIA_Image_Spec, (IPTR)"3:PROGDIR:data/lunaabout_logo.png",
                 End,
             End,
             Child, ( IPTR )GroupObject,
