@@ -214,7 +214,7 @@ void Destroy_Buffer ( struct oCanvas *canv );
     Draw the layers etc and return an unsigned int buffer for use by
     redrawScreenbufferRect and others
 */
-inline unsigned int *renderCanvas (
+unsigned int *renderCanvas (
     struct oCanvas *canvas, unsigned int rx, unsigned int ry,
     unsigned int rw, unsigned int rh, BOOL Transparent
 );
@@ -287,7 +287,7 @@ void swapCanvasBuffers ( struct oCanvas *canv );
 /*
     Draw preview of current tool / hover version
 */
-inline unsigned int drawToolPreview ( int x, int y );
+unsigned int drawToolPreview ( int x, int y );
 
 /*
     Use the value list

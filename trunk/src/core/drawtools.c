@@ -254,7 +254,7 @@ struct Affrect plotBrush (
     return rect;
 }
 
-inline void pixelAntialias (
+void pixelAntialias (
     double x, double y, struct rgba64 paintcol,
     int bw, int bh, unsigned long long int *buf
 )
@@ -280,7 +280,7 @@ inline void pixelAntialias (
     }
 }
 
-inline void pixelPlain ( int x, int y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf )
+void pixelPlain ( int x, int y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf )
 {
     if ( y < 0 || y >= bh || x < 0 || x >= bw ) return;
     int dataoffset = ( y * bw ) + x;
@@ -288,7 +288,7 @@ inline void pixelPlain ( int x, int y, struct rgba64 paintcol, int bw, int bh, u
     buf[ dataoffset ] = processPixel ( sourcecol, paintcol, x, y, x, y );
 }
 
-inline unsigned long long int processPixel (
+unsigned long long int processPixel (
     struct rgba64 origCol, struct rgba64 paintCol,
     double x, double y, double diffx, double diffy
 )

@@ -66,16 +66,16 @@ struct Affrect plotBrush (
     unsigned long long int *buffer
 );
 
-inline void pixelAntialias (
+void pixelAntialias (
     double x, double y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf
 );
 
-inline void pixelPlain (
+void pixelPlain (
     int x, int y, struct rgba64 paintcol, int bw, int bh, unsigned long long int *buf
 );
 
 
-inline unsigned long long int processPixel (
+unsigned long long int processPixel (
     struct rgba64 origCol, struct rgba64 paintCol, double x, double y,
     double diffx, double diffy
 );

@@ -1,6 +1,7 @@
 CC=i386-aros-gcc
 CFLAGS=-g -fno-strict-aliasing -funroll-loops -Wall -Wno-pointer-sign -I.
 LDFLAGS=-g -lmui -lpng -lz -lfreetype2
+RELEASEDIR=../../lunapaint.i386-aros
 
 EXE=../Lunapaint
 
@@ -57,6 +58,13 @@ $(EXE): $(OBJS)
 
 clean:
 		rm -rf $(EXE) $(OBJS)
+
+release:
+		rm -rf $(RELEASEDIR)
+		mkdir $(RELEASEDIR)
+		cp ../BUGS ../Changelog ../COPYING ../default.palette $(RELEASEDIR)
+		cp ../Lunapaint.info ../Lunapaint ../lunapaint.prefs ../README $(RELEASEDIR)
+		cp -r ../data $(RELEASEDIR)
 
 deps: $(CFILES)
 		$(CC) -MM $(CFLAGS) $^

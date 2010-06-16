@@ -234,7 +234,7 @@ struct gfxbuffer *getGfxbufferFromList ( struct gfxbuffer *buf, int layer, int f
     return NULL;
 }
 
-inline unsigned int *renderCanvas (
+unsigned int *renderCanvas (
     struct oCanvas *canvas, unsigned int rx, unsigned int ry,
     unsigned int rw, unsigned int rh, BOOL Transparent
 )
