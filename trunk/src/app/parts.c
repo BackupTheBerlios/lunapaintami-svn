@@ -41,7 +41,7 @@ char *getFilename ( )
         ASLFR_Screen, lunaPubScreen,
         TAG_DONE
     );
-    result = RequestFile ( aslfileReq );
+    result = AslRequest ( aslfileReq, NULL );
 
     char *file = NULL;
     if ( result != FALSE )
@@ -65,7 +65,7 @@ char *getFilename ( )
         }
     }
     end:
-    FreeFileRequest ( aslfileReq );
+    FreeAslRequest ( aslfileReq );
 
     keyboardEnabled = TRUE;
 
