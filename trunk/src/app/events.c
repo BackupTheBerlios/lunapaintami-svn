@@ -20,6 +20,7 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.            *
 *                                                                           *
 ****************************************************************************/
+#include  <SDI_hook.h>
 
 #include "events.h"
 
@@ -37,39 +38,23 @@ LONG evalMouseY;
 ULONG evalRawKey;
 ULONG releaseKey;
 
-AROS_UFH3 ( void, DisableKeyboard_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(DisableKeyboard_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
-
     keyboardEnabled = FALSE;
 
-    AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( void, EnableKeyboard_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(EnableKeyboard_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     keyboardEnabled = TRUE;
 
-    AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( struct InputEvent *, handleEvents,
-    AROS_UFHA ( struct InputEvent *, event, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+
+HOOKPROTO(handleEvents, struct InputEvent *, APTR obj, APTR param) 
 {
-    AROS_USERFUNC_INIT
+   struct InputEvent *event = (struct InputEvent *)hook; 
 
     if ( event )
     {
@@ -95,8 +80,6 @@ AROS_UFH3 ( struct InputEvent *, handleEvents,
     }
 
     return event;
-
-    AROS_USERFUNC_EXIT
 }
 
 BOOL InitEvents ( )

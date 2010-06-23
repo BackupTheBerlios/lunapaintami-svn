@@ -20,7 +20,7 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.            *
 *                                                                           *
 ****************************************************************************/
-
+#include  <SDI_hook.h>
 #include "new_image.h"
 
 Object *nwWindow;
@@ -34,13 +34,8 @@ Object *nwTemplates;
 struct Hook template_hook;
 
 
-AROS_UFH3 ( void, template_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(template_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     int selection = XGET ( nwTemplates, MUIA_Cycle_Active );
 
@@ -53,8 +48,8 @@ AROS_UFH3 ( void, template_func,
     set ( nwStringWidth, MUIA_String_Integer, ( IPTR )templates[ selection ][ 0 ] );
     set ( nwStringHeight, MUIA_String_Integer, ( IPTR )templates[ selection ][ 1 ] );
 
-    AROS_USERFUNC_EXIT
 }
+
 
 void nwNewWindow ( )
 {

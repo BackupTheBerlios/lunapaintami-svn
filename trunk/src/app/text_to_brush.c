@@ -21,6 +21,8 @@
 *                                                                           *
 ****************************************************************************/
 
+#include <SDI_hook.h>
+
 #include "text_to_brush.h"
 #define TTLOAD_DEFAULT  (TTLOAD_SCALE_GLYPH | TTLOAD_HINT_GLYPH )
 
@@ -37,17 +39,9 @@ STRPTR FontList[ MAX_FONTNUM ];
 struct Hook RenderTextToBrush_hook;
 
 
-AROS_UFH3 ( void, RenderTextToBrush_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(RenderTextToBrush_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
-
     RenderTextToBrushBuffer ( );
-
-    AROS_USERFUNC_EXIT
 }
 
 void Init_TextToBrushWindow ( )

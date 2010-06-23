@@ -21,6 +21,7 @@
 *                                                                           *
 ****************************************************************************/
 
+#include <SDI_hook.h>
 #include "layers.h"
 
 #define LAYERTHUMBSIZE 84
@@ -54,14 +55,8 @@ struct Hook changeVisibilityHook;
 struct oCanvas* lastDrawnCanvas;
 BOOL forceLayerRedraw;
 
-
-AROS_UFH3 ( void, changeOpacityFunc,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(changeOpacityFunc, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     // Fix it
     if ( globalActiveCanvas != NULL )
@@ -82,17 +77,12 @@ AROS_UFH3 ( void, changeOpacityFunc,
         DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_RedrawArea );
     }
 
-    AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( void, changeVisibilityFunc,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
-{
-    AROS_USERFUNC_INIT
 
+
+HOOKPROTONHNO(changeVisibilityFunc, void, int *param)
+{
     // Fix it
     if ( globalActiveCanvas != NULL )
     {
@@ -130,16 +120,10 @@ AROS_UFH3 ( void, changeVisibilityFunc,
         winHasChanged ( );
     }
 
-    AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( void, acknowledgeOpacityFunc,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO (acknowledgeOpacityFunc, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     // Fix it
     if ( globalActiveCanvas != NULL )
@@ -150,17 +134,11 @@ AROS_UFH3 ( void, acknowledgeOpacityFunc,
         set ( LayerOpacity, MUIA_Numeric_Value, integer );
     }
 
-    AROS_USERFUNC_EXIT
+ 
 }
 
-AROS_UFH3 ( void, acknowledgeLayNameFunc,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(acknowledgeLayNameFunc, void, int *param)
 {
-    AROS_USERFUNC_INIT
-
     // Fix it
     if ( globalActiveCanvas )
     {
@@ -182,7 +160,6 @@ AROS_UFH3 ( void, acknowledgeLayNameFunc,
         DoMethod ( WidgetLayers, MUIM_Draw );
     }
 
-    AROS_USERFUNC_EXIT
 }
 
 IPTR _Layers_MUIM_Setup ( Class *CLASS, Object *self, Msg message )
@@ -434,27 +411,29 @@ IPTR _Layers_MUIM_ChangeOnionskin ( Class *CLASS, Object *self, Msg msg )
     return 0;
 }
 
-BOOPSI_DISPATCHER ( IPTR, LayersClass, CLASS, self, message )
+DISPATCHERPROTO(LayersClass)
 {
-    switch ( message->MethodID )
+    switch ( msg->MethodID )
     {
-        case MUIM_Setup:                            return _Layers_MUIM_Setup ( CLASS, self, message );
-        case MUIM_Draw:                             return _Layers_MUIM_Draw ( CLASS, self, message );
-        case MUIM_HandleInput:                      return _Layers_MUIM_HandleInput ( CLASS, self, message );
-        case MUIM_AskMinMax:                        return _Layers_MUIM_AskMinMax ( CLASS, self, message );
-        case MUIM_Luna_Canvas_PrevFrame:            return _Layers_MUIM_PrevFrame ( CLASS, self, message );
-        case MUIM_Luna_Canvas_NextFrame:            return _Layers_MUIM_NextFrame ( CLASS, self, message );
-        case MUIM_Luna_Canvas_GotoFrame:            return _Layers_MUIM_GotoFrame ( CLASS, self, message );
-        case MUIM_Luna_Canvas_CanvasAddLayer:       return _Layers_MUIM_CanvasAddLayer ( CLASS, self, message );
-        case MUIM_Luna_Canvas_CanvasSwapLayer:      return _Layers_MUIM_CanvasSwapLayer ( CLASS, self, message );
-        case MUIM_Luna_Canvas_CanvasDeleteLayer:    return _Layers_MUIM_CanvasDeleteLayer ( CLASS, self, message );
-        case MUIM_Luna_Canvas_CanvasMergeLayer:     return _Layers_MUIM_CanvasMergeLayer ( CLASS, self, message );
-        case MUIM_Luna_Canvas_CanvasCopyLayer:      return _Layers_MUIM_CanvasCopyLayer ( CLASS, self, message );
-        case MUIM_Luna_Canvas_ChangeOnionskin:      return _Layers_MUIM_ChangeOnionskin ( CLASS, self, message );
-        default:                                    return DoSuperMethodA ( CLASS, self, message );
+        case MUIM_Setup:                            return _Layers_MUIM_Setup ( cl, obj, msg );
+        case MUIM_Draw:                             return _Layers_MUIM_Draw ( cl, obj, msg );
+        case MUIM_HandleInput:                      return _Layers_MUIM_HandleInput ( cl, obj, msg );
+        case MUIM_AskMinMax:                        return _Layers_MUIM_AskMinMax ( cl, obj, msg );
+        case MUIM_Luna_Canvas_PrevFrame:            return _Layers_MUIM_PrevFrame ( cl, obj, msg );
+        case MUIM_Luna_Canvas_NextFrame:            return _Layers_MUIM_NextFrame ( cl, obj, msg );
+        case MUIM_Luna_Canvas_GotoFrame:            return _Layers_MUIM_GotoFrame ( cl, obj, msg );
+        case MUIM_Luna_Canvas_CanvasAddLayer:       return _Layers_MUIM_CanvasAddLayer ( cl, obj, msg );
+        case MUIM_Luna_Canvas_CanvasSwapLayer:      return _Layers_MUIM_CanvasSwapLayer ( cl, obj, msg );
+        case MUIM_Luna_Canvas_CanvasDeleteLayer:    return _Layers_MUIM_CanvasDeleteLayer ( cl, obj, msg );
+        case MUIM_Luna_Canvas_CanvasMergeLayer:     return _Layers_MUIM_CanvasMergeLayer ( cl, obj, msg );
+        case MUIM_Luna_Canvas_CanvasCopyLayer:      return _Layers_MUIM_CanvasCopyLayer ( cl, obj, msg );
+        case MUIM_Luna_Canvas_ChangeOnionskin:      return _Layers_MUIM_ChangeOnionskin ( cl, obj, msg );
+        default:                                    return DoSuperMethodA ( cl, obj, msg );
     }
+
 }
-BOOPSI_DISPATCHER_END
+
+
 
 void Init_LayersWindow ( )
 {

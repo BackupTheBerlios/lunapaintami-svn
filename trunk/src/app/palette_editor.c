@@ -20,7 +20,7 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.            *
 *                                                                           *
 ****************************************************************************/
-
+#include <SDI_hook.h>
 #include "palette_editor.h"
 
 Object *paletteWindow;
@@ -55,69 +55,41 @@ struct Hook paletteClose_hook;
     Call the function that opens a palette file requestor and
     save on the resulting file...
 */
-AROS_UFH3 ( ULONG, paletteSave_func,
-    AROS_UFHA ( struct Hook *, hook, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A0 )
-)
-{
-    AROS_USERFUNC_INIT
 
+HOOKPROTONHNO(paletteSave_func, ULONG, int *param)
+{
     savePalette ( );
     return ( IPTR )NULL;
-
-    AROS_USERFUNC_EXIT
 }
 
 /*
     We do this when we close the palette window
 */
 
-AROS_UFH3 ( ULONG, paletteClose_func,
-    AROS_UFHA ( struct Hook *, hook, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A0 )
-)
+HOOKPROTONHNO(paletteClose_func, ULONG, int *param)
 {
-    AROS_USERFUNC_INIT
-
     set ( paletteWindow, MUIA_Window_Open, FALSE );
     DoMethod ( tbxAreaPalette, MUIM_Draw );
     return ( IPTR )NULL;
-
-    AROS_USERFUNC_EXIT
 }
 
 /*
     Call the function that opens a palette file requestor and
     load the resulting file...
 */
-AROS_UFH3 ( ULONG, paletteLoad_func,
-    AROS_UFHA ( struct Hook *, hook, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A0 )
-)
-{
-    AROS_USERFUNC_INIT
 
+HOOKPROTONHNO (paletteLoad_func, ULONG, int *param)
+{
     loadPalette ( );
     tbxPaletteRedraw ( );
 
     return ( IPTR )NULL;
-
-    AROS_USERFUNC_EXIT
 }
-
 /*
     To this every time a slider RGB moves...
 */
-AROS_UFH3 ( ULONG, rgbslider_func,
-    AROS_UFHA ( struct Hook *, hook, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A0 )
-)
+HOOKPROTONHNO(rgbslider_func, ULONG, int *param)
 {
-    AROS_USERFUNC_INIT
 
     // Set current selected color
 
@@ -131,23 +103,22 @@ AROS_UFH3 ( ULONG, rgbslider_func,
     updateColorPreview ( ); PaletteRedraw ( currColor );
 
     return 0;
-
-    AROS_USERFUNC_EXIT
 }
 
 
 /*
     Dispatcher for our palette area
 */
-BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
+
+DISPATCHERPROTO(PaletteArea)
 {
-    switch ( message->MethodID )
+    switch ( msg->MethodID )
     {
         case MUIM_Draw:
             return ( IPTR )PaletteRedraw ( -1 );
 
         case MUIM_HandleInput:
-            return ( IPTR )PaletteEvents ( CLASS, self, ( struct MUIP_HandleInput* )message );
+            return ( IPTR )PaletteEvents ( cl, obj, ( struct MUIP_HandleInput* )msg );
 
         case MUIM_Setup:
 
@@ -159,8 +130,8 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
                 set ( palSlideG, MUIA_Numeric_Value, colors.g );
                 set ( palSlideB, MUIA_Numeric_Value, colors.b );
             }
-            MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
-            return DoSuperMethodA ( CLASS, self, message );
+            MUI_RequestIDCMP( obj, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
+            return DoSuperMethodA ( cl, obj, msg );
 
         case MUIM_Luna_Palette_Copy:
             return ( IPTR )PaletteActions ( MUIM_Luna_Palette_Copy );
@@ -233,11 +204,10 @@ BOOPSI_DISPATCHER ( IPTR, PaletteArea, CLASS, self, message )
 
 
         default:
-            return DoSuperMethodA ( CLASS, self, message );
+            return DoSuperMethodA ( cl, obj, msg );
     }
     return ( IPTR )0;
 }
-BOOPSI_DISPATCHER_END
 
 IPTR PaletteRedraw ( int colorIndex )
 {

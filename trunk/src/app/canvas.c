@@ -21,6 +21,9 @@
 *                                                                           *
 ****************************************************************************/
 
+
+#include <SDI_hook.h>
+
 #include "canvas.h"
 
 BOOL isZooming;
@@ -35,13 +38,9 @@ Object *fullscreenGroup;
 /*
     Change project info
 */
-AROS_UFH3 ( void, projFunc,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+
+HOOKPROTONHNO(projFunc, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     // We allocate but do not deallocate as
     // this var is freed by Zune when it becomes part
@@ -54,35 +53,35 @@ AROS_UFH3 ( void, projFunc,
     set ( lst->win, MUIA_Window_Title, projectName );
     set ( lst->projectWin, MUIA_Window_Open, FALSE );
 
-    AROS_USERFUNC_EXIT
 }
+
+
 
 /*
     Dispatcher for our RGBitmapObject
 */
-BOOPSI_DISPATCHER ( IPTR, RGBitmapDispatcher, CLASS, self, message )
+DISPATCHERPROTO(RGBitmapDispatcher)
 {
-    switch ( message->MethodID )
+    switch ( msg->MethodID )
     {
-        case MUIM_Draw:                         return MUIM_RGB_Draw ( CLASS, self, message );
+        case MUIM_Draw:                         return MUIM_RGB_Draw ( cl, obj, msg );
         case MUIM_Luna_Canvas_Redraw:           return MUIM_RGB_Redraw ( );
         case MUIM_Luna_Canvas_RedrawArea:       return MUIM_RGB_RedrawArea ( );
-        case MUIM_HandleInput:                  return MUIM_RGB_HandleInput ( CLASS, self, message );
-        case MUIM_Setup:                        return MUIM_RGB_Setup ( CLASS, self, message );
-        case MUIM_Cleanup:                      return MUIM_RGB_Cleanup ( CLASS, self, message );
+        case MUIM_HandleInput:                  return MUIM_RGB_HandleInput ( cl, obj, msg );
+        case MUIM_Setup:                        return MUIM_RGB_Setup ( cl, obj, msg );
+        case MUIM_Cleanup:                      return MUIM_RGB_Cleanup ( cl, obj, msg );
         case MUIM_Luna_Canvas_ScrollingNotify:  return MUIM_RGB_ScrollingNotify ( );
-        case MUIM_Luna_CanvasActivate:          return MUIM_RGB_CanvasActivate ( CLASS, self, message );
-        case MUIM_Luna_CanvasDeactivate:        return MUIM_RGB_CanvasDeactivate ( CLASS, self, message );
+        case MUIM_Luna_CanvasActivate:          return MUIM_RGB_CanvasActivate ( cl, obj, msg );
+        case MUIM_Luna_CanvasDeactivate:        return MUIM_RGB_CanvasDeactivate ( cl, obj, msg );
         case MUIM_Luna_ZoomIn:                  return MUIM_RGB_ZoomIn ( );
         case MUIM_Luna_ZoomOut:                 return MUIM_RGB_ZoomOut ( );
         case MUIM_Luna_ShowAll:                 return MUIM_RGB_ShowAll ( );
-        case MUIM_AskMinMax:                    return MUIM_RGB_AskMinMax ( CLASS, self, message );
-        case MUIM_Luna_CloseCanvasWin:          return MUIM_RGB_CloseCanvasWin ( CLASS, self, message );
-        default:                                return DoSuperMethodA ( CLASS, self, message );
+        case MUIM_AskMinMax:                    return MUIM_RGB_AskMinMax ( cl, obj, msg );
+        case MUIM_Luna_CloseCanvasWin:          return MUIM_RGB_CloseCanvasWin ( cl, obj, msg );
+        default:                                return DoSuperMethodA ( cl, obj, msg );
     }
     return ( IPTR )NULL;
 }
-BOOPSI_DISPATCHER_END
 
 /******************************************************************************
     Public functions

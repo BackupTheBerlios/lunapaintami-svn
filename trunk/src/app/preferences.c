@@ -21,6 +21,7 @@
 *                                                                           *
 ****************************************************************************/
 
+#include  <SDI_hook.h>
 #include "preferences.h"
 
 struct Hook PrefsHandler_hook;
@@ -35,14 +36,9 @@ Object *PrefsBtnCancel;
 Object *PrefsCycScrType;
 
 
-AROS_UFH3 ( void, PrefsHandler_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
-{
-    AROS_USERFUNC_INIT
 
+HOOKPROTONHNO(PrefsHandler_func, void, int *param)
+{
     set ( PrefsWindow, MUIA_Window_Open, FALSE );
 
     BOOL save = *( BOOL *)param;
@@ -70,10 +66,7 @@ AROS_UFH3 ( void, PrefsHandler_func,
 
     if ( save == 1 )
         savePreferences ( );
-
-    AROS_USERFUNC_EXIT
 }
-
 
 
 void Init_PrefsWindow ( )

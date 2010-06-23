@@ -20,7 +20,7 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.            *
 *                                                                           *
 ****************************************************************************/
-
+#include <SDI_hook.h>
 #include "export_import.h"
 
 Object *exportCycDT;
@@ -49,13 +49,8 @@ struct Hook import_hook;
 struct Hook exportanimation_hook;
 
 
-AROS_UFH3 ( void, exportanimation_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(exportanimation_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     int datatype = 0;
     unsigned char *filename = NULL;
@@ -67,16 +62,12 @@ AROS_UFH3 ( void, exportanimation_func,
 
     createImageFromAnimation ( globalActiveCanvas, datatype, filename );
 
-    AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( void, export_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+
+
+HOOKPROTONHNO(export_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     int mode = 0, datatype = 0;
     unsigned char *filename = NULL;
@@ -124,17 +115,10 @@ AROS_UFH3 ( void, export_func,
     }
 
     FreeVec ( buffer );
-
-    AROS_USERFUNC_EXIT
 }
 
-AROS_UFH3 ( void, import_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(import_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
 
     int datatype = 0;
     unsigned char *filename = NULL;
@@ -165,9 +149,7 @@ AROS_UFH3 ( void, import_func,
         default: break;
     }
 
-    AROS_USERFUNC_EXIT
 }
-
 unsigned int *generateExportableBuffer ( struct oCanvas *canvas, int mode, int datatype )
 {
     unsigned int *buffer = NULL;

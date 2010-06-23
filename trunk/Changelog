@@ -1,3 +1,6 @@
+Lunapaint v0.5
+ * Fixed: Use SDI macros for easier porting.
+
 Lunapaint v0.4
 
  * Fixed: Use AddPart for correct combination of drawer and file

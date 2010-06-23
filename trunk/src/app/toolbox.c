@@ -20,7 +20,7 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.            *
 *                                                                           *
 ****************************************************************************/
-
+#include <SDI_hook.h>
 #include "toolbox.h"
 
 struct Hook getMenu_hook;
@@ -66,55 +66,28 @@ Object *offsetWindow, *offsetWindowOk, *offsetWindowCancel, *offsetWindowX, *off
 unsigned int *PreviewRectData;
 
 
-AROS_UFH3 ( void, getMenu_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(getMenu_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
-
-    checkMenuEvents ( *( int* )param );
-
-    AROS_USERFUNC_EXIT
+   checkMenuEvents (*param);
 }
 
 /* Get the opacity mode (add/keep) */
-AROS_UFH3 ( void, getOpacMode_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(getOpacMode_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
-
-    brushTool.opacitymode = XGET( tbxCycColorCtrl, MUIA_Cycle_Active );
-
-    AROS_USERFUNC_EXIT
+   brushTool.opacitymode = XGET( tbxCycColorCtrl, MUIA_Cycle_Active );
 }
 
-AROS_UFH3 ( void, getFill_func,
-    AROS_UFHA ( struct Hook *, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
+HOOKPROTONHNO(getFill_func, void, int *param)
 {
-    AROS_USERFUNC_INIT
-
-    GetDrawFillState ( );
-
-    AROS_USERFUNC_EXIT
+	GetDrawFillState ( );
 }
 
-AROS_UFH3 ( void, brushOptions_func,
-    AROS_UFHA ( struct Hook*, h, A0 ),
-    AROS_UFHA ( APTR, obj, A2 ),
-    AROS_UFHA ( APTR, param, A1 )
-)
-{
-    AROS_USERFUNC_INIT
 
-    int val = *( int *)param;
+HOOKPROTONHNO(brushOptions_func, void, int *param)
+{
+
+    //int val = *( int *)param;
+    int val = (*param);
 
     switch ( val )
     {
@@ -141,22 +114,21 @@ AROS_UFH3 ( void, brushOptions_func,
         default: break;
     }
     DoMethod ( tbxAreaPalette, MUIM_Luna_Canvas_AlterBrushShape );
-
-    AROS_USERFUNC_EXIT
 }
 
-BOOPSI_DISPATCHER ( IPTR, tbxPreview, CLASS, self, message )
-{
-    switch ( message->MethodID )
+DISPATCHERPROTO(tbxPreview)
+{ 
+
+  switch ( msg->MethodID )
     {
         case MUIM_Draw:
-            return ( IPTR )tbxPaintPreview ( );
+            return ( IPTR )tbxPaintPreview();
         default:
-            return DoSuperMethodA ( CLASS, self, message );
+            return DoSuperMethodA ( cl, obj, (struct MUIP_Draw *)msg );
     }
     return ( IPTR )NULL;
 }
-BOOPSI_DISPATCHER_END
+
 
 void prevPaletteColor ( )
 {
@@ -228,19 +200,19 @@ IPTR tbxPaintPreview ( )
     return ( IPTR )NULL;
 }
 
-BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
+DISPATCHERPROTO(tbxPalette)
 {
-    switch ( message->MethodID )
+    switch ( msg->MethodID )
     {
         case MUIM_Draw:
             return ( IPTR )tbxPaletteRedraw ();
 
         case MUIM_HandleInput:
-            return ( IPTR )tbxPaletteThink ( ( struct MUIP_HandleInput* )message );
+            return ( IPTR )tbxPaletteThink ( ( struct MUIP_HandleInput* )msg );
 
         case MUIM_Setup:
-            MUI_RequestIDCMP( self, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
-            return DoSuperMethodA ( CLASS, self, message );
+            MUI_RequestIDCMP( obj, IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY );
+            return DoSuperMethodA ( cl, obj, msg );
 
         case MUIM_Luna_Canvas_OpenPaletteEditor:
             set ( paletteWindow, MUIA_Window_Open, TRUE );
@@ -400,11 +372,11 @@ BOOPSI_DISPATCHER ( IPTR, tbxPalette, CLASS, self, message )
             break;
 
         default:
-            return DoSuperMethodA ( CLASS, self, message );
+            return DoSuperMethodA ( cl, obj, msg );
     }
     return ( IPTR )0;
 }
-BOOPSI_DISPATCHER_END
+
 
 IPTR tbxPaletteRedraw ( )
 {
