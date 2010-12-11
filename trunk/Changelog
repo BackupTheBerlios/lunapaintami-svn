@@ -1,5 +1,7 @@
 Lunapaint v0.5
- * Fixed: Use SDI macros for easier porting.
+  * Fixed: store animation frames like xx0001, xx0010, xx0100 instead
+    of xx1, xx10, xx100.
+  * Fixed: Use SDI macros for easier porting.
 
 Lunapaint v0.4
 

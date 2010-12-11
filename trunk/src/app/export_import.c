@@ -529,10 +529,12 @@ void createImageFromAnimation ( struct oCanvas *canv, int datatype, char *filena
 
         unsigned int *buf = NULL;
 
-        int f = FrameStart; for ( ; f <= FrameEnd; f++ )
+        int f = FrameStart;
+
+        for ( ; f <= FrameEnd; f++ )
         {
             char *tmpFilename = AllocVec ( 255, MEMF_ANY|MEMF_CLEAR );
-            sprintf ( tmpFilename, "%s%d", filename, ( f - FrameStart + 1 ) );
+            sprintf ( tmpFilename, "%s%04d", filename, ( f - FrameStart + 1 ) );
 
             canv->currentFrame = f - 1;
             setActiveBuffer ( canv );

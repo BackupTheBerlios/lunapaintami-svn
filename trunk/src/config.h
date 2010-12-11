@@ -24,9 +24,9 @@
 #ifndef _lunapaint_config_
 #define _lunapaint_config_
 
-#define LUNA_VERSION "0.4"
-#define LUNA_SCREEN_TITLE "Lunapaint 0.4, 2010-06-15"
-#define LUNA_ABOUT_TEXT "Lunapaint 0.4\n\n" \
+#define LUNA_VERSION "0.5"
+#define LUNA_SCREEN_TITLE "Lunapaint 0.5, 2010-12-11"
+#define LUNA_ABOUT_TEXT "Lunapaint 0.5\n\n" \
     "See http://developer.berlios.de/projects/lunapaintami/\n" \
     "for more information\n\n" \
     "Special thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
