@@ -30,7 +30,7 @@
     "See http://developer.berlios.de/projects/lunapaintami/\n" \
     "for more information\n\n" \
     "Special thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
-#define VERSIONSTRING "$VER: Lunapaint 0.4 (15.06.2010) by LunaPaint Development Team\n"
+#define VERSIONSTRING "$VER: Lunapaint 0.5 (11.12.2010) by LunaPaint Development Team\n"
 
 struct LunapaintPrefs
 {
