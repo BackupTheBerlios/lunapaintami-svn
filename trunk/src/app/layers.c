@@ -106,12 +106,12 @@ HOOKPROTONHNO(changeVisibilityFunc, void, int *param)
         STRPTR message = AllocVec ( 7, MEMF_CLEAR );
         if ( visible )
         {
-            sprintf ( message, "Hidden" );
+            sprintf ( message, _(MSG_LAYERS_HIDDEN) );
             set ( LayerVisible, MUIA_Text_Contents, ( IPTR )message );
         }
         else
         {
-            sprintf ( message, "Shown" );
+            sprintf ( message, _(MSG_LAYERS_SHOWN) );
             set ( LayerVisible, MUIA_Text_Contents, ( IPTR )message );
         }
         FreeVec ( message );
@@ -202,8 +202,8 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
             set ( LayerName, MUIA_String_Contents, ( IPTR )buf->name );
 
             STRPTR vistx = AllocVec ( 7, MEMF_CLEAR );
-            if ( buf->visible ) sprintf ( vistx, "Shown" );
-            else sprintf ( vistx, "Hidden" );
+            if ( buf->visible ) sprintf ( vistx, _(MSG_LAYERS_SHOWN) );
+            else sprintf ( vistx, _(MSG_LAYERS_HIDDEN) );
             set ( LayerVisible, MUIA_Text_Contents, ( IPTR )vistx );
             FreeVec ( vistx );
         }
@@ -445,10 +445,11 @@ void Init_LayersWindow ( )
     );
 
     WindowLayers = WindowObject,
-        MUIA_Window_Title, ( IPTR )"Layers",
-        MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
+        MUIA_Window_Title, __(MSG_LAYERS_WIN),
+        MUIA_Window_ScreenTitle, ( IPTR )VERSION,
         MUIA_Window_CloseGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','W','L'),
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_LeftEdge, 0,
         MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
@@ -502,7 +503,7 @@ void Init_LayersWindow ( )
                     Child, ( IPTR )VGroup,
                         MUIA_Weight, 25,
                         InnerSpacing ( 0, 0 ),
-                        Child, ( IPTR )( LayerVisible = SimpleButton ( "Shown" ) ),
+                        Child, ( IPTR )( LayerVisible = SimpleButton ( _(MSG_LAYERS_SHOWN) ) ),
                     End,
                 End,
             End ),
@@ -532,11 +533,11 @@ void Init_LayersWindow ( )
         WindowLayers, 2, MUIM_CallHook, &EnableKeyboard_hook );
 
     /* Bubble help */
-    DoMethod ( BtnAddLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Add layer" );
-    DoMethod ( BtnDelLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Delete layer" );
-    DoMethod ( BtnSwapLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Swap layer" );
-    DoMethod ( BtnCopyLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Copy layer" );
-    DoMethod ( BtnMergeLayer, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Merge layer" );
+    DoMethod ( BtnAddLayer, MUIM_Set, MUIA_ShortHelp, _(MSG_LAYERs_BB_ADD) );
+    DoMethod ( BtnDelLayer, MUIM_Set, MUIA_ShortHelp, _(MSG_LAYERs_BB_DEL) );
+    DoMethod ( BtnSwapLayer, MUIM_Set, MUIA_ShortHelp, _(MSG_LAYERs_BB_SWAP) );
+    DoMethod ( BtnCopyLayer, MUIM_Set, MUIA_ShortHelp, _(MSG_LAYER_BB_COPY) );
+    DoMethod ( BtnMergeLayer, MUIM_Set, MUIA_ShortHelp, _(MSG_LAYER_BB_MERGE) );
 
     /*
         Layers
@@ -850,14 +851,14 @@ void RenderLayerNames ( int x, int y, int w, int h )
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset + fnt->tf_YSize + 4 );
             STRPTR percent = "%";
             STRPTR str = AllocVec ( 16, MEMF_ANY|MEMF_CLEAR );
-            sprintf ( str, "Opacity: %d%s", buf->opacity, percent );
+            sprintf ( str, _(MSG_LAYERS_OPACITY), buf->opacity, percent );
             Text ( _rp ( obj ), str, strlen ( str ) );
             FreeVec ( str );
             // Visibility
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset + ( ( fnt->tf_YSize + 4 ) * 2 ) );
             if ( buf->visible )
-                Text ( _rp ( obj ), "Shown", 5 );
-            else Text ( _rp ( obj ), "Hidden", 6 );
+                Text ( _rp ( obj ), _(MSG_LAYERS_SHOWN), 5 );
+            else Text ( _rp ( obj ), _(MSG_LAYERS_HIDDEN), 6 );
         }
         buf = buf->nextbuf;
     }

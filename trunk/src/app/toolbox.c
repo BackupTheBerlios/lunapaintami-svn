@@ -65,6 +65,12 @@ Object *offsetWindow, *offsetWindowOk, *offsetWindowCancel, *offsetWindowX, *off
 
 unsigned int *PreviewRectData;
 
+static STRPTR arr_drawmodes[] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static STRPTR arr_fillmode[]  = { NULL, NULL, NULL, NULL};
+static STRPTR arr_colorctrl[] = { NULL, NULL, NULL};
+static STRPTR arr_grid[]      = { NULL, NULL, NULL};
+static STRPTR arr_grdz[]      = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static STRPTR arr_pltsnap[]   = { NULL, NULL, NULL};
 
 HOOKPROTONHNO(getMenu_func, void, int *param)
 {
@@ -511,28 +517,49 @@ void Init_ToolboxWindow ( )
         NULL, MUIC_Rectangle, NULL, 0, &tbxPreview
     );
 
-    static const char *arr_fillmode[] = { "Draw", "Fill", "Both", NULL };
-    static const char *arr_colorctrl[] = { "Add", "Lock", NULL };
-    static const char *arr_grid[] = { "Grid off", "Grid on", NULL };
-    static const char *arr_grdz[] = { "2", "3", "4", "5", "6", "7", "8", "9", "10", NULL };
-    static const char *arr_drawmodes[] = {
-        "Normal", "Color", "Blur", "Smudge", "Lighten", "Darken", "Colorize", "Erase", "Unerase", NULL
-    };
-    static const char *arr_pltsnap[] = { "64-bit", "Palette", NULL };
+    arr_fillmode[0] = _(MSG_TOOLBOX_DRAW);
+    arr_fillmode[1] = _(MSG_TOOLBOX_FILL);
+    arr_fillmode[2] = _(MSG_TOOLBOX_BOTH);
+    arr_colorctrl[0] = _(MSG_TOOLBOX_ADD);
+    arr_colorctrl[1] = _(MSG_TOOLBOX_LOCK);
+    arr_grid[0] = _(MSG_TOOLBOX_GRIDOFF);
+    arr_grid[1] = _(MSG_TOOLBOX_GRIDON);
+    arr_grdz[0] = (STRPTR) "2";
+    arr_grdz[1] = (STRPTR) "3";
+    arr_grdz[2] = (STRPTR) "4";
+    arr_grdz[3] = (STRPTR) "5";
+    arr_grdz[4] = (STRPTR) "6";
+    arr_grdz[5] = (STRPTR) "7";
+    arr_grdz[6] = (STRPTR) "8";
+    arr_grdz[7] = (STRPTR) "9";
+    arr_grdz[8] = (STRPTR) "10";
+    arr_drawmodes[0] = _(MSG_TOOLBOX_NORMAL);
+    arr_drawmodes[1] = _(MSG_TOOLBOX_COLOR);
+    arr_drawmodes[2] =  _(MSG_TOOLBOX_BLUR);
+    arr_drawmodes[3] =  _(MSG_TOOLBOX_SMUDGE);
+    arr_drawmodes[4] =  _(MSG_TOOLBOX_LIGHTEN);
+    arr_drawmodes[5] =  _(MSG_TOOLBOX_DARKEN);
+    arr_drawmodes[6] =  _(MSG_TOOLBOX_COLORIZE);
+    arr_drawmodes[7] =  _(MSG_TOOLBOX_ERASE);
+    arr_drawmodes[8] =  _(MSG_TOOLBOX_UNERASE);
+
+    arr_pltsnap[0] = _(MSG_TOOLBOX_64B);
+    arr_pltsnap[1] = _(MSG_TOOLBOX_PALETTE);
 
     offsetWindow = WindowObject,
-        MUIA_Window_Title, ( IPTR )"Set layer offset",
-        MUIA_Window_ScreenTitle, ( IPTR )"Set layer offset",
+        MUIA_Window_Title, __(MSG_TOOLBOX_WIN),
+        MUIA_Window_ScreenTitle, (IPTR) VERSION, //__(MSG_TOOLBOX_SCR),
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','O','W'),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, ( IPTR )TextObject,
-                    MUIA_Text_Contents, ( IPTR )"Please write in the coodinates\nby which you want to skew the\nactive layer.",
+                    MUIA_Text_Contents, __(MSG_TOOLBOX_COOR),
                 End,
                 Child, ( IPTR )HGroup,
                     Child, ( IPTR )TextObject,
-                        MUIA_Text_Contents, ( IPTR )"X Offset:",
+                        MUIA_Text_Contents, __(MSG_TOOLBOX_XOFFSET),
                         MUIA_Weight, 50,
                     End,
                     Child, ( IPTR )( offsetWindowX = StringObject,
@@ -545,7 +572,7 @@ void Init_ToolboxWindow ( )
                 End,
                 Child, ( IPTR )HGroup,
                     Child, ( IPTR )TextObject,
-                        MUIA_Text_Contents, ( IPTR )"Y Offset:",
+                        MUIA_Text_Contents, __(MSG_TOOLBOX_YOFFSET),
                         MUIA_Weight, 50,
                     End,
                     Child, ( IPTR )( offsetWindowY = StringObject,
@@ -558,22 +585,23 @@ void Init_ToolboxWindow ( )
                 End,
             End,
             Child, ( IPTR )HGroup,
-                Child, ( IPTR )( offsetWindowOk = SimpleButton ( ( IPTR )"Ok" ) ),
-                Child, ( IPTR )( offsetWindowCancel = SimpleButton ( ( IPTR )"Cancel" ) ),
+                Child, ( IPTR )( offsetWindowOk = SimpleButton ( _(MSG_TOOLBOX_OK) ) ),
+                Child, ( IPTR )( offsetWindowCancel = SimpleButton ( __(MSG_TOOLBOX_CANCEL) ) ),
             End,
         End,
     End;
 
     // The toolbox
     toolbox = WindowObject,
-        MUIA_Window_Title, ( IPTR )"Toolbox",
-        MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
+        MUIA_Window_Title, __(MSG_TOOLBOX),
+        MUIA_Window_ScreenTitle, ( IPTR )VERSION,
+        MUIA_Window_ID, MAKE_ID('L','P','T','B'),
         MUIA_Window_CloseGadget, FALSE,
         MUIA_Window_SizeGadget, FALSE,
-        MUIA_Window_Width, 150,
+//        MUIA_Window_Width, 150,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
-        MUIA_Window_LeftEdge, 0,
-        MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
+//        MUIA_Window_LeftEdge, 0,
+//        MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )VGroup,
                 Child, ( IPTR )( toolboxTopGroup = GroupObject,
@@ -673,7 +701,7 @@ void Init_ToolboxWindow ( )
                             MUIA_Frame, MUIV_Frame_None,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 64,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Brushsize:", End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents, __(MSG_TOOLBOX_BRUSHS), End,
                                 Child, ( IPTR )( tbxSlider_Brushdiameter = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 100,
@@ -682,7 +710,7 @@ void Init_ToolboxWindow ( )
                             End,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 32,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Step:", End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents,__(MSG_TOOLBOX_STEP), End,
                                 Child, ( IPTR )( tbxSlider_Brushstep = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 50,
@@ -693,7 +721,7 @@ void Init_ToolboxWindow ( )
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 64,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Opacity:", End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents, __(MSG_TOOLBOX_OPACITY), End,
                                 Child, ( IPTR )( tbxSlider_Brushopacity = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 255,
@@ -702,7 +730,7 @@ void Init_ToolboxWindow ( )
                             End,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 32,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, ( IPTR )"Power:", End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents, __(MSG_TOOLBOX_POWER), End,
                                 Child, ( IPTR )( tbxSlider_Brushincrement = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 100,
@@ -723,29 +751,29 @@ void Init_ToolboxWindow ( )
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 50,
                                 Child, ( IPTR )TextObject,
-                                    MUIA_Text_Contents, ( IPTR )"Paintmode:",
+                                    MUIA_Text_Contents, __(MSG_TOOLBOX_PAINT),
                                 End,
                                 Child, ( IPTR )( tbxCycPaintMode = CycleObject,
-                                    MUIA_Cycle_Entries, &arr_drawmodes,
+                                    MUIA_Cycle_Entries, arr_drawmodes,
                                 End ),
                                 Child, ( IPTR )HGroup,
                                     Child, ( IPTR )TextObject,
                                         MUIA_Weight, 50,
-                                        MUIA_Text_Contents, ( IPTR )"Draw/Fill:",
+                                        MUIA_Text_Contents, __(MSG_TOOLBOX_DRAW),
                                     End,
                                     Child, ( IPTR )TextObject,
                                         MUIA_Weight, 50,
-                                        MUIA_Text_Contents, ( IPTR )"Alpha:",
+                                        MUIA_Text_Contents, __(MSG_TOOLBOX_ALPHA),
                                     End,
                                 End,
                                 Child, ( IPTR )HGroup,
                                     Child, ( IPTR )( tbxCycFillmode = CycleObject,
-                                        MUIA_Cycle_Entries, ( IPTR )arr_fillmode,
+                                        MUIA_Cycle_Entries, arr_fillmode,
                                         MUIA_Cycle_Active, 0,
                                         MUIA_Weight, 50,
                                     End ),
                                     Child, ( IPTR )( tbxCycColorCtrl = CycleObject,
-                                        MUIA_Cycle_Entries, ( IPTR )arr_colorctrl,
+                                        MUIA_Cycle_Entries, arr_colorctrl,
                                         MUIA_Cycle_Active, 0,
                                         MUIA_Weight, 50,
                                     End ),
@@ -760,7 +788,7 @@ void Init_ToolboxWindow ( )
                             End,
                             Child, ( IPTR )VGroup,
                                 Child, ( IPTR )TextObject,
-                                    MUIA_Text_Contents, ( IPTR )"Brush shape:",
+                                    MUIA_Text_Contents, __(MSG_TOOLBOX_BRUSHSH),
                                 End,
                                 Child, ( IPTR )HGroup,
                                     MUIA_Weight, 25,
@@ -818,11 +846,11 @@ void Init_ToolboxWindow ( )
                 Child, ( IPTR )HGroup,
                     MUIA_Frame, MUIV_Frame_None,
                     Child, ( IPTR )( tbxCycGrid = CycleObject,
-                        MUIA_Cycle_Entries, &arr_grid,
+                        MUIA_Cycle_Entries, arr_grid,
                         MUIA_Weight, 60,
                     End ),
                     Child, ( IPTR )( tbxCyc_GridSize = CycleObject,
-                        MUIA_Cycle_Entries, &arr_grdz,
+                        MUIA_Cycle_Entries, arr_grdz,
                         MUIA_Weight, 40,
                     End ),
                 End,
@@ -848,8 +876,8 @@ void Init_ToolboxWindow ( )
     End;
 
     // Move to left edge of screen (todo: improve this!)
-    int toolboxWidth = 0; get ( toolbox, MUIA_Window_Width, &toolboxWidth );
-    set ( toolbox, MUIA_Window_LeftEdge, ( lunaPubScreen->Width - toolboxWidth ) );
+//    int toolboxWidth = 0; get ( toolbox, MUIA_Window_Width, &toolboxWidth );
+//    set ( toolbox, MUIA_Window_LeftEdge, ( lunaPubScreen->Width - toolboxWidth ) );
 
     // set buttons
     set ( antiImage, MUIA_Background, MUII_FILL );
@@ -904,49 +932,49 @@ void Init_ToolboxMethods ( )
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_Draw
     );
-    DoMethod ( tbxBtn_draw, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Draw" );
+    DoMethod ( tbxBtn_draw, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_DRAWFILL) );
 
     DoMethod (
         tbxBtn_fill, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_Fill
     );
-    DoMethod ( tbxBtn_fill, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Flood fill" );
+    DoMethod ( tbxBtn_fill, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_FLOOD) );
 
     DoMethod (
         tbxBtn_line, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_Line
     );
-    DoMethod ( tbxBtn_line, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Line" );
+    DoMethod ( tbxBtn_line, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_LINE) );
 
     DoMethod (
         tbxBtn_rectangle, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_Rectangle
     );
-    DoMethod ( tbxBtn_rectangle, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Rectangle" );
+    DoMethod ( tbxBtn_rectangle, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_RECTANGLE) );
 
     DoMethod (
         tbxBtn_circle, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_Circle
     );
-    DoMethod ( tbxBtn_circle, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Circle" );
+    DoMethod ( tbxBtn_circle, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_CIRCLE) );
 
     DoMethod (
         tbxBtn_getbrush, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_ClipBrush
     );
-    DoMethod ( tbxBtn_getbrush, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Cut out brush" );
+    DoMethod ( tbxBtn_getbrush, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_CUT) );
 
     DoMethod (
         tbxBtn_pickcolor, MUIM_Notify,
         MUIA_Pressed, FALSE,
         paletteRect, 1, MUIM_Luna_SetTool_Colorpicker
     );
-    DoMethod ( tbxBtn_pickcolor, MUIM_Set, MUIA_ShortHelp, (STRPTR)"Pick color" );
+    DoMethod ( tbxBtn_pickcolor, MUIM_Set, MUIA_ShortHelp, _(MSG_TOOLBOX_PICK) );
 
     /*
         Other

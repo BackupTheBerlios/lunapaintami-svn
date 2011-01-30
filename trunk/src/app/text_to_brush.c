@@ -59,27 +59,28 @@ void Init_TextToBrushWindow ( )
     };
 
     ttbw_FontSizeList = MUI_NewObject ( MUIC_List,
-        MUIA_List_Title, "Size:",
+        MUIA_List_Title, _(MSG_TEXT_SIZE),
         MUIA_Frame, MUIV_Frame_ReadList,
         MUIA_List_SourceArray, ( APTR )fontSizes,
         TAG_END
     );
 
     ttbw_FontList = MUI_NewObject ( MUIC_List,
-        MUIA_List_Title, "Fonts:",
+        MUIA_List_Title, _(MSG_TEXT_FONTS),
         MUIA_Frame, MUIV_Frame_ReadList,
         TAG_END
     );
 
     textToBrushWindow = WindowObject,
-        MUIA_Window_Title, ( IPTR )"Render text to brush buffer",
-        MUIA_Window_ScreenTitle, ( IPTR )"Render text to brush buffer",
+        MUIA_Window_Title, __(MSG_TEXT_WIN),
+        MUIA_Window_ScreenTitle, __(MSG_TEXT_SCR),
         MUIA_Window_CloseGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','B','W'),
         MUIA_Window_SizeGadget, TRUE,
         WindowContents, ( IPTR )VGroup,
             Child, GroupObject,
-                MUIA_FrameTitle, ( IPTR )"Select font",
+                MUIA_FrameTitle, __(MSG_TEXT_SELECT),
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, HGroup,
                     MUIA_Weight, 100,
@@ -98,7 +99,7 @@ void Init_TextToBrushWindow ( )
                 End,
             End,
             Child, GroupObject,
-                MUIA_FrameTitle, ( IPTR )"Enter text",
+                MUIA_FrameTitle, __(MSG_TEXT_ENTER),
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, HGroup,
                     MUIA_Weight, 100,
@@ -111,7 +112,7 @@ void Init_TextToBrushWindow ( )
                     End,
                     Child, VGroup,
                         MUIA_Weight, 30,
-                        Child, ( IPTR )( ttbw_RenderButton = SimpleButton ( "Render" ) ),
+                        Child, ( IPTR )( ttbw_RenderButton = SimpleButton ( _(MSG_TEXT_RENDER) ) ),
                     End,
                 End,
             End,

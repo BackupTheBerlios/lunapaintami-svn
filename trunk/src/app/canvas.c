@@ -831,14 +831,14 @@ void UpdateCanvasInfo ( struct WindowList *win )
     int frams = ( int )win->canvas->totalFrames;
     int layer = ( int )( win->canvas->currentLayer + 1 );
     int layrs = ( int )win->canvas->totalLayers;
-    sprintf ( ( unsigned char *)&frameText, "Frame: %d/%d ", frame, frams );
+    sprintf ( ( unsigned char *)&frameText, _(MSG_CANVAS_FRAME), frame, frams );
     set ( win->txtFrameInf, MUIA_Text_Contents, ( STRPTR )&frameText );
-    sprintf ( ( unsigned char *)&layerText, "Layer: %d/%d ", layer, layrs );
+    sprintf ( ( unsigned char *)&layerText, _(MSG_CANVAS_LAYER), layer, layrs );
     set ( win->txtLayerInf, MUIA_Text_Contents, ( STRPTR )&layerText );
 
     // Update zoom display
     STRPTR zlevel = AllocVec ( 20, MEMF_CLEAR );
-    sprintf ( zlevel, "Zoom: x%d ", ( int )win->canvas->zoom );
+    sprintf ( zlevel, _(MSG_CANVAS_ZOOM), ( int )win->canvas->zoom );
     set ( win->txtZoomLevel, MUIA_Text_Contents, ( IPTR )zlevel );
     FreeVec ( zlevel );
 }
@@ -981,11 +981,12 @@ void addCanvaswindow (
         );
 
     canvases->win = MUI_NewObject ( MUIC_Window,
-        MUIA_Window_Title, ( IPTR )"Unnamed image",
+        MUIA_Window_Title, __(MSG_CANVAS_UNNAMED),
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','W','C'),
         MUIA_Window_MouseObject, ( IPTR )canvases->mouse,
-        MUIA_Window_ScreenTitle, ( IPTR )LUNA_SCREEN_TITLE,
+        MUIA_Window_ScreenTitle, ( IPTR )VERSION,
         MUIA_Window_UseRightBorderScroller, TRUE,
         MUIA_Window_UseBottomBorderScroller, TRUE,
         MUIA_Window_IsSubWindow, TRUE,
@@ -1019,13 +1020,13 @@ void addCanvaswindow (
                         InnerSpacing ( 3, 3 ),
                         MUIA_Weight, 100,
                         Child, ( IPTR )( canvases->txtLayerInf = TextObject,
-                            MUIA_Text_Contents, "Layer: 0/0  ",
+                            MUIA_Text_Contents, _(MSG_CANVAS_LAYER2),
                         End ),
                         Child, ( IPTR )( canvases->txtFrameInf = TextObject,
-                            MUIA_Text_Contents, "Frame: 0/0  ",
+                            MUIA_Text_Contents, _(MSG_CANVAS_FRAME2),
                         End ),
                         Child, ( IPTR )( canvases->txtZoomLevel = TextObject,
-                            MUIA_Text_Contents, "Zoom: 1x ",
+                            MUIA_Text_Contents, _(MSG_CANVAS_ZOOM2),
                         End ),
                         Child, ( IPTR )( canvases->txtCoordX = TextObject,
                             MUIA_Text_Contents, "X: 0 " ,
@@ -1166,7 +1167,7 @@ void showFullscreenWindow ( struct oCanvas *canvas )
             MUIA_Window_DragBar, FALSE,
             MUIA_Window_Screen, ( IPTR ) lunaPubScreen,
             MUIA_Window_MouseObject, ( IPTR ) canvases->mouse,
-            MUIA_Window_ScreenTitle, ( IPTR ) LUNA_SCREEN_TITLE,
+            MUIA_Window_ScreenTitle, ( IPTR ) VERSION,
             MUIA_Window_UseRightBorderScroller, FALSE,
             MUIA_Window_UseBottomBorderScroller, FALSE,
             MUIA_Window_IsSubWindow, FALSE,

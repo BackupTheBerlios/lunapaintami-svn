@@ -48,6 +48,12 @@ struct Hook export_hook;
 struct Hook import_hook;
 struct Hook exportanimation_hook;
 
+static STRPTR exp_datatypes[]   = { NULL, NULL, NULL, NULL, NULL };
+static STRPTR exp_mode[]        = { NULL, NULL, NULL };
+static STRPTR exp_titles[]      = { NULL, NULL, NULL };
+static STRPTR exp_anim_mode[]   = { NULL, NULL, NULL };
+static STRPTR exp_anim_method[] = { NULL, NULL, NULL };
+static STRPTR imp_datatypes[]   = { NULL, NULL };
 
 HOOKPROTONHNO(exportanimation_func, void, int *param)
 {
@@ -230,24 +236,34 @@ unsigned int *generateExportableBuffer ( struct oCanvas *canvas, int mode, int d
 
 void makeExportWindow ( )
 {
-    static const char *exp_datatypes[] = { "JPEG", "PNG", "RAW64", "RAW32", NULL };
-    static const char *exp_mode[] = { "Current active layer", "Flatten layers", NULL };
-    static const char *exp_titles[] = { "Export one frame", "Export frames", NULL };
-    static const char *exp_anim_mode[] = { "Current active layer", "Flatten layers", NULL };
-    static const char *exp_anim_method[] = {
-        "One file pr. frame", "One vertical strip", NULL
-    };
+    exp_datatypes[0] = _(MSG_EXPORT_JPEG);
+    exp_datatypes[1] = _(MSG_EXPORT_PNG);
+    exp_datatypes[2] = _(MSG_EXPORT_RAW64);
+    exp_datatypes[3] = _(MSG_EXPORT_RAW32);
+
+    exp_mode[0] = _(MSG_EXPORT_ACTIV_LAYER);
+    exp_mode[1] = _(MSG_EXPORT_FLAT_LAYER);
+
+    exp_titles[0] = _(MSG_EXPORT_ONE_FRAME);
+    exp_titles[1] = _(MSG_EXPORT_FRAMES);
+
+    exp_anim_mode[0] = _(MSG_EXPORT_ACTIV_LAYER);
+    exp_anim_mode[1] = _(MSG_EXPORT_FLAT_LAYER);
+
+    exp_anim_method[0] = _(MSG_EXPORT_FILEPERFRAME);
+    exp_anim_method[1] = _(MSG_EXPORT_STRIP);
 
     exportWindow = WindowObject,
-        MUIA_Window_ScreenTitle, ( IPTR )"Export project",
-        MUIA_Window_Title, ( IPTR )"Export project",
+        MUIA_Window_ScreenTitle, __(MSG_EXPORT_SCR),
+        MUIA_Window_Title, __(MSG_EXPORT_WIN),
         MUIA_Window_CloseGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','W','E'),
         WindowContents, VGroup,
             Child, GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, TextObject,
-                    MUIA_Text_Contents, ( IPTR )"Filename:",
+                    MUIA_Text_Contents, _(MSG_EXPORT_FILENAME),
                 End,
                 Child, HGroup,
                     Child, PopaslObject,
@@ -256,19 +272,21 @@ void makeExportWindow ( )
                             MUIO_String, NULL, 200
                         ),
                         MUIA_Popstring_Button, PopButton ( MUII_PopFile ),
+                        MUIA_CycleChain, 1,
                     End,
                 End,
                 Child, VGroup,
                     Child, TextObject,
-                        MUIA_Text_Contents, "Datatype:",
+                        MUIA_Text_Contents, _(MSG_EXPORT_DT),
                     End,
                     Child, exportCycDT = CycleObject,
-                        MUIA_Cycle_Entries, &exp_datatypes,
+                        MUIA_Cycle_Entries, exp_datatypes,
+                        MUIA_CycleChain, 1,
                     End,
                 End,
             End,
             Child, RegisterObject,
-                MUIA_Register_Titles, &exp_titles,
+                MUIA_Register_Titles, exp_titles,
                 MUIA_Register_Frame, MUIV_Frame_Group,
                 /*
                     Image export
@@ -276,14 +294,16 @@ void makeExportWindow ( )
                 Child, GroupObject,
                     Child, GroupObject,
                         MUIA_Frame, MUIV_Frame_Group,
+                        MUIA_CycleChain, 1,
                         Child, VGroup,
                             Child, exportMode = CycleObject,
-                                MUIA_Cycle_Entries, &exp_mode,
+                                MUIA_Cycle_Entries, exp_mode,
+                                MUIA_CycleChain, 1,
                             End,
                         End,
                         Child, HGroup,
-                            Child, exportBtnExport = SimpleButton ( ( IPTR )"Export" ),
-                            Child, exportBtnCancel = SimpleButton ( ( IPTR )"Cancel" ),
+                            Child, exportBtnExport = SimpleButton ( __(MSG_EXPORT_EXPORT) ),
+                            Child, exportBtnCancel = SimpleButton ( __(MSG_EXPORT_CANCEL) ),
                         End,
                     End,
                 End,
@@ -293,18 +313,21 @@ void makeExportWindow ( )
                 Child, GroupObject,
                     Child, GroupObject,
                         MUIA_Frame, MUIV_Frame_Group,
+                        MUIA_CycleChain, 1,
                         Child, VGroup,
                             Child, exportAnimMode = CycleObject,
-                                MUIA_Cycle_Entries, &exp_anim_mode,
+                                MUIA_Cycle_Entries, exp_anim_mode,
+                                MUIA_CycleChain, 1,
                             End,
                             Child, exportAnimMethod = CycleObject,
-                                MUIA_Cycle_Entries, &exp_anim_method,
+                                MUIA_Cycle_Entries, exp_anim_method,
+                                MUIA_CycleChain, 1,
                             End,
                         End,
                         Child, VGroup,
                             Child, HGroup,
                                 Child, TextObject,
-                                    MUIA_Text_Contents, ( IPTR )"Define frame range:",
+                                    MUIA_Text_Contents, __(MSG_EXPORT_FRAMERANGE),
                                 End,
                                 Child, exportAnimRangeStart = StringObject,
                                     MUIA_String_Accept, ( IPTR )"0123456789",
@@ -312,6 +335,7 @@ void makeExportWindow ( )
                                     MUIA_String_Integer, 1,
                                     MUIA_String_MaxLen, 10,
                                     MUIA_Frame, MUIV_Frame_String,
+                                    MUIA_CycleChain, 1,
                                 End,
                                 Child, TextObject,
                                     MUIA_Text_Contents, " - ",
@@ -322,11 +346,12 @@ void makeExportWindow ( )
                                     MUIA_String_Integer, 1,
                                     MUIA_String_MaxLen, 10,
                                     MUIA_Frame, MUIV_Frame_String,
+                                    MUIA_CycleChain, 1,
                                 End,
                             End,
                             Child, HGroup,
-                                Child, exportAnimBtnExport = SimpleButton ( ( IPTR )"Export Frames" ),
-                                Child, exportAnimBtnCancel = SimpleButton ( ( IPTR )"Cancel" ),
+                                Child, exportAnimBtnExport = SimpleButton ( __(MSG_EXPORT_FRAMES) ),
+                                Child, exportAnimBtnCancel = SimpleButton ( __(MSG_EXPORT_CANCEL) ),
                             End,
                         End,
                     End,
@@ -363,43 +388,46 @@ void makeExportWindow ( )
 
 void makeImportWindow ( )
 {
-    static const char *imp_datatypes[] = { "RAW64", NULL };
+    imp_datatypes[0] = _(MSG_EXPORT_RAW64);
 
     importWindow = WindowObject,
-        MUIA_Window_ScreenTitle, ( IPTR )"Import image",
-        MUIA_Window_Title, ( IPTR )"Import image",
+        MUIA_Window_ScreenTitle, __(MSG_IMPORT_SCR),
+        MUIA_Window_Title, __(MSG_IMPORT_WIN),
         MUIA_Window_CloseGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','W','I'),
         WindowContents, VGroup,
             Child, GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, VGroup,
                     Child, TextObject,
-                        MUIA_Text_Contents, ( IPTR )"Filename:",
+                        MUIA_Text_Contents, __(MSG_IMPORT_FILENAME),
                     End,
                     Child, HGroup,
                         Child, PopaslObject,
                             ASLFR_DoSaveMode, TRUE,
                             MUIA_Popstring_String, importPopFilename = MUI_MakeObject ( MUIO_String, NULL, 200 ),
+                            MUIA_CycleChain, 1,
                             MUIA_Popstring_Button, PopButton ( MUII_PopFile ),
                         End,
                     End,
                     Child, TextObject,
-                        MUIA_Text_Contents, ( IPTR )"Import onto current active layer",
+                        MUIA_Text_Contents, __(MSG_IMPORT_ACTIV_LAYER),
                     End,
                     Child, TextObject,
-                        MUIA_Text_Contents, ( IPTR )"Datatype:",
+                        MUIA_Text_Contents, __(MSG_IMPORT_DT),
                     End,
                     Child, importCycDT = CycleObject,
-                        MUIA_Cycle_Entries, &imp_datatypes,
+                        MUIA_Cycle_Entries, imp_datatypes,
+                        MUIA_CycleChain, 1,
                     End,
                 End,
             End,
             Child, GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, HGroup,
-                    Child, importBtnImport = SimpleButton ( ( IPTR )"Import" ),
-                    Child, importBtnCancel = SimpleButton ( ( IPTR )"Cancel" ),
+                    Child, importBtnImport = SimpleButton ( __(MSG_IMPORT_IMPORT) ),
+                    Child, importBtnCancel = SimpleButton ( __(MSG_IMPORT_CANCEL) ),
                 End,
             End,
         End,

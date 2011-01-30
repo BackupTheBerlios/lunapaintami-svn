@@ -52,7 +52,7 @@ HOOKPROTONHNO(PrefsHandler_func, void, int *param)
     // Open the screen again and move windows
     if ( canvases != NULL )
     {
-        ShowAlert ( "The screenmode can't be changed if you\nhave open canvas windows. Please\nclose any windows and save/use again." );
+        ShowAlert ( _(MSG_PREFS_ALERT) );
     }
     else
     {
@@ -71,39 +71,45 @@ HOOKPROTONHNO(PrefsHandler_func, void, int *param)
 
 void Init_PrefsWindow ( )
 {
-    static const char * titles[] = { "General", "View", NULL };
-    static const char * scrntypes[] = { "Use Wanderer", "Clone Wanderer", NULL };
-    static const char * layerbacktypes[] = { "Checkers", "Black", "Gray", "White", NULL };
+    titles[0] = _(MSG_PREFS_GENERAL);
+    titles[1] = _(MSG_PREFS_VIEW);
+    scrntypes[0] = _(MSG_PREFS_WAND_USE);
+    scrntypes[1] = _(MSG_PREFS_WAND_CLONE);
+    layerbacktypes[0] = _(MSG_PREFS_CHECKERS);
+    layerbacktypes[1] = _(MSG_PREFS_BLACK);
+    layerbacktypes[2] = _(MSG_PREFS_GRAY);
+    layerbacktypes[3] = _(MSG_PREFS_WHITE);
     // Init the window itself
     PrefsWindow = WindowObject,
-        MUIA_Window_Title, ( IPTR )"Preferences",
+        MUIA_Window_Title, __(MSG_PREFS_WIN),
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_CloseGadget, TRUE,
+        MUIA_Window_ID, MAKE_ID('L','P','P','R'),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )RegisterObject,
-                MUIA_Register_Titles, ( IPTR )titles,
+                MUIA_Register_Titles, titles,
                 Child, ( IPTR )GroupObject,
-                    MUIA_FrameTitle, ( IPTR )"Screen preferences",
+                    MUIA_FrameTitle, __(MSG_PREFS_WIN_SCR),
                     MUIA_Frame, MUIV_Frame_Group,
                     Child, ( IPTR )( PrefsCycScrType = CycleObject,
-                        MUIA_Cycle_Entries, ( IPTR )scrntypes,
+                        MUIA_Cycle_Entries, scrntypes,
                         MUIA_Cycle_Active, 0,
                     End ),
                 End,
                 Child, ( IPTR )GroupObject,
-                    MUIA_FrameTitle, ( IPTR )"Layers",
+                    MUIA_FrameTitle, __(MSG_PREFS_LAYERS),
                     MUIA_Frame, MUIV_Frame_Group,
                     Child, ( IPTR )( PrefsLayBackMode = CycleObject,
-                        MUIA_Cycle_Entries, ( IPTR )layerbacktypes,
+                        MUIA_Cycle_Entries, layerbacktypes,
                         MUIA_Cycle_Active, 0,
                     End ),
                 End,
             End,
             Child, ( IPTR )HGroup,
-                Child, ( IPTR )( PrefsBtnSave = SimpleButton ( "Save" ) ),
-                Child, ( IPTR )( PrefsBtnUse = SimpleButton ( "Use" ) ),
-                Child, ( IPTR )( PrefsBtnCancel = SimpleButton ( "Cancel" ) ),
+                Child, ( IPTR )( PrefsBtnSave = SimpleButton ( _(MSG_PREFS_SAVE) ) ),
+                Child, ( IPTR )( PrefsBtnUse = SimpleButton ( _(MSG_PREFS_USE) ) ),
+                Child, ( IPTR )( PrefsBtnCancel = SimpleButton ( _(MSG_PREFS_CANCEL) ) ),
             End,
         End,
     End;

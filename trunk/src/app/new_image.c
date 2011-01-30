@@ -53,17 +53,22 @@ HOOKPROTONHNO(template_func, void, int *param)
 
 void nwNewWindow ( )
 {
-    static const char *templates[] = {
-        "32x32", "48x48", "64x64", "160x120",
-        "320x240", "640x480", "800x600",
-        "1024x768", "1280x1024", NULL
-    };
+    templates[0] = "32x32";
+    templates[1] = "48x48";
+    templates[2] = "64x64";
+    templates[3] = "160x120";
+    templates[4] = "320x240";
+    templates[5] = "640x480";
+    templates[6] = "800x600";
+    templates[7] = "1024x768";
+    templates[8] = "1280x1024";
 
     nwWindow = WindowObject,
-        MUIA_Window_ScreenTitle, ( IPTR )"New Lunapaint Project",
-        MUIA_Window_Title, ( IPTR )"New Lunapaint Project",
+        MUIA_Window_ScreenTitle, __(MSG_NEW_IMAGE_SCR),
+        MUIA_Window_Title, __(MSG_NEW_IMAGE_WIN),
         MUIA_Window_CloseGadget, FALSE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','W','P'),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
@@ -71,29 +76,29 @@ void nwNewWindow ( )
                     Child, ( IPTR )VGroup,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )TextObject,
-                                MUIA_Text_Contents, ( IPTR )"Project name:",
+                                MUIA_Text_Contents, __(MSG_NEW_IMAGE_PRJNAME),
                             End,
                             Child, ( IPTR )( nwStringPrjName = StringObject,
                                 MUIA_String_MaxLen, 128,
                                 MUIA_String_Format, MUIV_String_Format_Left,
                                 MUIA_Frame, MUIV_Frame_String,
-                                MUIA_String_Contents, ( IPTR )"Unnamed project",
+                                MUIA_String_Contents, __(MSG_NEW_IMAGE_UNNAMED),
                                 MUIA_CycleChain, 1,
                             End ),
                         End,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )TextObject,
-                                MUIA_Text_Contents, ( IPTR )"Size templates:",
+                                MUIA_Text_Contents, __(MSG_NEW_IMAGE_TEMPLATES),
                             End,
                             Child, ( IPTR )( nwTemplates = CycleObject,
-                                MUIA_Cycle_Entries, ( IPTR )templates,
+                                MUIA_Cycle_Entries, templates,
                                 MUIA_Cycle_Active, 5,
                                 MUIA_CycleChain, 1,
                             End ),
                         End,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )TextObject,
-                                MUIA_Text_Contents, ( IPTR )"Canvas width:",
+                                MUIA_Text_Contents, __(MSG_NEW_IMAGE_CANVASW),
                             End,
                             Child, ( IPTR )( nwStringWidth = StringObject,
                                 MUIA_String_MaxLen, 5,
@@ -105,7 +110,7 @@ void nwNewWindow ( )
                         End,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )TextObject,
-                                MUIA_Text_Contents, ( IPTR )"Canvas height:",
+                                MUIA_Text_Contents, __(MSG_NEW_IMAGE_CANVASH),
                             End,
                             Child, ( IPTR )( nwStringHeight = StringObject,
                                 MUIA_String_MaxLen, 5,
@@ -117,7 +122,7 @@ void nwNewWindow ( )
                         End,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )TextObject,
-                                MUIA_Text_Contents, ( IPTR )"Number of frames:",
+                                MUIA_Text_Contents, __(MSG_NEW_IMAGE_NB_FRAMES),
                             End,
                             Child, ( IPTR )( nwStringFrames = StringObject,
                                 MUIA_String_MaxLen, 5,
@@ -131,8 +136,8 @@ void nwNewWindow ( )
                 End,
             End,
             Child, ( IPTR )HGroup,
-                Child, ( IPTR )( nwBtnOk = SimpleButton ( ( IPTR )"Ok" ) ),
-                Child, ( IPTR )( nwBtnCancel = SimpleButton ( ( IPTR )"Cancel" ) ),
+                Child, ( IPTR )( nwBtnOk = SimpleButton ( __(MSG_NEW_IMAGE_OK) ) ),
+                Child, ( IPTR )( nwBtnCancel = SimpleButton ( __(MSG_NEW_IMAGE_CANCEL) ) ),
             End,
         End,
     End;

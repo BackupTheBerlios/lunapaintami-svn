@@ -29,10 +29,11 @@ Object *aboutWindow, *aboutWindowOk;
 void Init_AboutWindow ( )
 {
     aboutWindow = WindowObject,
-        MUIA_Window_Title, ( IPTR )"About Lunapaint",
-        MUIA_Window_ScreenTitle, ( IPTR )"About Lunapaint",
+        MUIA_Window_Title, __(MSG_ABOUT_WIN),
+        MUIA_Window_ScreenTitle, __(MSG_ABOUT_SCR),
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_CloseGadget, FALSE,
+        MUIA_Window_ID, MAKE_ID('L','P','A','B'),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )GroupObject,
                 InnerSpacing(0,0),
@@ -48,7 +49,7 @@ void Init_AboutWindow ( )
                     MUIA_Text_Contents, ( IPTR )LUNA_ABOUT_TEXT,
                 End,
             End,
-            Child, ( IPTR )( aboutWindowOk = SimpleButton ( ( IPTR )"Close window" ) ),
+            Child, ( IPTR )( aboutWindowOk = SimpleButton ( _(MSG_ABOUT_CLOSE) )),
         End,
     End;
     DoMethod (

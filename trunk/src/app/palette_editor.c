@@ -299,7 +299,7 @@ IPTR PaletteEvents ( Class *CLASS, Object *self, struct MUIP_HandleInput *msg )
                 if ( msg->imsg->Code == SELECTDOWN )
                 {
                     // Set a color based on click in palette
-                    int mousex, mousey, topedge, leftedge, wi, he;
+                    int mousex, mousey, topedge=0, leftedge=0, wi=0, he=0;
                     double slicex, slicey;
                     get ( paletteRect, MUIA_TopEdge, &topedge );
                     get ( paletteRect, MUIA_LeftEdge, &leftedge );
@@ -469,13 +469,13 @@ void updateColorPreview ( )
 {
     // Update only color preview if we have an open window!
 
-    BOOL state;
+    BOOL state = FALSE;
 
     get ( paletteWindow, MUIA_Window_Open, &state );
 
     if ( state == TRUE )
     {
-        int R, G, B, W, H, TE, LE;
+        int R=0, G=0, B=0, W=0, H=0, TE=0, LE=0;
 
         get ( palSlideR, MUIA_Numeric_Value, &R );
         get ( palSlideG, MUIA_Numeric_Value, &G );
@@ -511,9 +511,10 @@ void Init_PaletteWindow ( )
         );
 
     paletteWindow = WindowObject,
-        MUIA_Window_Title, ( IPTR )"Palette Editor",
+        MUIA_Window_Title, __(MSG_PALETTE_WIN),
         MUIA_Window_SizeGadget, FALSE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','P','W'),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
@@ -521,14 +522,14 @@ void Init_PaletteWindow ( )
                     Child, ( IPTR )VGroup,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )VGroup,
-                                Child, ( IPTR )( palBtnCopy = SimpleButton ( ( IPTR )"Copy" ) ),
-                                Child, ( IPTR )( palBtnPaste = SimpleButton ( ( IPTR )"Paste" ) ),
-                                Child, ( IPTR )( palBtnClear = SimpleButton ( ( IPTR )"Clear" ) ),
+                                Child, ( IPTR )( palBtnCopy = SimpleButton ( __(MSG_PALETTE_COPY) )),
+                                Child, ( IPTR )( palBtnPaste = SimpleButton ( __(MSG_PALETTE_PASTE) )),
+                                Child, ( IPTR )( palBtnClear = SimpleButton ( __(MSG_PALETTE_CLEAR) )),
                             End,
                             Child, ( IPTR )VGroup,
-                                Child, ( IPTR )( palBtnReverse = SimpleButton ( ( IPTR )"Reverse" ) ),
-                                Child, ( IPTR )( palBtnSwap = SimpleButton ( ( IPTR )"Swap" ) ),
-                                Child, ( IPTR )( palBtnSpread = SimpleButton ( ( IPTR )"Spread" ) ),
+                                Child, ( IPTR )( palBtnReverse = SimpleButton ( __(MSG_PALETTE_REVERSE) )),
+                                Child, ( IPTR )( palBtnSwap = SimpleButton ( __(MSG_PALETTE_SWAP) )),
+                                Child, ( IPTR )( palBtnSpread = SimpleButton ( __(MSG_PALETTE_SPREAD) )),
                             End,
                         End,
                         Child, ( IPTR )VGroup,
@@ -542,7 +543,7 @@ void Init_PaletteWindow ( )
                                 MUIA_String_Format, MUIV_String_Format_Center,
                                 MUIA_Frame, MUIV_Frame_String,
                             End,
-                            Child, ( IPTR )SimpleButton ( ( IPTR )"Set Web Color" ),
+                            Child, ( IPTR )SimpleButton ( __(MSG_PALETTE_WEB) ),
                         End,
                     End,
                     Child, ( IPTR )VGroup,
@@ -593,9 +594,9 @@ void Init_PaletteWindow ( )
                     End,
                 End,
                 Child, HGroup,
-                    Child, ( IPTR )( palBtnLoad = SimpleButton ( ( IPTR )"Load" ) ),
-                    Child, ( IPTR )( palBtnSave = SimpleButton ( ( IPTR )"Save" ) ),
-                    Child, ( IPTR )( palBtnUse = SimpleButton ( ( IPTR )"Use" ) ),
+                    Child, ( IPTR )( palBtnLoad = SimpleButton ( __(MSG_PALETTE_LOAD) ) ),
+                    Child, ( IPTR )( palBtnSave = SimpleButton ( __(MSG_PALETTE_SAVE) ) ),
+                    Child, ( IPTR )( palBtnUse = SimpleButton (  __(MSG_PALETTE__USE)  )),
                 End,
             End,
         End,

@@ -30,31 +30,34 @@ void CreateProjectWindow ( struct WindowList *lst )
     get ( lst->win, MUIA_Window_Title, &windowtitle );
 
     lst->projectWin = WindowObject,
-        MUIA_Window_ScreenTitle, ( IPTR )"Project properties",
-        MUIA_Window_Title, ( IPTR )"Project properties",
+        MUIA_Window_ScreenTitle, (IPTR) VERSION, //__(MSG_PRJ_SCR),
+        MUIA_Window_Title, __(MSG_PRJ_WIN),
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','P','J'),
         MUIA_Window_CloseGadget, TRUE,
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, ( IPTR )TextObject,
-                    MUIA_Text_Contents, ( IPTR )"Project name:",
+                    MUIA_Text_Contents, __(MSG_PRJ_NAME),
                 End,
                 Child, ( IPTR )( lst->projName = StringObject,
                     MUIA_String_MaxLen, 128,
                     MUIA_Frame, MUIV_Frame_String,
                     MUIA_String_Contents, windowtitle,
+                    MUIA_CycleChain, 1,
                 End ),
                 Child, ( IPTR )TextObject,
-                    MUIA_Text_Contents, ( IPTR )"Author:",
+                    MUIA_Text_Contents, __(MSG_PRJ_AUTHOR),
                 End,
                 Child, ( IPTR )( lst->projAuthor = StringObject,
                     MUIA_String_MaxLen, 128,
                     MUIA_Frame, MUIV_Frame_String,
                     MUIA_String_Contents, ( IPTR )"",
+                    MUIA_CycleChain, 1,
                 End ),
             End,
-            Child, ( IPTR )( lst->projBtnOk = SimpleButton ( ( IPTR )"Ok" ) ),
+            Child, ( IPTR )( lst->projBtnOk = SimpleButton ( _(MSG_BUTTON_OK) ) ),
         End,
     End;
 
@@ -183,7 +186,7 @@ void LoadProject ( unsigned char *filename, BOOL useCurrentCanvas )
                 FreeVec ( tmpFilename );
                 FreeVec ( header );
                 Close ( inputFile );
-                ShowAlert("File isn't a Lunapaint file");
+                ShowAlert(_(MSG_PRJ_ALERT_NOLUNA));
                 return;
             }
         }
