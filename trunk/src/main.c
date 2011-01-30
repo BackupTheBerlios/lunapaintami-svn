@@ -42,6 +42,8 @@
 #define DEBUG 1
 #endif
 
+#include "app/locale.h"
+
 #define ARG_TEMPLATE "FILE/M"
 
 enum
@@ -50,7 +52,7 @@ enum
     ARG_CNT
 };
 
-char *Version = VERSIONSTRING;
+CONST_STRPTR Version = VERSIONSTRING;
 
 void doEvents ( )
 {
@@ -119,6 +121,8 @@ int main ( int argc, char *argv[] )
     keyboardEnabled = TRUE;
 
     // Starts up the application
+    Locale_Initialize();
+
     Init_Application ( );
 
     if (argc)
@@ -189,6 +193,7 @@ int main ( int argc, char *argv[] )
     // Exists the application and cleans up reserved resources
 exit:
     Exit_Application ( );
+    Locale_Deinitialize();
     if (rda) FreeArgs(rda);
 
     return 0;
