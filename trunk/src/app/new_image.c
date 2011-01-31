@@ -33,6 +33,7 @@ Object *nwStringPrjName;
 Object *nwTemplates;
 struct Hook template_hook;
 
+static STRPTR templates[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 HOOKPROTONHNO(template_func, void, int *param)
 {

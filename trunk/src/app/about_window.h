@@ -48,6 +48,8 @@
 #include <clib/alib_protos.h>
 #include <string.h>
 
+#include "locale.h"
+
 #include "config.h"
 #include "parts.h"
 

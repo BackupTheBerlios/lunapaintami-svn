@@ -35,6 +35,9 @@ Object *PrefsBtnSave;
 Object *PrefsBtnCancel;
 Object *PrefsCycScrType;
 
+static STRPTR titles[] = { NULL, NULL, NULL };
+static STRPTR scrntypes[] = { NULL, NULL, NULL };
+static STRPTR layerbacktypes[] = { NULL, NULL, NULL, NULL, NULL };
 
 
 HOOKPROTONHNO(PrefsHandler_func, void, int *param)
