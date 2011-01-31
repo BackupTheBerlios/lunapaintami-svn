@@ -41,6 +41,7 @@
 #include "color.h"
 #include "common.h"
 #include "math/math.h"
+#include "../app/locale.h"
 
 // Use this to interrupt redrawing
 extern BOOL abortRedraw;
