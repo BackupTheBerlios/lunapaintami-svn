@@ -63,6 +63,8 @@
 
 #include "../config.h"
 
+#include "locale.h"
+
 struct ObjectBOOL
 {
     Object *obj;
