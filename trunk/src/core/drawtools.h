@@ -3,7 +3,7 @@
 * drawtools.h -- Lunapaint,                                                 *
 *    http://developer.berlios.de/projects/lunapaintami/                     *
 * Copyright (C) 2006, 2007, Hogne Titlestad <hogga@sub-ether.org>           *
-* Copyright (C) 2009 LunaPaint Development Team                             *
+* Copyright (C) 2009-2011 LunaPaint Development Team                        *
 *                                                                           *
 * This program is free software; you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published by      *
