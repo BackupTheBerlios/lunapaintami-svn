@@ -56,7 +56,7 @@ struct oCanvas* Init_Canvas (
             tmp->opacity = 100;
             tmp->visible = TRUE;
             tmp->name = AllocVec ( 12, MEMF_ANY|MEMF_CLEAR );
-            strcpy ( tmp->name, "Empty layer" );
+            strcpy ( tmp->name, _(MSG_CORE_LAYER_EMPTY) );
 
             // Clear the buffer
             int i = 0; for ( ; i < scope; i++ )
@@ -567,7 +567,7 @@ void addLayer ( struct oCanvas *canv )
         newlayer->visible = TRUE;
         newlayer->nextbuf = pos->nextbuf;
         newlayer->name = AllocVec ( 10, MEMF_ANY|MEMF_CLEAR );
-        strcpy ( newlayer->name, "New layer" );
+        strcpy ( newlayer->name, _(MSG_CORE_LAYER_NEW) );
         pos->nextbuf = newlayer;
         pos = newlayer->nextbuf;
     }
