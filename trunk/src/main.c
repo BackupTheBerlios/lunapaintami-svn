@@ -119,12 +119,20 @@ int main ( int argc, char *argv[] )
 
     BOOL keyIsDown = FALSE;
     keyboardEnabled = TRUE;
-
     // Starts up the application
-    Locale_Initialize();
 
-    Init_Application ( );
-
+    struct MsgPort *port;
+    Forbid();
+    port = FindPort("LUNAPAINT");
+    Permit();
+    if ( port == NULL)
+    {
+        Locale_Initialize();
+        Init_Application ( );
+    } else { // Double Start
+        // TODO: open projects when clicking on icons from there
+        goto quit;
+    }
     if (argc)
     {
         IPTR args[ ARG_CNT ] = {0};
@@ -195,6 +203,6 @@ exit:
     Exit_Application ( );
     Locale_Deinitialize();
     if (rda) FreeArgs(rda);
-
+quit:
     return 0;
 }
