@@ -681,6 +681,20 @@ void Init_PaletteMethods ( )
         palBtnLoad, MUIM_Notify, MUIA_Pressed, FALSE,
         palBtnLoad, 3, MUIM_CallHook, &paletteLoad_hook, MUIV_TriggerValue
     );
+
+    // Menu check
+    Object *strip = NULL;
+    if ((strip = FindMenuitem(mainPulldownMenu, 750)) != NULL)
+    {
+        DoMethod (
+            paletteWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
+        );
+        DoMethod (
+            paletteWindow, MUIM_Notify, MUIA_Window_Open, TRUE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, TRUE
+        );
+    }
 }
 
 ULONG savePalette ( )

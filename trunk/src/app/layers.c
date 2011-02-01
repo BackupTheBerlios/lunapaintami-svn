@@ -575,6 +575,14 @@ void Init_LayersWindow ( )
         WindowLayers, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
         ( IPTR )WindowLayers, 3, MUIM_Set, MUIA_Window_Open, FALSE
     );
+    Object *strip = NULL;
+    if ((strip = FindMenuitem(mainPulldownMenu, 401)) != NULL)
+    {
+        DoMethod (
+            WindowLayers, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
+        );
+    }
 
     // Layer opacity
     changeOpacityHook.h_Entry = ( HOOKFUNC )&changeOpacityFunc;

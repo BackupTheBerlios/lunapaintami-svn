@@ -1265,7 +1265,14 @@ void checkMenuEvents ( int udata )
 
         // Palette editor
         case 750:
-            set ( paletteWindow, MUIA_Window_Open, TRUE );
+            {
+                BOOL opened = FALSE;
+                get ( paletteWindow, MUIA_Window_Open, &opened );
+                if ( opened )
+                    set ( paletteWindow, MUIA_Window_Open, FALSE );
+                else
+                    set ( paletteWindow, MUIA_Window_Open, TRUE );
+            }
             break;
 
         // The text to brush window
@@ -1449,4 +1456,9 @@ void setToolbarActive ( )
 void GetDrawFillState ( )
 {
     filledDrawing = XGET ( tbxCycFillmode, MUIA_Cycle_Active );
+}
+
+Object *FindMenuitem(Object* strip, int id)
+{
+    return (Object*)DoMethod(strip, MUIM_FindUData, id);
 }

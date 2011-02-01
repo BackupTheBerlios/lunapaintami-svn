@@ -157,4 +157,10 @@ void setToolbarActive ( );
 */
 void GetDrawFillState ( );
 
+/*
+        Find a menu given its id
+*/
+Object *FindMenuitem(Object* strip, int id);
+
+
 #endif

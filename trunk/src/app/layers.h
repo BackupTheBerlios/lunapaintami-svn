@@ -79,6 +79,8 @@ extern struct Hook changeVisibilityHook;
 extern struct oCanvas* lastDrawnCanvas;
 extern BOOL forceLayerRedraw;
 
+extern Object * FindMenuitem(Object *strip, int id);
+
 /*
     This function initializes the layer window and the widget
 */
