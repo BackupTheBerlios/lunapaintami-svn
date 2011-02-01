@@ -608,3 +608,15 @@ Couche vide
 MSG_CORE_LAYER_NEW
 Nouvelle couche
 ;
+MSG_QUIT_WIN
+Quitter Lunapaint
+;
+MSG_SCR_QUIT
+Quitter Lunapaint
+;
+MSG_QUIT_TEXT
+Voulez-vous vraiment quitter Lunapaint ?
+;
+MSG_BUTTON_CANCEL
+Annuler
+;

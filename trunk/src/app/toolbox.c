@@ -1167,8 +1167,10 @@ void checkMenuEvents ( int udata )
             break;
 
         case 700:
+            ShowQuit ( _(MSG_QUIT_TEXT) );
             DoMethod (
-                PaintApp, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
+                QuitOk, MUIM_Notify, MUIA_Pressed, FALSE,
+                (IPTR) PaintApp, 2, MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit
             );
             break;
 

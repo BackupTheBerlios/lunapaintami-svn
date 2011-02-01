@@ -88,6 +88,10 @@ extern Object *AlertWindow;
 extern Object *AlertText;
 extern Object *AlertOk;
 extern Object *LunaBackdrop;
+extern Object *QuitWindow;
+extern Object *QuitText;
+extern Object *QuitOk;
+extern Object *QuitCl;
 
 /*
     This function returns a pointer to a window by id
@@ -133,6 +137,16 @@ void Init_AlertWindow ( );
     Display an alert message
 */
 void ShowAlert ( unsigned char *text );
+
+/*
+    Initialize the quit window
+*/
+void Init_QuitWindow ( );
+
+/*
+    Display a quit message
+*/
+void ShowQuit ( unsigned char *text);
 
 /*
     Hide all open windows and save their state so they can be reopened

@@ -599,3 +599,15 @@ Empty layer
 MSG_CORE_LAYER_NEW (//)
 New Layer
 ;
+MSG_QUIT_WIN (//)
+Quit Lunapaint
+;
+MSG_SCR_QUIT (//)
+Quit Lunapaint
+;
+MSG_QUIT_TEXT (//)
+Do you really want to quit Lunapaint?
+;
+MSG_BUTTON_CANCEL (//)
+Cancel
+;

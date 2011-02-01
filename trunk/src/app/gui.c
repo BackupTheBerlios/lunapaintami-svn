@@ -41,7 +41,10 @@ Object *AlertWindow;
 Object *AlertText;
 Object *AlertOk;
 Object *LunaBackdrop;
-
+Object *QuitWindow;
+Object *QuitText;
+Object *QuitOk;
+Object *QuitCl;
 
 void Init_Application ( )
 {
@@ -134,6 +137,7 @@ void Init_Application ( )
     Init_PaletteWindow ( );
     Init_PrefsWindow ( );
     Init_AlertWindow ( );
+    Init_QuitWindow ( );
     Init_TextToBrushWindow ( );
     Init_Backdrop ( );
 
@@ -164,6 +168,7 @@ void Init_Application ( )
         SubWindow, ( IPTR )importWindow,
         SubWindow, ( IPTR )PrefsWindow,
         SubWindow, ( IPTR )AlertWindow,
+        SubWindow, ( IPTR )QuitWindow,
         SubWindow, ( IPTR )textToBrushWindow,
         SubWindow, ( IPTR )LunaBackdrop,
     End;
@@ -350,6 +355,7 @@ void HideOpenWindows ( )
     set ( importWindow, MUIA_Window_Open, FALSE );
     set ( PrefsWindow, MUIA_Window_Open, FALSE );
     set ( AlertWindow, MUIA_Window_Open, FALSE );
+    set ( QuitWindow, MUIA_Window_Open, FALSE );
     set ( LunaBackdrop, MUIA_Window_Open, FALSE );
     set ( textToBrushWindow, MUIA_Window_Open, FALSE );
 
@@ -376,6 +382,7 @@ void ReopenWindows ( )
     set ( importWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( PrefsWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( AlertWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
+    set ( QuitWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( LunaBackdrop, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
     set ( textToBrushWindow, MUIA_Window_Screen, ( IPTR )lunaPubScreen );
 
@@ -440,4 +447,45 @@ void ShowAlert ( unsigned char *text )
 {
     set ( AlertText, MUIA_Text_Contents, ( IPTR )text );
     set ( AlertWindow, MUIA_Window_Open, TRUE );
+}
+
+void Init_QuitWindow ( )
+{
+    QuitWindow = WindowObject,
+        MUIA_Window_Title, __(MSG_QUIT_WIN),
+        MUIA_Window_ScreenTitle, __(MSG_SCR_QUIT),
+        MUIA_Window_Screen, ( IPTR )lunaPubScreen,
+        MUIA_Window_ID, MAKE_ID('L','P','Q','W'),
+        WindowContents, ( IPTR )VGroup,
+            Child, ( IPTR )GroupObject,
+                    MUIA_Frame, MUIV_Frame_Group,
+                Child, ( IPTR )( QuitText = TextObject,
+                    MUIA_Text_Contents, ( IPTR )"",
+                End ),
+            End,
+            Child, ( IPTR )HGroup,
+                Child, ( IPTR )( QuitOk = SimpleButton ( _(MSG_BUTTON_OK) ) ),
+                Child, ( IPTR )( QuitCl = SimpleButton ( _(MSG_BUTTON_CANCEL) ) ),
+            End,
+        End,
+    End;
+    DoMethod (
+        QuitWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
+        QuitWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
+    );
+    DoMethod (
+        QuitOk, MUIM_Notify, MUIA_Pressed, FALSE,
+        QuitWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
+    );
+    DoMethod (
+        QuitCl, MUIM_Notify, MUIA_Pressed, FALSE,
+        QuitWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
+    );
+
+}
+
+void ShowQuit ( unsigned char *text )
+{
+    set ( QuitText, MUIA_Text_Contents, ( IPTR )text );
+    set ( QuitWindow, MUIA_Window_Open, TRUE );
 }
