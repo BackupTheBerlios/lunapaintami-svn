@@ -512,6 +512,7 @@ void Init_PaletteWindow ( )
 
     paletteWindow = WindowObject,
         MUIA_Window_Title, __(MSG_PALETTE_WIN),
+        MUIA_Window_ScreenTitle, (IPTR) VERSION,
         MUIA_Window_SizeGadget, FALSE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_ID, MAKE_ID('L','P','P','W'),
