@@ -560,13 +560,13 @@ void addLayer ( struct oCanvas *canv )
         // Go to the last layer
         int l = 0; for ( ; l < canv->totalLayers - 1; l++ ) pos = pos->nextbuf;
         // Add new blank layer
-        struct gfxbuffer *newlayer = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_ANY );
+        struct gfxbuffer *newlayer = AllocVec ( sizeof ( struct gfxbuffer ), MEMF_ANY|MEMF_CLEAR );
         newlayer->buf = AllocVec ( size * 8, MEMF_ANY );
         int i = 0; for ( ; i < size; i++ ) newlayer->buf[ i ] = TRANSCOLOR;
         newlayer->opacity = 100;
         newlayer->visible = TRUE;
         newlayer->nextbuf = pos->nextbuf;
-        newlayer->name = AllocVec ( 10, MEMF_ANY|MEMF_CLEAR );
+        newlayer->name = AllocVec ( 59, MEMF_ANY|MEMF_CLEAR );
         strcpy ( newlayer->name, _(MSG_CORE_LAYER_NEW) );
         pos->nextbuf = newlayer;
         pos = newlayer->nextbuf;
