@@ -103,18 +103,14 @@ HOOKPROTONHNO(changeVisibilityFunc, void, int *param)
             buf = buf->nextbuf;
         }
 
-        STRPTR message = AllocVec ( 7, MEMF_CLEAR );
         if ( visible )
         {
-            sprintf ( message, _(MSG_LAYERS_HIDDEN) );
-            set ( LayerVisible, MUIA_Text_Contents, ( IPTR )message );
+            set ( LayerVisible, MUIA_Text_Contents, _(MSG_LAYERS_HIDDEN) );
         }
         else
         {
-            sprintf ( message, _(MSG_LAYERS_SHOWN) );
-            set ( LayerVisible, MUIA_Text_Contents, ( IPTR )message );
+            set ( LayerVisible, MUIA_Text_Contents, _(MSG_LAYERS_SHOWN) );
         }
-        FreeVec ( message );
 
         globalActiveWindow->layersChg = TRUE;
         winHasChanged ( );
@@ -151,7 +147,7 @@ HOOKPROTONHNO(acknowledgeLayNameFunc, void, int *param)
             {
                 unsigned char *nm = ( unsigned char *)XGET ( LayerName, MUIA_String_Contents );
                 if ( buf->name != NULL ) FreeVec ( buf->name );
-                buf->name = AllocVec ( strlen ( nm ) + 1, MEMF_CLEAR );
+                buf->name = AllocVec ( 59, MEMF_ANY|MEMF_CLEAR );
                 sprintf ( buf->name, "%s", nm );
             }
             buf = buf->nextbuf;
@@ -174,7 +170,7 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
     if ( !globalActiveWindow || !globalActiveCanvas )
     {
         layerRenderBlank ( );
-        set ( LayerName, MUIA_String_Contents, ( IPTR )"\0" );
+        set ( LayerName, MUIA_String_Contents, (STRPTR)"" );
         return ( IPTR )NULL;
     }
     else
@@ -199,13 +195,16 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
             lastDrawnCanvas = globalActiveCanvas;
             layerRender ( CLASS, self );
             layersRepaintWindow ( CLASS, self );
-            set ( LayerName, MUIA_String_Contents, ( IPTR )buf->name );
+            set ( LayerName, MUIA_String_Contents, buf->name );
 
-            STRPTR vistx = AllocVec ( 7, MEMF_CLEAR );
-            if ( buf->visible ) sprintf ( vistx, _(MSG_LAYERS_SHOWN) );
-            else sprintf ( vistx, _(MSG_LAYERS_HIDDEN) );
-            set ( LayerVisible, MUIA_Text_Contents, ( IPTR )vistx );
-            FreeVec ( vistx );
+            if ( buf->visible )
+            {
+                set ( LayerVisible, MUIA_Text_Contents, _(MSG_LAYERS_SHOWN) );
+            }
+            else
+            {
+                set ( LayerVisible, MUIA_Text_Contents, _(MSG_LAYERS_HIDDEN) );
+            }
         }
         // If we changed anything important
         else if
@@ -220,13 +219,15 @@ IPTR _Layers_MUIM_Draw ( Class *CLASS, Object *self, Msg message )
             layerRender ( CLASS, self );
             forceLayerRedraw = FALSE;
             layersRepaintWindow ( CLASS, self );
-            set ( LayerName, MUIA_String_Contents, ( IPTR )buf->name );
-            STRPTR vistx = AllocVec ( 7, MEMF_CLEAR );
+            set ( LayerName, MUIA_String_Contents, buf->name );
             if ( buf->visible )
-                sprintf ( vistx, "Shown" );
-            else sprintf ( vistx, "Hidden" );
-            set ( LayerVisible, MUIA_Text_Contents, ( IPTR )vistx );
-            FreeVec ( vistx );
+            {
+                set ( LayerVisible, MUIA_Text_Contents, _(MSG_LAYERS_SHOWN)  );
+            }
+            else
+            {
+                set ( LayerVisible, MUIA_Text_Contents, _(MSG_LAYERS_HIDDEN) );
+            }
         }
         UpdateCanvasInfo ( globalActiveWindow );
         globalActiveWindow->layersChg = FALSE;
@@ -273,7 +274,7 @@ IPTR _Layers_MUIM_HandleInput ( Class *CLASS, Object *self, Msg message )
                         globalActiveCanvas->currentLayer = wantedLayer;
                         struct gfxbuffer *buf = getActiveGfxbuffer ( globalActiveCanvas );
                         set ( LayerOpacity, MUIA_Numeric_Value, ( IPTR )buf->opacity );
-                        set ( LayerName, MUIA_String_Contents, ( STRPTR )buf->name );
+                        set ( LayerName, MUIA_String_Contents, buf->name );
                         setActiveBuffer ( globalActiveCanvas );
                     }
                     forceLayerRedraw = TRUE;
@@ -445,7 +446,7 @@ void Init_LayersWindow ( )
     );
 
     WindowLayers = WindowObject,
-        MUIA_Window_Title, __(MSG_LAYERS_WIN),
+        MUIA_Window_Title, _(MSG_LAYERS_WIN),
         MUIA_Window_ScreenTitle, ( IPTR )VERSION,
         MUIA_Window_CloseGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
@@ -499,6 +500,7 @@ void Init_LayersWindow ( )
                         MUIA_String_MaxLen, 4,
                         MUIA_String_Format, MUIV_String_Format_Right,
                         MUIA_Frame, MUIV_Frame_String,
+                        MUIA_CycleChain, 1,
                     End ),
                     Child, ( IPTR )VGroup,
                         MUIA_Weight, 25,
@@ -857,16 +859,19 @@ void RenderLayerNames ( int x, int y, int w, int h )
             Text ( _rp ( obj ), buf->name, strlen ( buf->name ) );
             // Layer opacity
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset + fnt->tf_YSize + 4 );
-            STRPTR percent = "%";
-            STRPTR str = AllocVec ( 16, MEMF_ANY|MEMF_CLEAR );
-            sprintf ( str, _(MSG_LAYERS_OPACITY), buf->opacity, percent );
+            STRPTR str = AllocVec ( 59, MEMF_ANY|MEMF_CLEAR );
+            sprintf ( str, _(MSG_LAYERS_OPACITY), buf->opacity);
             Text ( _rp ( obj ), str, strlen ( str ) );
             FreeVec ( str );
             // Visibility
             Move ( _rp ( obj ), areaLeft + LAYERTHUMBSIZE + xoffset, y + areaTop + yoffset + ( ( fnt->tf_YSize + 4 ) * 2 ) );
+            STRPTR str1 = AllocVec ( 59, MEMF_ANY|MEMF_CLEAR );
             if ( buf->visible )
-                Text ( _rp ( obj ), _(MSG_LAYERS_SHOWN), 5 );
-            else Text ( _rp ( obj ), _(MSG_LAYERS_HIDDEN), 6 );
+                sprintf ( str1, _(MSG_LAYERS_SHOWN) );
+            else
+                sprintf ( str1, _(MSG_LAYERS_HIDDEN) );
+            Text ( _rp ( obj ), str1, strlen( str1 ) );
+            FreeVec ( str1 );
         }
         buf = buf->nextbuf;
     }
