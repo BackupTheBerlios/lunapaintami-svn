@@ -52,7 +52,8 @@
 #include "parts.h"
 #include "toolbox.h"
 
-#include "config.h"
+#include "../common.h" 
+#include "../config.h"
 
 // Some defines for palette actions
 #define LNPATAGBASE (TAG_USER+200)
