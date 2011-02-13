@@ -32,4 +32,12 @@
 #define VERSION "Lunapaint " LUNA_VERSION " (13.02.2011)"
 #define VERSIONSTRING "$VER: " VERSION " © LunaPaint Development Team\n"
 
+#ifdef __amigaos4__
+#define DESKTOP_NAME "Workbench"
+typedef unsigned long IPTR;
+#else
+#define DESKTOP_NAME "Wanderer"
+#endif
+
+
 #endif
