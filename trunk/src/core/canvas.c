@@ -21,6 +21,7 @@
 *                                                                           *
 ****************************************************************************/
 
+#include "../config.h"
 #include "canvas.h"
 
 BOOL abortRedraw;
@@ -120,7 +121,7 @@ void Destroy_Canvas ( struct oCanvas *canvas )
         FreeVec ( canvas->tmpBuf );
 
     canvas->activebuffer = NULL;
-    globalActiveWindow->canvas = NULL;
+//    globalActiveWindow->canvas = NULL;
 
     Destroy_Buffer ( canvas );
 
