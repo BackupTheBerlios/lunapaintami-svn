@@ -24,7 +24,7 @@
 
 #include "about_window.h"
 
-Object *aboutWindow, *aboutWindowOk;
+Object *aboutWindow, *aboutWindowOk, *abouttext;
 
 void Init_AboutWindow ( )
 {
@@ -36,7 +36,6 @@ void Init_AboutWindow ( )
         MUIA_Window_ID, MAKE_ID('L','P','A','B'),
         WindowContents, ( IPTR )VGroup,
             Child, ( IPTR )GroupObject,
-                InnerSpacing(0,0),
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, MUI_NewObject(MUIC_Dtpic,
                     MUIA_Dtpic_Name, "PROGDIR:data/lunaabout_logo.png",
@@ -44,13 +43,16 @@ void Init_AboutWindow ( )
             End,
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
-                Child, ( IPTR )TextObject,
-                    MUIA_Text_Contents, ( IPTR )LUNA_ABOUT_TEXT,
-                End,
-            End,
+                Child, ( IPTR )(abouttext = TextObject,
+                    MUIA_Text_Contents, ( IPTR )"",
+                End),
             Child, ( IPTR )( aboutWindowOk = SimpleButton ( _(MSG_ABOUT_CLOSE) )),
+            End,
         End,
     End;
+
+    set(abouttext, MUIA_Text_Contents, ( IPTR )LUNA_ABOUT_TEXT );
+
     DoMethod (
         aboutWindowOk, MUIM_Notify, MUIA_Pressed, FALSE,
         aboutWindow, 3, MUIM_Set, MUIA_Window_Open, FALSE
