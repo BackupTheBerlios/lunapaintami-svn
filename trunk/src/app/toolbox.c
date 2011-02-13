@@ -130,7 +130,7 @@ DISPATCHERPROTO(tbxPreview)
         case MUIM_Draw:
             return ( IPTR )tbxPaintPreview();
         default:
-            return DoSuperMethodA ( cl, obj, (struct MUIP_Draw *)msg );
+            return DoSuperMethodA ( cl, obj, msg); //(struct MUIP_Draw *)msg );
     }
     return ( IPTR )NULL;
 }
