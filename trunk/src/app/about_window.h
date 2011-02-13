@@ -50,7 +50,8 @@
 
 #include "locale.h"
 
-#include "config.h"
+#include "../common.h" 
+#include "../config.h"
 #include "parts.h"
 
 extern Object *aboutWindow, *aboutWindowOk;
