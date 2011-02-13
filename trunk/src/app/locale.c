@@ -2,8 +2,9 @@
     Copyright © 1995-2006 AROS Development Team. All rights reserved.
     $Id: locale.c 30792 2009-03-07 22:40:04Z neil $
 */
-
+#ifdef __AROS__
 #include <aros/symbolsets.h>
+#endif
 #include <exec/types.h>
 #include <proto/locale.h>
 
