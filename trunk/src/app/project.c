@@ -20,16 +20,20 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.            *
 *                                                                           *
 ****************************************************************************/
+#ifdef __AROS__
+#include <aros/debug.h>
+#define DEBUG 1
+#endif
 
 #include "project.h"
 
 void CreateProjectWindow ( struct WindowList *lst )
 {
 
-    STRPTR windowtitle = NULL;
+    STRPTR windowtitle = AllocVec(128, MEMF_ANY|MEMF_CLEAR);
     // FIXME: doesn't work. This will not return the project name 
     // of the current window.
-    get ( lst->win, MUIA_Window_Title, &windowtitle );
+    get ( lst->win, MUIA_Window_Title, windowtitle );
 
     lst->projectWin = WindowObject,
         MUIA_Window_ScreenTitle, (IPTR) VERSION,
@@ -75,6 +79,8 @@ void CreateProjectWindow ( struct WindowList *lst )
         lst->projBtnOk, MUIM_Notify, MUIA_Pressed, FALSE,
         lst->win, 3, MUIM_CallHook, ( IPTR )&lst->projHook, ( APTR )lst
     );
+
+    FreeVec(windowtitle);
 }
 
 void DestroyProjectWindow ( struct WindowList *lst )
