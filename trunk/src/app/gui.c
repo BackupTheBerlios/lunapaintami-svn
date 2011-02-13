@@ -323,7 +323,7 @@ void InitLunaScreen ( )
             SA_Height, scrHeight,
             SA_Depth, scrDepth,
             SA_DisplayID, idok,
-            SA_Title, ( IPTR )LUNA_SCREEN_TITLE,
+            SA_Title, ( IPTR ) VERSION,
             SA_PubName, ( IPTR )"Lunapaint",
             SA_ShowTitle, TRUE,
             SA_SysFont, 1,

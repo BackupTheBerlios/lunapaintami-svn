@@ -53,6 +53,14 @@
 #include "app/parts.h"
 #endif
 
+struct LunapaintPrefs
+{
+    char ScreenmodeType;
+    char LayerBackgroundMode;
+};
+
+extern struct LunapaintPrefs GlobalPrefs;
+
 struct Affrect
 {
     int x;

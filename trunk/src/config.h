@@ -25,20 +25,11 @@
 #define _lunapaint_config_
 
 #define LUNA_VERSION "0.5"
-#define LUNA_SCREEN_TITLE "Lunapaint 0.5, 13.02.2011"
 #define LUNA_ABOUT_TEXT "Lunapaint 0.5\n\n" \
     "See http://developer.berlios.de/projects/lunapaintami/\n" \
     "for more information\n\n" \
-    "Special thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
+    "Special thanks to:\n\n* d980, Michal Schulz , Ola Jensen,\nMinisterQ"
 #define VERSION "Lunapaint " LUNA_VERSION " (13.02.2011)"
 #define VERSIONSTRING "$VER: " VERSION " © LunaPaint Development Team\n"
-
-struct LunapaintPrefs
-{
-    char ScreenmodeType;
-    char LayerBackgroundMode;
-};
-
-extern struct LunapaintPrefs GlobalPrefs;
 
 #endif
