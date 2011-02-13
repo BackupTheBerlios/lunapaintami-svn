@@ -26,6 +26,10 @@
 
 #include "canvas.h"
 
+#ifdef __amigaos4__
+#define RECTFMT_RAW (5UL)
+#endif
+
 BOOL isZooming;
 BOOL isScrolling;
 BOOL fullscreenEditing;
