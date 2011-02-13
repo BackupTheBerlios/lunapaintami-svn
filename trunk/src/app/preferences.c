@@ -147,6 +147,26 @@ void Init_PrefsWindow ( )
         PrefsBtnSave, MUIM_Notify, MUIA_Pressed, FALSE,
         PrefsBtnSave, 3, MUIM_CallHook, &PrefsHandler_hook, TRUE
     );
+    Object *strip = NULL;
+    if ((strip = FindMenuitem(mainPulldownMenu, 900)) != NULL)
+    {
+        DoMethod (
+            PrefsWindow, MUIM_Notify, MUIA_Window_CloseRequest, TRUE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
+        );
+        DoMethod (
+            PrefsBtnSave, MUIM_Notify, MUIA_Pressed, FALSE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
+        );
+        DoMethod (
+            PrefsBtnUse, MUIM_Notify, MUIA_Pressed, FALSE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
+        );
+        DoMethod (
+            PrefsBtnCancel, MUIM_Notify, MUIA_Pressed, FALSE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
+        );
+    }
 
 }
 
