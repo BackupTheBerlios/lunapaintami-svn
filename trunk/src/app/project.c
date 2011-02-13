@@ -27,6 +27,8 @@ void CreateProjectWindow ( struct WindowList *lst )
 {
 
     STRPTR windowtitle = NULL;
+    // FIXME: doesn't work. This will not return the project name 
+    // of the current window.
     get ( lst->win, MUIA_Window_Title, &windowtitle );
 
     lst->projectWin = WindowObject,
