@@ -37,9 +37,51 @@
 #define MUIM_Think 9999
 #include "app/gui.h"
 #include "app/parts.h"
-#include <aros/debug.h>
+#include "aros/debug.h"
 #include "config.h"
 #define DEBUG 1
+#endif
+
+#ifdef __amigaos4__
+struct Library                 *MUIMasterBase;
+struct MUIMasterIFace *IMUIMaster;
+
+struct Library                  *CyberGfxBase;
+struct CyberGfxIFace   *ICyberGfx;
+
+// ----- open MUIMASTER.LIBRARY---
+
+   MUIMasterBase = OpenLibrary("muimaster.library", 0);
+    if (!MUIMasterBase) {
+        printf("Error opening muimaster library\n");
+        exit(0);
+    };
+
+    IMUIMaster = (struct MUIMasterIFace *) GetInterface(MUIMasterBase, "main", 1, NULL);
+
+    if (!MUIMasterBase && !IMUIMaster) {
+        printf("Error opening muimaster library\n");
+        exit(0);
+    };
+
+// -------------------------------------------------
+// ----- open CYBERGRAPHICS.LIBRARY---
+
+   CyberGfxBase = OpenLibrary("cybergraphics.library", 0);
+    if (!CyberGfxBase) {
+        printf("Error opening cybergraphics library\n");
+        exit(0);
+    };
+
+    ICyberGfx = (struct CyberGfxIFace *) GetInterface(CyberGfxBase, "main", 1, NULL);
+
+    if (!CyberGfxBase && !ICyberGfx) {
+        printf("Error opening muimaster library\n");
+        exit(0);
+    };
+
+// -------------------------------------------------
+
 #endif
 
 #include "app/locale.h"
