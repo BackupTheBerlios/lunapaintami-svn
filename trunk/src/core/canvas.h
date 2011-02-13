@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <proto/exec.h>
+
 #define AROS 1
 #ifdef AROS
 #include <proto/dos.h>
