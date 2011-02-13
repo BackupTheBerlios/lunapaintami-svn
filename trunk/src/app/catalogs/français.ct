@@ -539,7 +539,7 @@ MSG_TOOLBOX_SCR
 Décalage couche
 ;
 MSG_TOOLBOX_COOR
-Écrivez SVP les coordonnées avec lesquelles\nvous voulez décaler la couche\active.
+Écrivez SVP les coordonnées avec lesquelles\nvous voulez décaler la couche active.
 ;Please write in the coordinates\nby which you want to skew the\nactive layer.
 ;
 MSG_TOOLBOX_XOFFSET
