@@ -207,10 +207,10 @@ MSG_PREFS_VIEW (//)
 View
 ;
 MSG_PREFS_WAND_USE (//)
-Use Wanderer
+Use %s
 ;
 MSG_PREFS_WAND_CLONE (//)
-Clone Wanderer (//)
+Clone %s
 ;
 MSG_PREFS_CHECKERS (//)
 Checkers

@@ -215,10 +215,10 @@ MSG_PREFS_VIEW
 Vue
 ;
 MSG_PREFS_WAND_USE
-Utiliser le Wanderer
+Utiliser %s
 ;
 MSG_PREFS_WAND_CLONE
-Cloner le Wanderer
+Cloner %s
 ;
 MSG_PREFS_CHECKERS
 Échiquier
