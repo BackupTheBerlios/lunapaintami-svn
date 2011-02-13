@@ -29,7 +29,7 @@
     "See http://developer.berlios.de/\nprojects/lunapaintami\n" \
     "for more information\n\n" \
     "Special thanks to:\n\n* d980,\nMichal Schulz,\nOla Jensen,\nMinisterQ"
-#define VERSION "Lunapaint " LUNA_VERSION " ("__DATE__ ")"
+#define VERSION "Lunapaint " LUNA_VERSION " (13.02.2011)"
 #define VERSIONSTRING "$VER: " VERSION " © LunaPaint Development Team\n"
 
 #ifdef __amigaos4__
