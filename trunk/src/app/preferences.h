@@ -73,9 +73,13 @@ extern Object *PrefsCycScrType;     // Screen type cycle
 
 void Init_PrefsWindow ( );
 
+void Exit_PrefsWindow ( );
+
 /*
     Save program preferences
 */
+
+
 BOOL savePreferences ( );
 
 /*
