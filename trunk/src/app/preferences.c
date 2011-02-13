@@ -76,8 +76,11 @@ void Init_PrefsWindow ( )
 {
     titles[0] = _(MSG_PREFS_GENERAL);
     titles[1] = _(MSG_PREFS_VIEW);
-    scrntypes[0] = _(MSG_PREFS_WAND_USE);
-    scrntypes[1] = _(MSG_PREFS_WAND_CLONE);
+    // WARNING: scrntypes Leaks
+    scrntypes[0] = AllocVec(59, MEMF_ANY|MEMF_CLEAR );
+    scrntypes[1] = AllocVec(59, MEMF_ANY|MEMF_CLEAR );
+    sprintf(scrntypes[0], _(MSG_PREFS_WAND_USE),   DESKTOP_NAME);
+    sprintf(scrntypes[1], _(MSG_PREFS_WAND_CLONE), DESKTOP_NAME);
     layerbacktypes[0] = _(MSG_PREFS_CHECKERS);
     layerbacktypes[1] = _(MSG_PREFS_BLACK);
     layerbacktypes[2] = _(MSG_PREFS_GRAY);
@@ -264,6 +267,5 @@ BOOL loadPreferences ( )
     if ( handle != NULL ) CloseIFF(handle);
     if ( filehandle != NULL ) Close (filehandle);
     if ( handle != NULL ) FreeIFF(handle);
-
     return result;
 }
