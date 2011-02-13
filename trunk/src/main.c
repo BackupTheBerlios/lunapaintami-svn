@@ -48,40 +48,6 @@ struct MUIMasterIFace *IMUIMaster;
 
 struct Library                  *CyberGfxBase;
 struct CyberGfxIFace   *ICyberGfx;
-
-// ----- open MUIMASTER.LIBRARY---
-
-   MUIMasterBase = OpenLibrary("muimaster.library", 0);
-    if (!MUIMasterBase) {
-        printf("Error opening muimaster library\n");
-        exit(0);
-    };
-
-    IMUIMaster = (struct MUIMasterIFace *) GetInterface(MUIMasterBase, "main", 1, NULL);
-
-    if (!MUIMasterBase && !IMUIMaster) {
-        printf("Error opening muimaster library\n");
-        exit(0);
-    };
-
-// -------------------------------------------------
-// ----- open CYBERGRAPHICS.LIBRARY---
-
-   CyberGfxBase = OpenLibrary("cybergraphics.library", 0);
-    if (!CyberGfxBase) {
-        printf("Error opening cybergraphics library\n");
-        exit(0);
-    };
-
-    ICyberGfx = (struct CyberGfxIFace *) GetInterface(CyberGfxBase, "main", 1, NULL);
-
-    if (!CyberGfxBase && !ICyberGfx) {
-        printf("Error opening muimaster library\n");
-        exit(0);
-    };
-
-// -------------------------------------------------
-
 #endif
 
 #include "app/locale.h"
@@ -162,6 +128,35 @@ int main ( int argc, char *argv[] )
     BOOL keyIsDown = FALSE;
     keyboardEnabled = TRUE;
     // Starts up the application
+
+#ifdef __amigaos4__
+   MUIMasterBase = OpenLibrary("muimaster.library", 0);
+    if (!MUIMasterBase) {
+        printf("Error opening muimaster library\n");
+        exit(0);
+    };
+
+    IMUIMaster = (struct MUIMasterIFace *) GetInterface(MUIMasterBase, "main", 1, NULL);
+
+    if (!MUIMasterBase && !IMUIMaster) {
+        printf("Error opening muimaster library\n");
+        exit(0);
+    };
+
+   CyberGfxBase = OpenLibrary("cybergraphics.library", 0);
+    if (!CyberGfxBase) {
+        printf("Error opening cybergraphics library\n");
+        exit(0);
+    };
+
+    ICyberGfx = (struct CyberGfxIFace *) GetInterface(CyberGfxBase, "main", 1, NULL);
+
+    if (!CyberGfxBase && !ICyberGfx) {
+        printf("Error opening muimaster library\n");
+        exit(0);
+    };
+#endif
+
 
     struct MsgPort *port;
     Forbid();
@@ -244,6 +239,17 @@ int main ( int argc, char *argv[] )
 exit:
     Exit_Application ( );
     Locale_Deinitialize();
+
+#ifdef __amigaos4__
+
+    if(MUIMasterBase &&  IMUIMaster)  DropInterface((struct Interface *)IMUIMaster);
+    if (MUIMasterBase)      CloseLibrary(MUIMasterBase);
+
+    if(CyberGfxBase && ICyberGfx)  DropInterface((struct Interface *)ICyberGfx);
+    if(CyberGfxBase)      CloseLibrary(CyberGfxBase);
+
+#endif
+
     if (rda) FreeArgs(rda);
 quit:
     return 0;
