@@ -53,6 +53,10 @@
 #include "app/parts.h"
 #endif
 
+#ifndef MAKE_ID
+#define MAKE_ID(a,b,c,d) ((ULONG) (a)<<24 | (ULONG) (b)<<16 | (ULONG) (c)<<8 | (ULONG) (d))
+#endif
+
 struct LunapaintPrefs
 {
     char ScreenmodeType;
