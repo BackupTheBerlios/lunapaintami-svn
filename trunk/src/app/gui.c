@@ -255,6 +255,7 @@ void Exit_Application ( )
         FreeVec ( globalPalette );
 
     // Final cleanup with toolbox related things
+    Exit_PrefsWindow ( );
     Exit_ToolboxWindow ( );
 
     // Clean up fonts etc
