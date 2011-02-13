@@ -56,11 +56,11 @@ void Init_Application ( )
             {NM_ITEM, _(MSG_MENU_SAVE),               "S",    2, 0L, (APTR)598 },
             {NM_ITEM, _(MSG_MENU_SAVE_AS),            "A",    2, 0L, (APTR)596 },
             {NM_ITEM, _(MSG_MENU_REVERT),             "R",    2, 0L, (APTR)595 },
-            {NM_ITEM, _(MSG_MENU_IMPORT),             "I",    2, 0L, (APTR)600 },
+            {NM_ITEM, _(MSG_MENU_IMPORT),             "M",    2, 0L, (APTR)600 },
             {NM_ITEM, _(MSG_MENU_EXPORT),             "E",    2, 0L, (APTR)601 },
             {NM_ITEM, _(MSG_MENU_INFO),               "I",    2, 0L, (APTR)604 },
             {NM_ITEM, NM_BARLABEL,                     0 ,    0, 0L, (APTR)0   },
-            {NM_ITEM, _(MSG_MENU_ABOUT),             NULL,    2, 0L, (APTR)602 },
+            {NM_ITEM, _(MSG_MENU_ABOUT),              "?",    2, 0L, (APTR)602 },
             {NM_ITEM, _(MSG_MENU_QUIT),               "Q",    2, 0L, (APTR)700 },
         {NM_TITLE,    _(MSG_MENU_EDIT)},
             {NM_ITEM, _(MSG_MENU_ZOOMIN),             "+",    2, 0L, (APTR)730 },
@@ -112,7 +112,7 @@ void Init_Application ( )
         {NM_TITLE,    _(MSG_MENU_FILTERS)},
             {NM_ITEM, _(MSG_MENU_SOON),                   NULL,   2, 0L, (APTR)999 },
         {NM_TITLE,    _(MSG_MENU_PREFS)},
-            {NM_ITEM, _(MSG_MENU_PRG_PREF),                "P",   2, 0L, (APTR)900 },
+            {NM_ITEM, _(MSG_MENU_PRG_PREF),                "P",   CHECKIT|MENUTOGGLE, 0L, (APTR)900 },
         {NM_END}
     };
     mainPulldownMenu = MUI_MakeObject (
