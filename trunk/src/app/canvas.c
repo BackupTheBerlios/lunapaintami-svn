@@ -187,13 +187,13 @@ IPTR MUIM_RGB_HandleInput ( Class *CLASS, Object *self, Msg message )
                 data->window->canvas->winEdgeHeight = data->zuneAreaTop;
 
                 // Update coordinates on display
-                STRPTR coord = AllocVec ( 20, MEMF_CLEAR );
+                STRPTR coord = AllocVec ( 20, MEMF_ANY|MEMF_CLEAR );
                 sprintf ( coord, "X: %d ", ( int )cMouseX );
-                set ( data->window->txtCoordX, MUIA_Text_Contents, ( IPTR )coord );
+                set ( data->window->txtCoordX, MUIA_Text_Contents, coord );
                 FreeVec ( coord );
-                coord = AllocVec ( 20, MEMF_CLEAR );
+                coord = AllocVec ( 20, MEMF_ANY|MEMF_CLEAR );
                 sprintf ( coord, "Y: %d ", ( int )cMouseY );
-                set ( data->window->txtCoordY, MUIA_Text_Contents, ( IPTR )coord );
+                set ( data->window->txtCoordY, MUIA_Text_Contents, coord );
                 FreeVec ( coord );
 
 
@@ -825,21 +825,25 @@ void SnapOffsetToZoom ( struct oCanvas *canv )
 
 void UpdateCanvasInfo ( struct WindowList *win )
 {
-    unsigned char frameText[ 32 ];
-    unsigned char layerText[ 32 ];
+    //unsigned char frameText[ 32 ];
+    STRPTR frameText = AllocVec(32, MEMF_ANY|MEMF_CLEAR);
+    //unsigned char layerText[ 32 ];
+    STRPTR layerText = AllocVec(32, MEMF_ANY|MEMF_CLEAR);
     int frame = ( int )( win->canvas->currentFrame + 1 );
     int frams = ( int )win->canvas->totalFrames;
     int layer = ( int )( win->canvas->currentLayer + 1 );
     int layrs = ( int )win->canvas->totalLayers;
-    sprintf ( ( unsigned char *)&frameText, _(MSG_CANVAS_FRAME), frame, frams );
-    set ( win->txtFrameInf, MUIA_Text_Contents, ( STRPTR )&frameText );
-    sprintf ( ( unsigned char *)&layerText, _(MSG_CANVAS_LAYER), layer, layrs );
-    set ( win->txtLayerInf, MUIA_Text_Contents, ( STRPTR )&layerText );
-
+    //sprintf ( ( unsigned char *)&frameText, _(MSG_CANVAS_FRAME), frame, frams );
+    sprintf ( frameText, _(MSG_CANVAS_FRAME), frame, frams );
+    set ( win->txtFrameInf, MUIA_Text_Contents, frameText );
+    sprintf ( layerText, _(MSG_CANVAS_LAYER), layer, layrs );
+    set ( win->txtLayerInf, MUIA_Text_Contents, layerText );
+    FreeVec ( frameText );
+    FreeVec ( layerText );
     // Update zoom display
     STRPTR zlevel = AllocVec ( 20, MEMF_CLEAR );
-    sprintf ( zlevel, _(MSG_CANVAS_ZOOM), ( int )win->canvas->zoom );
-    set ( win->txtZoomLevel, MUIA_Text_Contents, ( IPTR )zlevel );
+    sprintf ( zlevel, _(MSG_CANVAS_ZOOM), win->canvas->zoom );
+    set ( win->txtZoomLevel, MUIA_Text_Contents, zlevel );
     FreeVec ( zlevel );
 }
 
@@ -971,7 +975,7 @@ void addCanvaswindow (
 )
 {
     struct WindowList *temp = canvases; // Put current in temp
-    canvases = AllocVec ( sizeof ( WindowList ), MEMF_CLEAR );
+    canvases = AllocVec ( sizeof ( WindowList ), MEMF_ANY|MEMF_CLEAR );
 
     struct MUI_CustomClass *mcc =
         MUI_CreateCustomClass (
@@ -981,7 +985,7 @@ void addCanvaswindow (
         );
 
     canvases->win = MUI_NewObject ( MUIC_Window,
-        MUIA_Window_Title, __(MSG_CANVAS_UNNAMED),
+        MUIA_Window_Title, _(MSG_CANVAS_UNNAMED),
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_ID, MAKE_ID('L','P','W','C'),
