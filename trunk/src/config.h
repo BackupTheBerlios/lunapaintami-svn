@@ -25,12 +25,12 @@
 #define _lunapaint_config_
 
 #define LUNA_VERSION "0.5"
-#define LUNA_SCREEN_TITLE "Lunapaint 0.5, 2010-12-11"
+#define LUNA_SCREEN_TITLE "Lunapaint 0.5, 13.02.2011"
 #define LUNA_ABOUT_TEXT "Lunapaint 0.5\n\n" \
     "See http://developer.berlios.de/projects/lunapaintami/\n" \
     "for more information\n\n" \
     "Special thanks to:\n\n  * d980, Michal Schulz , Ola Jensen,\n    MinisterQ"
-#define VERSION "Lunapaint " LUNA_VERSION " (15.06.2010)"
+#define VERSION "Lunapaint " LUNA_VERSION " (13.02.2011)"
 #define VERSIONSTRING "$VER: " VERSION " © LunaPaint Development Team\n"
 
 struct LunapaintPrefs
