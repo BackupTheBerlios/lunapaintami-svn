@@ -11,7 +11,7 @@
 #include "strings.h"
 
 #define CATALOG_NAME     "Lunapaint.catalog"
-#define CATALOG_VERSION  0
+#define CATALOG_VERSION  1.1
 
 /*** Variables **************************************************************/
 static struct Catalog *catalog;
