@@ -30,8 +30,8 @@ void CreateProjectWindow ( struct WindowList *lst )
     get ( lst->win, MUIA_Window_Title, &windowtitle );
 
     lst->projectWin = WindowObject,
-        MUIA_Window_ScreenTitle, (IPTR) VERSION, //__(MSG_PRJ_SCR),
-        MUIA_Window_Title, __(MSG_PRJ_WIN),
+        MUIA_Window_ScreenTitle, (IPTR) VERSION,
+        MUIA_Window_Title, _(MSG_PRJ_WIN),
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_ID, MAKE_ID('L','P','P','J'),
         MUIA_Window_CloseGadget, TRUE,
@@ -39,7 +39,7 @@ void CreateProjectWindow ( struct WindowList *lst )
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_Group,
                 Child, ( IPTR )TextObject,
-                    MUIA_Text_Contents, __(MSG_PRJ_NAME),
+                    MUIA_Text_Contents, _(MSG_PRJ_NAME),
                 End,
                 Child, ( IPTR )( lst->projName = StringObject,
                     MUIA_String_MaxLen, 128,
@@ -48,7 +48,7 @@ void CreateProjectWindow ( struct WindowList *lst )
                     MUIA_CycleChain, 1,
                 End ),
                 Child, ( IPTR )TextObject,
-                    MUIA_Text_Contents, __(MSG_PRJ_AUTHOR),
+                    MUIA_Text_Contents, _(MSG_PRJ_AUTHOR),
                 End,
                 Child, ( IPTR )( lst->projAuthor = StringObject,
                     MUIA_String_MaxLen, 128,

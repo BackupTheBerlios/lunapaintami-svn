@@ -85,6 +85,7 @@ void Init_PrefsWindow ( )
     // Init the window itself
     PrefsWindow = WindowObject,
         MUIA_Window_Title, _(MSG_PREFS_WIN),
+        MUIA_Window_ScreenTitle, (IPTR) VERSION,
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_CloseGadget, TRUE,

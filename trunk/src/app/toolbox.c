@@ -698,7 +698,7 @@ void Init_ToolboxWindow ( )
                             MUIA_Frame, MUIV_Frame_None,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 64,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, __(MSG_TOOLBOX_BRUSHS), End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents, _(MSG_TOOLBOX_BRUSHS), End,
                                 Child, ( IPTR )( tbxSlider_Brushdiameter = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 100,
@@ -707,7 +707,7 @@ void Init_ToolboxWindow ( )
                             End,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 32,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents,__(MSG_TOOLBOX_STEP), End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents,_(MSG_TOOLBOX_STEP), End,
                                 Child, ( IPTR )( tbxSlider_Brushstep = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 50,
@@ -718,7 +718,7 @@ void Init_ToolboxWindow ( )
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 64,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, __(MSG_TOOLBOX_OPACITY), End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents, _(MSG_TOOLBOX_OPACITY), End,
                                 Child, ( IPTR )( tbxSlider_Brushopacity = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 255,
@@ -727,7 +727,7 @@ void Init_ToolboxWindow ( )
                             End,
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 32,
-                                Child, ( IPTR )TextObject, MUIA_Text_Contents, __(MSG_TOOLBOX_POWER), End,
+                                Child, ( IPTR )TextObject, MUIA_Text_Contents, _(MSG_TOOLBOX_POWER), End,
                                 Child, ( IPTR )( tbxSlider_Brushincrement = SliderObject,
                                     MUIA_Numeric_Min, 1,
                                     MUIA_Numeric_Max, 100,
@@ -748,7 +748,7 @@ void Init_ToolboxWindow ( )
                             Child, ( IPTR )VGroup,
                                 MUIA_Weight, 50,
                                 Child, ( IPTR )TextObject,
-                                    MUIA_Text_Contents, __(MSG_TOOLBOX_PAINT),
+                                    MUIA_Text_Contents, _(MSG_TOOLBOX_PAINT),
                                 End,
                                 Child, ( IPTR )( tbxCycPaintMode = CycleObject,
                                     MUIA_Cycle_Entries, arr_drawmodes,
@@ -756,11 +756,11 @@ void Init_ToolboxWindow ( )
                                 Child, ( IPTR )HGroup,
                                     Child, ( IPTR )TextObject,
                                         MUIA_Weight, 50,
-                                        MUIA_Text_Contents, __(MSG_TOOLBOX_DRAW),
+                                        MUIA_Text_Contents, _(MSG_TOOLBOX_DRAW),
                                     End,
                                     Child, ( IPTR )TextObject,
                                         MUIA_Weight, 50,
-                                        MUIA_Text_Contents, __(MSG_TOOLBOX_ALPHA),
+                                        MUIA_Text_Contents, _(MSG_TOOLBOX_ALPHA),
                                     End,
                                 End,
                                 Child, ( IPTR )HGroup,
@@ -785,7 +785,7 @@ void Init_ToolboxWindow ( )
                             End,
                             Child, ( IPTR )VGroup,
                                 Child, ( IPTR )TextObject,
-                                    MUIA_Text_Contents, __(MSG_TOOLBOX_BRUSHSH),
+                                    MUIA_Text_Contents, _(MSG_TOOLBOX_BRUSHSH),
                                 End,
                                 Child, ( IPTR )HGroup,
                                     MUIA_Weight, 25,
@@ -871,10 +871,6 @@ void Init_ToolboxWindow ( )
             End,
         End,
     End;
-
-    // Move to left edge of screen (todo: improve this!)
-//    int toolboxWidth = 0; get ( toolbox, MUIA_Window_Width, &toolboxWidth );
-//    set ( toolbox, MUIA_Window_LeftEdge, ( lunaPubScreen->Width - toolboxWidth ) );
 
     // set buttons
     set ( antiImage, MUIA_Background, MUII_FILL );
