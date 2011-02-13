@@ -29,8 +29,8 @@ Object *aboutWindow, *aboutWindowOk;
 void Init_AboutWindow ( )
 {
     aboutWindow = WindowObject,
-        MUIA_Window_Title, __(MSG_ABOUT_WIN),
-        MUIA_Window_ScreenTitle, __(MSG_ABOUT_SCR),
+        MUIA_Window_Title, _(MSG_ABOUT_WIN),
+        MUIA_Window_ScreenTitle, _(MSG_ABOUT_SCR),
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_CloseGadget, FALSE,
         MUIA_Window_ID, MAKE_ID('L','P','A','B'),
@@ -38,9 +38,8 @@ void Init_AboutWindow ( )
             Child, ( IPTR )GroupObject,
                 InnerSpacing(0,0),
                 MUIA_Frame, MUIV_Frame_Group,
-                Child, ( IPTR )ImageObject,
-                    MUIA_Frame, MUIV_Frame_Group,
-                    MUIA_Image_Spec, (IPTR)"3:PROGDIR:data/lunaabout_logo.png",
+                Child, MUI_NewObject(MUIC_Dtpic,
+                    MUIA_Dtpic_Name, "PROGDIR:data/lunaabout_logo.png",
                 End,
             End,
             Child, ( IPTR )GroupObject,
