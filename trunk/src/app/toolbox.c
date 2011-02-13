@@ -1399,7 +1399,14 @@ void checkMenuEvents ( int udata )
 
         // Program preferences
         case 900:
-            set ( PrefsWindow, MUIA_Window_Open, TRUE );
+            {
+                BOOL opened = FALSE;
+                get ( PrefsWindow, MUIA_Window_Open, &opened );
+                if ( opened )
+                    set ( PrefsWindow, MUIA_Window_Open, FALSE );
+                else
+                    set ( PrefsWindow, MUIA_Window_Open, TRUE );
+            }
             break;
 
         default:
