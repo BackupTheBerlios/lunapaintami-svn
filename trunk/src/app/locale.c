@@ -54,5 +54,5 @@ VOID Locale_Deinitialize(VOID)
     if(LocaleBase != NULL && catalog != NULL) CloseCatalog(catalog);
 }
 
-ADD2INIT(Locale_Initialize,   90);
-ADD2EXIT(Locale_Deinitialize, 90);
+// ADD2INIT(Locale_Initialize,   90);
+// ADD2EXIT(Locale_Deinitialize, 90);
