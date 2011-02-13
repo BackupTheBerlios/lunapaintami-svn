@@ -170,6 +170,14 @@ void Init_PrefsWindow ( )
 
 }
 
+void Exit_PrefsWindow ( )
+{
+    if (scrntypes[0] != NULL)
+        FreeVec(scrntypes[0]);
+    if (scrntypes[1] != NULL)
+        FreeVec(scrntypes[1]);
+}
+
 BOOL savePreferences ( )
 {
     struct PrefHeader head = { 0 };
