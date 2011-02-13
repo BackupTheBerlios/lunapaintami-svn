@@ -452,8 +452,8 @@ void ShowAlert ( unsigned char *text )
 void Init_QuitWindow ( )
 {
     QuitWindow = WindowObject,
-        MUIA_Window_Title, __(MSG_QUIT_WIN),
-        MUIA_Window_ScreenTitle, __(MSG_SCR_QUIT),
+        MUIA_Window_Title, _(MSG_QUIT_WIN),
+        MUIA_Window_ScreenTitle, _(MSG_SCR_QUIT),
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_ID, MAKE_ID('L','P','Q','W'),
         WindowContents, ( IPTR )VGroup,

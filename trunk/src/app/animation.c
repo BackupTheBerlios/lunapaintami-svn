@@ -36,13 +36,11 @@ void Init_AnimationWindow ( )
     arr_onion[1] = _(MSG_ANIM_SIMPLEONION);
 
     WindowAnimation = WindowObject,
-        MUIA_Window_Title, __(MSG_ANIM_CONTROL),
+        MUIA_Window_Title, _(MSG_ANIM_CONTROL),
         MUIA_Window_ScreenTitle, ( IPTR )VERSION,
         MUIA_Window_CloseGadget, FALSE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_ID, MAKE_ID('L','P','W','A'),
-//        MUIA_Window_LeftEdge, 0,
-//        MUIA_Window_TopEdge, ( lunaPubScreen->BarHeight + 1 ),
         WindowContents, ( IPTR )HGroup,
             Child, ( IPTR )GroupObject,
                 MUIA_Frame, MUIV_Frame_None,

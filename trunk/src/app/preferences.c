@@ -84,7 +84,7 @@ void Init_PrefsWindow ( )
     layerbacktypes[3] = _(MSG_PREFS_WHITE);
     // Init the window itself
     PrefsWindow = WindowObject,
-        MUIA_Window_Title, __(MSG_PREFS_WIN),
+        MUIA_Window_Title, _(MSG_PREFS_WIN),
         MUIA_Window_SizeGadget, TRUE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
         MUIA_Window_CloseGadget, TRUE,
@@ -93,7 +93,7 @@ void Init_PrefsWindow ( )
             Child, ( IPTR )RegisterObject,
                 MUIA_Register_Titles, titles,
                 Child, ( IPTR )GroupObject,
-                    MUIA_FrameTitle, __(MSG_PREFS_WIN_SCR),
+                    MUIA_FrameTitle, _(MSG_PREFS_WIN_SCR),
                     MUIA_Frame, MUIV_Frame_Group,
                     MUIA_CycleChain, 1,
                     Child, ( IPTR )( PrefsCycScrType = CycleObject,
@@ -103,7 +103,7 @@ void Init_PrefsWindow ( )
                     End ),
                 End,
                 Child, ( IPTR )GroupObject,
-                    MUIA_FrameTitle, __(MSG_PREFS_LAYERS),
+                    MUIA_FrameTitle, _(MSG_PREFS_LAYERS),
                     MUIA_Frame, MUIV_Frame_Group,
                     MUIA_CycleChain, 1,
                     Child, ( IPTR )( PrefsLayBackMode = CycleObject,

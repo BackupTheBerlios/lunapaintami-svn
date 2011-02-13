@@ -511,7 +511,7 @@ void Init_PaletteWindow ( )
         );
 
     paletteWindow = WindowObject,
-        MUIA_Window_Title, __(MSG_PALETTE_WIN),
+        MUIA_Window_Title, _(MSG_PALETTE_WIN),
         MUIA_Window_ScreenTitle, (IPTR) VERSION,
         MUIA_Window_SizeGadget, FALSE,
         MUIA_Window_Screen, ( IPTR )lunaPubScreen,
@@ -523,14 +523,14 @@ void Init_PaletteWindow ( )
                     Child, ( IPTR )VGroup,
                         Child, ( IPTR )HGroup,
                             Child, ( IPTR )VGroup,
-                                Child, ( IPTR )( palBtnCopy = SimpleButton ( __(MSG_PALETTE_COPY) )),
-                                Child, ( IPTR )( palBtnPaste = SimpleButton ( __(MSG_PALETTE_PASTE) )),
-                                Child, ( IPTR )( palBtnClear = SimpleButton ( __(MSG_PALETTE_CLEAR) )),
+                                Child, ( IPTR )( palBtnCopy = SimpleButton ( _(MSG_PALETTE_COPY) )),
+                                Child, ( IPTR )( palBtnPaste = SimpleButton ( _(MSG_PALETTE_PASTE) )),
+                                Child, ( IPTR )( palBtnClear = SimpleButton ( _(MSG_PALETTE_CLEAR) )),
                             End,
                             Child, ( IPTR )VGroup,
-                                Child, ( IPTR )( palBtnReverse = SimpleButton ( __(MSG_PALETTE_REVERSE) )),
-                                Child, ( IPTR )( palBtnSwap = SimpleButton ( __(MSG_PALETTE_SWAP) )),
-                                Child, ( IPTR )( palBtnSpread = SimpleButton ( __(MSG_PALETTE_SPREAD) )),
+                                Child, ( IPTR )( palBtnReverse = SimpleButton ( _(MSG_PALETTE_REVERSE) )),
+                                Child, ( IPTR )( palBtnSwap = SimpleButton ( _(MSG_PALETTE_SWAP) )),
+                                Child, ( IPTR )( palBtnSpread = SimpleButton ( _(MSG_PALETTE_SPREAD) )),
                             End,
                         End,
                         Child, ( IPTR )VGroup,
@@ -544,7 +544,7 @@ void Init_PaletteWindow ( )
                                 MUIA_String_Format, MUIV_String_Format_Center,
                                 MUIA_Frame, MUIV_Frame_String,
                             End,
-                            Child, ( IPTR )SimpleButton ( __(MSG_PALETTE_WEB) ),
+                            Child, ( IPTR )SimpleButton ( _(MSG_PALETTE_WEB) ),
                         End,
                     End,
                     Child, ( IPTR )VGroup,
@@ -595,9 +595,9 @@ void Init_PaletteWindow ( )
                     End,
                 End,
                 Child, HGroup,
-                    Child, ( IPTR )( palBtnLoad = SimpleButton ( __(MSG_PALETTE_LOAD) ) ),
-                    Child, ( IPTR )( palBtnSave = SimpleButton ( __(MSG_PALETTE_SAVE) ) ),
-                    Child, ( IPTR )( palBtnUse = SimpleButton (  __(MSG_PALETTE__USE)  )),
+                    Child, ( IPTR )( palBtnLoad = SimpleButton ( _(MSG_PALETTE_LOAD) ) ),
+                    Child, ( IPTR )( palBtnSave = SimpleButton ( _(MSG_PALETTE_SAVE) ) ),
+                    Child, ( IPTR )( palBtnUse = SimpleButton (  _(MSG_PALETTE__USE)  )),
                 End,
             End,
         End,
@@ -711,6 +711,7 @@ ULONG savePalette ( )
             Write ( myfile, globalPalette, 4 * 256 );
             Close ( myfile );
         }
+        // TODO: Comprehensive error requester
         else printf ( "Failed to write palette..\n" );
         FreeVec ( filename );
     }
@@ -730,6 +731,7 @@ ULONG loadPalette ( )
             Read ( myfile, globalPalette, 4 * 256 );
             Close ( myfile );
         }
+        // TODO: Comprehensive error requester
         else printf ( "Failed to load palette..\n" );
         FreeVec ( filename );
     }
