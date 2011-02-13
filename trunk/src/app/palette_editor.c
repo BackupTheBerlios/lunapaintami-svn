@@ -682,6 +682,10 @@ void Init_PaletteMethods ( )
         palBtnLoad, MUIM_Notify, MUIA_Pressed, FALSE,
         palBtnLoad, 3, MUIM_CallHook, &paletteLoad_hook, MUIV_TriggerValue
     );
+    DoMethod (
+        palBtnUse, MUIM_Notify, MUIA_Pressed, FALSE,
+        palBtnUse, 3, MUIM_CallHook, &paletteClose_hook, MUIV_TriggerValue
+    );
 
     // Menu check
     Object *strip = NULL;
@@ -694,6 +698,10 @@ void Init_PaletteMethods ( )
         DoMethod (
             paletteWindow, MUIM_Notify, MUIA_Window_Open, TRUE,
             (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, TRUE
+        );
+        DoMethod (
+            palBtnUse, MUIM_Notify, MUIA_Pressed, FALSE,
+            (IPTR) strip, 3, MUIM_Set, MUIA_Menuitem_Checked, FALSE
         );
     }
 }
@@ -714,6 +722,7 @@ ULONG savePalette ( )
         // TODO: Comprehensive error requester
         else printf ( "Failed to write palette..\n" );
         FreeVec ( filename );
+
     }
     return 0;
 }
