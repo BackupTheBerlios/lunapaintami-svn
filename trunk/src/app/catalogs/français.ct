@@ -1,4 +1,4 @@
-## version $VER: Lunapaint.catalog 1.0 (25.01.2011)
+## version $VER: Lunapaint.catalog 1.1 (13.02.2011)
 ## language français
 ## codeset 0
 ;
@@ -284,7 +284,7 @@ MSG_CANVAS_LAYER
 Couche : %d/%d
 ;
 MSG_CANVAS_ZOOM
-Zoom : x%d
+Zoom : %dx
 ;
 MSG_CANVAS_UNNAMED
 Sans titre
@@ -600,7 +600,7 @@ MSG_TOOLBOX_PICK
 Pipette
 ;
 MSG_LAYERS_OPACITY
-Opacité : %d%s
+Opacité : %d%
 ;
 MSG_CORE_LAYER_EMPTY
 Couche vide

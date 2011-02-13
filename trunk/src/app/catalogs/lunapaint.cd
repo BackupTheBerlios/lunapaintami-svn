@@ -591,7 +591,7 @@ MSG_TOOLBOX_PICK (//)
 Pick color
 ;
 MSG_LAYERS_OPACITY (//)
-Opacity: %d%s
+Opacity: %d%
 ;
 MSG_CORE_LAYER_EMPTY (//)
 Empty layer
