@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <proto/exec.h>
+
 #include "canvas.h"
 #include "definitions.h"
 
