@@ -25,11 +25,11 @@
 #define _lunapaint_config_
 
 #define LUNA_VERSION "0.5"
-#define LUNA_ABOUT_TEXT "Lunapaint 0.5\n\n" \
-    "See http://developer.berlios.de/projects/lunapaintami/\n" \
+#define LUNA_ABOUT_TEXT "Lunapaint " LUNA_VERSION "\n\n" \
+    "See http://developer.berlios.de/\nprojects/lunapaintami\n" \
     "for more information\n\n" \
-    "Special thanks to:\n\n* d980, Michal Schulz , Ola Jensen,\nMinisterQ"
-#define VERSION "Lunapaint " LUNA_VERSION " (13.02.2011)"
+    "Special thanks to:\n\n* d980,\nMichal Schulz,\nOla Jensen,\nMinisterQ"
+#define VERSION "Lunapaint " LUNA_VERSION " ("__DATE__ ")"
 #define VERSIONSTRING "$VER: " VERSION " © LunaPaint Development Team\n"
 
 #ifdef __amigaos4__
