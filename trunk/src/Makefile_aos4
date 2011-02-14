@@ -11,7 +11,7 @@ EXE=../Lunapaint
 
 OBJS = \
 main.o \
-morphos.o \
+aos4_mos.o \
 	core/drawtools.o \
 	core/canvas.o \
 	core/color.o \
