@@ -65,7 +65,7 @@ Object *offsetWindow, *offsetWindowOk, *offsetWindowCancel, *offsetWindowX, *off
 
 unsigned int *PreviewRectData;
 
-static STRPTR arr_drawmodes[] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static STRPTR arr_drawmodes[] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 static STRPTR arr_fillmode[]  = { NULL, NULL, NULL, NULL};
 static STRPTR arr_colorctrl[] = { NULL, NULL, NULL};
 static STRPTR arr_grid[]      = { NULL, NULL, NULL};
@@ -153,7 +153,7 @@ void nextPaletteColor ( )
 
 IPTR tbxPaintPreview ( )
 {
-    if ( !XGET( toolbox, MUIA_Window_Open ) ) return 0;
+    if ( !XGET( toolbox, MUIA_Window_Open ) ) return (IPTR)NULL;
 
     unsigned int w = XGET ( tbxAreaPreview, MUIA_Width );
     unsigned int h = XGET ( tbxAreaPreview, MUIA_Height );
@@ -271,7 +271,7 @@ DISPATCHERPROTO(tbxPalette)
                     case 8:
                         brushTool.paintmode = LUNA_PAINTMODE_UNERASE;
                         break;
-                    default: return 0;
+                    default: return (IPTR)NULL;
                 }
                 if ( globalBrushMode == 0 )
                     makeToolBrush ( );
@@ -380,13 +380,13 @@ DISPATCHERPROTO(tbxPalette)
         default:
             return DoSuperMethodA ( cl, obj, msg );
     }
-    return ( IPTR )0;
+    return ( IPTR )NULL;
 }
 
 
 IPTR tbxPaletteRedraw ( )
 {
-    if ( !XGET ( toolbox, MUIA_Window_Open ) ) return 0;
+    if ( !XGET ( toolbox, MUIA_Window_Open ) ) return (IPTR)NULL;
 
     int topedge = 0, leftedge = 0, w = 0, h = 0;
     get ( tbxAreaPalette, MUIA_TopEdge, &topedge );
@@ -440,7 +440,7 @@ IPTR tbxPaletteRedraw ( )
 
 IPTR tbxPaletteThink ( struct MUIP_HandleInput *msg )
 {
-    if ( !XGET ( toolbox, MUIA_Window_Open ) ) return 0;
+    if ( !XGET ( toolbox, MUIA_Window_Open ) ) return (IPTR)NULL;
 
     int topedge = 0, leftedge = 0, w = 0, h = 0;
     get ( tbxAreaPalette, MUIA_TopEdge, &topedge );
