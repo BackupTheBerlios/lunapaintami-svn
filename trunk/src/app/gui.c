@@ -32,7 +32,7 @@ Object *mainPulldownMenu;
 
 /*
     - The MUI "Application" runs on *PaintApp
-    - The canvases is managed in the canvases list
+    - The canvases are managed in the canvases list
 */
 Object *PaintApp;
 struct WindowList *canvases;
