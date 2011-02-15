@@ -231,7 +231,7 @@ IPTR MUIM_RGB_HandleInput ( Class *CLASS, Object *self, Msg message )
         }
 
     }
-    return 0;
+    return ( IPTR )NULL;
 }
 
 IPTR MUIM_RGB_Setup ( Class *CLASS, Object *self, Msg message )
