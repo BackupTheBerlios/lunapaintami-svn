@@ -327,13 +327,7 @@ unsigned int *renderCanvas (
 
                         // Get color from current canvas buffer
                         struct rgba64 col2t = *( struct rgba64 *)&currentBuf[ canvymul + x ];
-/*
-                        // Convert 16-bit pr pixel to 8
-                        int     a = col2t.r / 256,
-                                r = col2t.g / 256,
-                                g = col2t.b / 256,
-                                b = col2t.a / 256;
-*/
+
                         // Convert 16-bit pr pixel to 8
                         int     r = col2t.a / 256,
                                 g = col2t.b / 256,
@@ -384,9 +378,9 @@ unsigned int *renderCanvas (
                             {
                                 struct rgba32 blend = *( struct rgba32 *)&test;
                                 double balph = blend.a / 255.0;
-                                col1.r -= ( col1.r - blend.b ) * balph;
+                                col1.r -= ( col1.r - blend.r ) * balph;
                                 col1.g -= ( col1.g - blend.g ) * balph;
-                                col1.b -= ( col1.b - blend.r ) * balph;
+                                col1.b -= ( col1.b - blend.b ) * balph;
                                 if ( col1.a + blend.a < 255 )
                                     col1.a += blend.a;
                                 else col1.a = 255;
