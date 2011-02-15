@@ -26,9 +26,6 @@
 
 #include "canvas.h"
 
-#ifdef __amigaos4__
-#define RECTFMT_RAW (5UL)
-#endif
 
 BOOL isZooming;
 BOOL isScrolling;
@@ -768,7 +765,7 @@ IPTR _RGBitmapRedraw ( Class *CLASS, Object *self )
                     WritePixelArray (
                         data->window->canvas->screenbuffer,
                         0, 0, data->window->canvas->scrStorageWidth * 4, _rp ( data->window->area ),
-                        data->rgbAreaLeft, data->rgbAreaTop, cvisWidth, cvisHeight, RECTFMT_RAW
+                        data->rgbAreaLeft, data->rgbAreaTop, cvisWidth, cvisHeight, RECTFMT_RGBA
                     );
                 }
                 D(bug("2b. Redraw complete\n"));
@@ -794,7 +791,7 @@ IPTR _RGBitmapRedraw ( Class *CLASS, Object *self )
                 WritePixelArray (
                     data->window->canvas->screenstorage,
                     0, 0, data->window->canvas->scrStorageWidth * 4, _rp ( data->window->area ),
-                    data->rgbAreaLeft, data->rgbAreaTop, cvisWidth, cvisHeight, RECTFMT_RAW
+                    data->rgbAreaLeft, data->rgbAreaTop, cvisWidth, cvisHeight, RECTFMT_RGBA
                 );
             }
         }
@@ -810,7 +807,7 @@ IPTR _RGBitmapRedraw ( Class *CLASS, Object *self )
                 data->window->canvas->screenstorage,
                 0, 0, data->window->canvas->scrStorageWidth * 4,
                 _rp ( data->window->area ),
-                data->rgbAreaLeft, data->rgbAreaTop, data->rgbAreaWidth, data->rgbAreaHeight, RECTFMT_RAW
+                data->rgbAreaLeft, data->rgbAreaTop, data->rgbAreaWidth, data->rgbAreaHeight, RECTFMT_RGBA
             );
         }
     }
@@ -882,7 +879,7 @@ IPTR ScrollCanvas ( int x, int y )
             globalActiveCanvas->scrStorageWidth * 4,
             _rp ( globalActiveWindow->area ),
             areaLeft, areaTop, globalActiveCanvas->scrStorageWidth, globalActiveCanvas->scrStorageHeight,
-            RECTFMT_RAW
+            RECTFMT_RGBA
         );
     }
 
@@ -1389,7 +1386,7 @@ void blitAreaRect (
                 canvas->screenbuffer, 0, 0, canvas->visibleWidth * 4, rp,
                 ( int )sx + _getAreaOffsetX ( ) + _getAreaLeft ( ),
                 ( int )sy + _getAreaOffsetY ( ) + _getAreaTop ( ),
-                ( int )sw, ( int )sh, RECTFMT_RAW
+                ( int )sw, ( int )sh, RECTFMT_RGBA
             );
         }
     }

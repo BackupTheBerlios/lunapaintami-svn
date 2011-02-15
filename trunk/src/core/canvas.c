@@ -327,13 +327,18 @@ unsigned int *renderCanvas (
 
                         // Get color from current canvas buffer
                         struct rgba64 col2t = *( struct rgba64 *)&currentBuf[ canvymul + x ];
-
+/*
                         // Convert 16-bit pr pixel to 8
                         int     a = col2t.r / 256,
                                 r = col2t.g / 256,
                                 g = col2t.b / 256,
                                 b = col2t.a / 256;
-
+*/
+                        // Convert 16-bit pr pixel to 8
+                        int     r = col2t.a / 256,
+                                g = col2t.b / 256,
+                                b = col2t.g / 256,
+                                a = col2t.r / 256;
 
                         // Apply layer opacity
                         if ( buf->opacity < 100 ) a = a / 100.0 * buf->opacity;
