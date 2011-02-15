@@ -1072,7 +1072,7 @@ void checkMenuEvents ( int udata )
                 setActiveBuffer ( globalActiveCanvas );
                 globalActiveCanvas->winHasChanged = TRUE;
                 set ( globalActiveWindow->win, MUIA_Window_Open, TRUE );
-                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw, NULL );
+                DoMethod ( globalActiveWindow->area, MUIM_Luna_Canvas_Redraw);
             }
             break;
 
